@@ -40,11 +40,13 @@ std::shared_ptr<Player> World::AddPlayer() {
 
 
 
-std::shared_ptr<Unit> World::FindUnit(uint64_t unit_id) {
+std::shared_ptr<Unit> World::FindUnit(uint64_t owner_id, uint64_t unit_id) {
     for (auto& player : players) {
-        auto unit = player.second->units.find(unit_id);
-        if (unit != player.second->units.end())
-            return unit->second;
+        if (player.first == owner_id) {
+            auto unit = player.second->units.find(unit_id);
+            if (unit != player.second->units.end())
+                return unit->second;
+        }
     }
 
     return nullptr;

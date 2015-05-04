@@ -32,12 +32,26 @@ void Renderer::ProcessInputs() {
 void Renderer::RenderWorld() {
     window->clear();
 
-
-
-
+    RenderLand();
+    RenderUnits();
     RenderInterface();
 
     window->display();
+}
+
+/**
+ * Render the land for the game.
+ */
+void Renderer::RenderLand() {
+
+}
+
+/**
+ * Render the units for the game.
+ */
+void Renderer::RenderUnits() {
+    // For now just drawing tiny circles until we can get real graphics done
+
 }
 
 /**

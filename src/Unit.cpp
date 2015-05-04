@@ -50,7 +50,7 @@ void Unit::ProcessRequest(Request& request, double duration) {
         // Commands unit to attack a unit if within attack range, if not within range will instead walk towards unit
         if (action == ActionType::WALK or action == ActionType::IDLE or action == ActionType::NONE or
             action == ActionType::ATTACK) {
-            Attack(static_cast<uint64_t>(request.int_data[0]), duration);
+            Attack(static_cast<uint64_t>(request.int_data[1]), static_cast<uint64_t>(request.int_data[0]), duration);
         }
     }
 }
@@ -69,13 +69,15 @@ Request Unit::MakeDecision() {
     auto closest_enemy = FindClosestEnemy();
     if (closest_enemy and (type == UnitType::BASE or type == UnitType::FIGHTER or type == UnitType::BRUTE)) {
         request.type = RequestType::ATTACK;
-        request.int_data[0] = static_cast<int>(closest_enemy->id);
+        request.int_data[0] = static_cast<int>(closest_enemy->owner_id);
+        request.int_data[1] = static_cast<int>(closest_enemy->id);
     } else {
         // No enemies, try to find resource to gather
         auto closest_resource = FindClosestResource();
         if (closest_resource and (type == UnitType::BASE or type == UnitType::GATHERER)) {
             request.type = RequestType::GATHER;
-            request.int_data[0] = static_cast<int>(closest_resource->id);
+            request.int_data[0] = static_cast<int>(closest_resource->owner_id);
+            request.int_data[1] = static_cast<int>(closest_resource->id);
         } else {
             // No enemies to attack and no resources to gather, so just wander around
             auto wander_position = RandomWanderLocation();
@@ -158,8 +160,8 @@ void Unit::WalkTo(sf::Vector2f destination, double duration) {
 /**
  * Helper function to process an attack (either a new attack, or an ongoing attack).
  */
-void Unit::Attack(uint64_t target, double duration) {
-    auto target_unit = world->FindUnit(target);
+void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
+    auto target_unit = world->FindUnit(target_owner, target);
 
     if (action == ActionType::ATTACK) {
         // Complete current attack (regardless of what the new target is)
@@ -180,7 +182,7 @@ void Unit::Attack(uint64_t target, double duration) {
             action_target = target;
             action_duration = 0.0;
 
-            Attack(target, duration);
+            Attack(target, target_owner,duration);
         } else {
             // Outside attack range, walk towards target
             WalkTo(target_position, duration);

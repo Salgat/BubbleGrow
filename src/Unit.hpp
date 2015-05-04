@@ -25,10 +25,10 @@ private:
     std::shared_ptr<Unit> FindClosestResource();
 
     void WalkTo(sf::Vector2f destination, double duration);
-    void Attack(uint64_t target, double duration);
+    void Attack(uint64_t target, uint64_t target_owner, double duration);
 
 public:
-    uint64_t id;
+    uint64_t id; // Each id/owner_id pair is assumed to be unique, in that no two units will ever have the same pair
     uint64_t owner_id;
     std::shared_ptr<Player> owner; // Used to gain knowledge like current location of player (owner)
     std::shared_ptr<World> world;

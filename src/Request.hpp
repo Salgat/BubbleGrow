@@ -44,9 +44,11 @@ struct Request {
  *
  *  ATTACK:
  *   - type = RequestType::ATTACK
- *   - int_data[0] = target id
+ *   - int_data[0] = target owner id
+ *   - int_data[1] = target id
  *
  *  GATHER:
  *   - type = RequestType::GATHER
- *   - int_data[0] = target id
+ *   - int_data[0] = target owner id
+ *   - int_data[1] = target id
  */

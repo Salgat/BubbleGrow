@@ -27,6 +27,9 @@ public:
     void ProcessInputs(); // Use player->requests to add input requests
 
     void RenderWorld();
+
+    void RenderLand();
+    void RenderUnits();
     void RenderInterface();
 };
 
