@@ -61,9 +61,9 @@ void Unit::ProcessRequest(Request& request, double duration) {
  * Todo: May be more efficient to pass in a reference of a Request to modify.
  * Todo 2: Calculating closest_enemy and closest_resource before checking unit type is inefficient.
  */
-Request Unit::MakeDecision() {
-    auto request = Request();
-    request.type = RequestType::NONE;
+void Unit::MakeDecision(Request& request) {
+    //auto request = Request();
+    //request.type = RequestType::NONE;
 
     // Attacking is prioritized
     auto closest_enemy = FindClosestEnemy();
@@ -78,7 +78,7 @@ Request Unit::MakeDecision() {
             request.type = RequestType::GATHER;
             request.int_data[0] = static_cast<int>(closest_resource->owner_id);
             request.int_data[1] = static_cast<int>(closest_resource->id);
-        } else {
+        } else if (action != ActionType::WALK) {
             // No enemies to attack and no resources to gather, so just wander around
             auto wander_position = RandomWanderLocation();
             request.type = RequestType::WALK;
@@ -87,7 +87,7 @@ Request Unit::MakeDecision() {
         }
     }
 
-    return request;
+    //return request;
 }
 
 /**
@@ -136,8 +136,8 @@ inline double Unit::CalculateDistanceTo(sf::Vector2f target_position) {
  */
 inline sf::Vector2f Unit::RandomWanderLocation() {
     // Choose a random angle (0 to 2*PI) and calculate position based off direction * wander_range
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 2*PI);
     double random_angle = dis(gen);
     double wander_range = owner->wander_range;
@@ -151,6 +151,13 @@ inline sf::Vector2f Unit::RandomWanderLocation() {
  */
 void Unit::WalkTo(sf::Vector2f destination, double duration) {
     double distance_traveled = duration * CalculateWalkSpeed(); // distance = time * speed
+
+    // First make sure unit isn't already at position
+    if (CalculateDistanceTo(destination) < distance_traveled) {
+        action = ActionType::IDLE;
+        return;
+    }
+
     double angle = atan2(destination.y - position.y, destination.x - position.x);
     position = sf::Vector2f(static_cast<float>(position.x + distance_traveled*cos(angle)),
                             static_cast<float>(position.y + distance_traveled*sin(angle)));

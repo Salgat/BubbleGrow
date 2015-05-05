@@ -49,7 +49,7 @@ public:
 
     Unit();
     void Update(double duration);
-    Request MakeDecision();
+    void MakeDecision(Request& request);
     void ProcessRequest(Request& request, double duration);
 
 

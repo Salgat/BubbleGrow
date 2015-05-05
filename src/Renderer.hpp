@@ -28,8 +28,9 @@ public:
 
     void RenderWorld();
 
-    void RenderLand();
+    void RenderMap();
     void RenderUnits();
+    //void RenderMiniMap();
     void RenderInterface();
 };
 

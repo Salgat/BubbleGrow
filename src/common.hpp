@@ -75,7 +75,7 @@ int const BRUTE_MAX_HEALTH = 200;
 int const SCOUT_MAX_HEALTH = 50;
 
 // Walk speed (meters/second)
-double const BASE_WALK_SPEED = 1.0;
+double const BASE_WALK_SPEED = 20.0;
 double const GATHERER_WALK_SPEED = 1.0;
 double const FIGHTER_WALK_SPEED = 1.0;
 double const BRUTE_WALK_SPEED = 0.7;

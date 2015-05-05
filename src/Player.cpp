@@ -46,7 +46,7 @@ void Player::ProcessRequests(double duration) {
 void Player::MakeDecisions() {
     // Todo: Parallelize
     for (auto& unit : units) {
-        unit_requests.find(unit.first)->second = unit.second->MakeDecision();
+        unit.second->MakeDecision(unit_requests.find(unit.first)->second);
     }
 }
 
@@ -58,7 +58,7 @@ void Player::CreateUnits(int amount, UnitType type) {
         auto resource_cost = amount * BASE_RESOURCE_COST;
         if (resource_cost > resources) {
             // Can't afford to create requested amount, create maximum we can afford
-            amount = resources % BASE_RESOURCE_COST;
+            amount = resources / BASE_RESOURCE_COST;
         }
 
         while (amount-- > 0) {

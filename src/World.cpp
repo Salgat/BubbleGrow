@@ -6,7 +6,8 @@
 #include "Player.hpp"
 
 
-World::World() {
+World::World()
+    : player_id_count(0) {
 
 }
 
@@ -14,6 +15,8 @@ World::World() {
  * Processes the game for the given duration, including unit AI, user input, request processing, etc.
  */
 void World::UpdateAndProcess(double duration) {
+    //std::cout << "Update Frequency: " << 1.0/duration << std::endl;
+
     // Update each unit
     for (auto& player : players) {
         player.second->Update(duration);
@@ -34,8 +37,11 @@ void World::UpdateAndProcess(double duration) {
 }
 
 std::shared_ptr<Player> World::AddPlayer() {
+    auto player = std::make_shared<Player>();
+    player->id = ++player_id_count;
+    players[player->id] = player;
 
-    return nullptr;
+    return player;
 }
 
 

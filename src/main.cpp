@@ -1,5 +1,6 @@
 #include "common.hpp"
 #include "World.hpp"
+#include "Player.hpp"
 #include "Renderer.hpp"
 
 int main() {
@@ -9,7 +10,9 @@ int main() {
     auto world = std::make_shared<World>();
     auto player = world->AddPlayer();
     if (player) {
-
+        player->name = "Test_Player";
+        player->resources = 1000;
+        player->CreateUnits(1000, UnitType::BASE);
     } else {
         //return 1;
     }
@@ -21,11 +24,12 @@ int main() {
 
     // Start game loop
     bool running = true;
-    while(running) {
+    sf::Clock clock;
+    while(running and renderer->window->isOpen()) {
         running = renderer->PollEvents();
         renderer->ProcessInputs();
 
-        world->UpdateAndProcess(1.0);
+        world->UpdateAndProcess(clock.restart().asSeconds());
 
         renderer->RenderWorld();
     }

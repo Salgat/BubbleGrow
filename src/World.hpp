@@ -15,6 +15,7 @@ class Unit;
  */
 class World : public std::enable_shared_from_this<World> {
 private:
+    uint64_t player_id_count;
 
 public:
     std::unordered_map<uint64_t, std::shared_ptr<Player>> players;
