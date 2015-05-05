@@ -140,7 +140,8 @@ inline sf::Vector2f Unit::RandomWanderLocation() {
     static std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 2*PI);
     double random_angle = dis(gen);
-    double wander_range = owner->wander_range;
+    std::uniform_real_distribution<> dis2(0, owner->wander_range);
+    double wander_range = dis2(gen);
 
     return sf::Vector2f(static_cast<float>(wander_range*std::cos(random_angle)),
                         static_cast<float>(wander_range*std::sin(random_angle)));
