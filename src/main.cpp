@@ -9,10 +9,17 @@ int main() {
     // Setup game state
     auto world = std::make_shared<World>();
     auto player = world->AddPlayer();
-    if (player) {
+    auto enemy_player = world->AddPlayer();
+    if (player and enemy_player) {
+        player->position = sf::Vector2f(0.0, 0.0);
         player->name = "Test_Player";
         player->resources = 1000;
-        player->CreateUnits(1000, UnitType::BASE);
+        player->CreateUnits(5, UnitType::BASE);
+
+        enemy_player->position = sf::Vector2f(10.0, 10.0);
+        enemy_player->name = "Test_Computer_Player";
+        enemy_player->resources = 1000;
+        enemy_player->CreateUnits(2, UnitType::BASE);
     } else {
         //return 1;
     }

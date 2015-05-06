@@ -25,7 +25,8 @@ Player::Player()
  */
 void Player::Update(double duration) {
     for (auto& unit : units) {
-        unit.second->Update(duration);
+        if (unit.second->health[0] > 0)
+            unit.second->Update(duration);
     }
 }
 
@@ -36,7 +37,8 @@ void Player::ProcessRequests(double duration) {
     // Todo: Parallelize
     for (auto& request : unit_requests) {
         auto unit = units.find(request.first)->second;
-        unit->ProcessRequest(request.second, duration);
+        if (unit->health[0] > 0)
+            unit->ProcessRequest(request.second, duration);
     }
 }
 
@@ -46,7 +48,8 @@ void Player::ProcessRequests(double duration) {
 void Player::MakeDecisions() {
     // Todo: Parallelize
     for (auto& unit : units) {
-        unit.second->MakeDecision(unit_requests.find(unit.first)->second);
+        if (unit.second->health[0] > 0)
+            unit.second->MakeDecision(unit_requests.find(unit.first)->second);
     }
 }
 

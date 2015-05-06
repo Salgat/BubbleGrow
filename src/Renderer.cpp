@@ -39,7 +39,7 @@ void Renderer::ProcessInputs() {
  * Render the current game world.
  */
 void Renderer::RenderWorld() {
-    window->clear();
+    window->clear(sf::Color(255, 255, 255));
 
     RenderMap();
     RenderUnits();
@@ -66,15 +66,22 @@ void Renderer::RenderUnits() {
     double scale = 20.0;
 
     // For now just drawing tiny circles until we can get real graphics done
-    sf::CircleShape circle(5);
-    circle.setFillColor(sf::Color(100, 250, 50));
-
+    sf::Color player_colors[] = {sf::Color::Red, sf::Color::Green, sf::Color::Blue, sf::Color::Yellow};
+    std::size_t count = 0;
+    sf::CircleShape circle(10);
     for (auto& player_reference : world->players) {
         for (auto& unit : player_reference.second->units) {
+            if (unit.second->health[0] > 0) {
+                circle.setFillColor(player_colors[count % sizeof(player_colors)]);
+            } else {
+                circle.setFillColor(sf::Color::Black);
+            }
+
             circle.setPosition((unit.second->position.x - player_position.x)*scale + RESOLUTION_X/2,
                                (unit.second->position.y - player_position.y)*scale + RESOLUTION_Y/2);
             window->draw(circle);
         }
+        count++;
     }
 }
 

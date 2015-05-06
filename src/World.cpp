@@ -38,6 +38,7 @@ void World::UpdateAndProcess(double duration) {
 
 std::shared_ptr<Player> World::AddPlayer() {
     auto player = std::make_shared<Player>();
+    player->world = shared_from_this();
     player->id = ++player_id_count;
     players[player->id] = player;
 

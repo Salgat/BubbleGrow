@@ -44,7 +44,7 @@ void Unit::ProcessRequest(Request& request, double duration) {
     } else if (request.type == RequestType::WALK) {
         // Commands a unit to start walking in the direction provided
         if (action == ActionType::WALK or action == ActionType::IDLE or action == ActionType::NONE) {
-            WalkTo(sf::Vector2f(request.float_data[0], request.float_data[1]), duration);
+            WalkTo(sf::Vector2f(request.float_data[0], request.float_data[1]), duration, true);
         }
     } else if (request.type == RequestType::ATTACK) {
         // Commands unit to attack a unit if within attack range, if not within range will instead walk towards unit
@@ -150,19 +150,19 @@ inline sf::Vector2f Unit::RandomWanderLocation() {
 /**
  * Helper function to "walk" the unit towards destination.
  */
-void Unit::WalkTo(sf::Vector2f destination, double duration) {
+void Unit::WalkTo(sf::Vector2f destination, double duration, bool update_action) {
     double distance_traveled = duration * CalculateWalkSpeed(); // distance = time * speed
 
     // First make sure unit isn't already at position
     if (CalculateDistanceTo(destination) < distance_traveled) {
-        action = ActionType::IDLE;
+        if (update_action) action = ActionType::IDLE;
         return;
     }
 
     double angle = atan2(destination.y - position.y, destination.x - position.x);
     position = sf::Vector2f(static_cast<float>(position.x + distance_traveled*cos(angle)),
                             static_cast<float>(position.y + distance_traveled*sin(angle)));
-    action = ActionType::WALK;
+    if (update_action) action = ActionType::WALK;
 }
 
 /**
@@ -176,7 +176,8 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
         if (action_duration >= CalculateAttackSpeed()) {
             // Attack has finished
             if (target_unit)
-                target_unit->pending_damage.fetch_add(CalculateAttackDamage());
+                target_unit->health[0].fetch_add(-1 * CalculateAttackDamage());
+                //target_unit->pending_damage.fetch_add(-1 * CalculateAttackDamage());
             action = ActionType::IDLE;
         } else {
             action_duration += duration;
@@ -184,7 +185,7 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
     } else if (target_unit) {
         auto target_position = target_unit->position;
         auto range = CalculateDistanceTo(target_position);
-        if (CalculateAttackRange() <= range) {
+        if (CalculateAttackRange() >= range) {
             // Start a new attack
             action = ActionType::ATTACK;
             action_target = target;
@@ -193,8 +194,11 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
             Attack(target, target_owner,duration);
         } else {
             // Outside attack range, walk towards target
-            WalkTo(target_position, duration);
+            WalkTo(target_position, duration, false);
         }
+    } else {
+        // No enemy, set action back to idle
+        action = ActionType::IDLE;
     }
 }
 
@@ -202,8 +206,23 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
  * Returns shared_ptr to closest enemy, otherwise returns nullptr.
  */
 std::shared_ptr<Unit> Unit::FindClosestEnemy() {
+    // Game state is read-only (except for requests), so can parallel find closest unit
+    // Iterate through every other player to find which unit is the closest
+    std::pair<double, std::shared_ptr<Unit>> closest_unit = std::make_pair(std::numeric_limits<double>::max(), nullptr);
+    for (auto& player : world->players) {
+        if (player.first != owner_id) {
+            for (auto& unit : player.second->units) {
+                if (unit.second->health[0] > 0) {
+                    auto distance = CalculateDistanceTo(unit.second->position);
+                    if (distance < closest_unit.first) {
+                        closest_unit = std::make_pair(distance, unit.second);
+                    }
+                }
+            }
+        }
+    }
 
-    return nullptr;
+    return closest_unit.second;
 }
 
 /**

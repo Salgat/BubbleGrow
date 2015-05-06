@@ -24,7 +24,7 @@ private:
     std::shared_ptr<Unit> FindClosestEnemy();
     std::shared_ptr<Unit> FindClosestResource();
 
-    void WalkTo(sf::Vector2f destination, double duration);
+    void WalkTo(sf::Vector2f destination, double duration, bool update_action);
     void Attack(uint64_t target, uint64_t target_owner, double duration);
 
 public:
@@ -35,7 +35,7 @@ public:
 
     UnitType type;
     sf::Vector2f position;
-    std::array<int, 2> health;
+    std::array<std::atomic<int>, 2> health;
     double walk_speed;
     double attack_speed;
     int attack_damage;

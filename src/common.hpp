@@ -89,7 +89,7 @@ double const BRUTE_ATTACK_SPEED = 0.7;
 double const SCOUT_ATTACK_SPEED = 1.5;
 
 // Attack damage (health/attack)
-int const BASE_ATTACK_DAMAGE = 10;
+int const BASE_ATTACK_DAMAGE = 20;
 int const GATHERER_ATTACK_DAMAGE = 1;
 int const FIGHTER_ATTACK_DAMAGE = 15;
 int const BRUTE_ATTACK_DAMAGE = 35;
