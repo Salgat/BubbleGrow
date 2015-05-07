@@ -10,6 +10,7 @@ int main() {
     auto world = std::make_shared<World>();
     auto player = world->AddPlayer();
     auto enemy_player = world->AddPlayer();
+    auto resource_player = world->AddResources(200, 50, 400);
     if (player and enemy_player) {
         player->position = sf::Vector2f(0.0, 0.0);
         player->name = "Test_Player";

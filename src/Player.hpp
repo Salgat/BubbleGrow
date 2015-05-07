@@ -19,6 +19,7 @@ public:
     std::string name; // Visible name to all players
     uint64_t id;
     uint64_t unit_ids; // Increment and assign each time a new unit is created
+    PlayerType type;
     AiType ai_type;
 
     std::shared_ptr<World> world;
@@ -45,7 +46,7 @@ public:
 
     Player();
 
-    void Update(double duration);
+    virtual void Update(double duration);
     void ProcessRequests(double duration); // Duration is in seconds (example: 0.01666 == 60fps)
     void MakeDecisions();
     void CreateUnits(int amount, UnitType type);

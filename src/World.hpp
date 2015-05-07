@@ -8,6 +8,7 @@
 #include "common.hpp"
 
 class Player;
+class Resources;
 class Unit;
 
 /**
@@ -24,6 +25,7 @@ public:
 
     void UpdateAndProcess(double duration);
     std::shared_ptr<Player> AddPlayer();
+    std::shared_ptr<Resources> AddResources(unsigned int amount, float radius, float density);
     std::shared_ptr<Unit> FindUnit(uint64_t owner_id, uint64_t unit_id);
 
 };

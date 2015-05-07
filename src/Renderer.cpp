@@ -77,8 +77,12 @@ void Renderer::RenderUnits() {
                 circle.setFillColor(sf::Color::Black);
             }
 
+            auto radius = unit.second->size*10.0;
+            circle.setRadius(radius);
+            circle.setOrigin(circle.getLocalBounds().width/2.0, circle.getLocalBounds().height/2.0);
             circle.setPosition((unit.second->position.x - player_position.x)*scale + RESOLUTION_X/2,
                                (unit.second->position.y - player_position.y)*scale + RESOLUTION_Y/2);
+
             window->draw(circle);
         }
         count++;

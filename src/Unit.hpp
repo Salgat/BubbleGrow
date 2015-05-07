@@ -23,6 +23,7 @@ private:
 
     std::shared_ptr<Unit> FindClosestEnemy();
     std::shared_ptr<Unit> FindClosestResource();
+    std::shared_ptr<Unit> FindClosestUnit(PlayerType ignore = PlayerType::NONE);
 
     void WalkTo(sf::Vector2f destination, double duration, bool update_action);
     void Attack(uint64_t target, uint64_t target_owner, double duration);
@@ -35,6 +36,7 @@ public:
 
     UnitType type;
     sf::Vector2f position;
+    float size; // Radius of unit (meters)
     std::array<std::atomic<int>, 2> health;
     double walk_speed;
     double attack_speed;
@@ -46,6 +48,7 @@ public:
 
     // Update information
     std::atomic<int> pending_damage; // Damage to apply to unit from other sources
+    std::atomic<int> resource_value; // Value if the unit is a resource
 
     Unit();
     void Update(double duration);

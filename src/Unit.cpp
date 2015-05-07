@@ -15,6 +15,7 @@ Unit::Unit()
     , owner_id(0)
     , type(UnitType::BASE)
     , position(sf::Vector2f(0.0, 0.0))
+    , size(1.0)
     , walk_speed(BASE_WALK_SPEED)
     , attack_speed(BASE_ATTACK_SPEED)
     , attack_damage(BASE_ATTACK_DAMAGE)
@@ -58,15 +59,12 @@ void Unit::ProcessRequest(Request& request, double duration) {
 /**
  * Returns a request made by the unit's AI.
  *
- * Todo: May be more efficient to pass in a reference of a Request to modify.
- * Todo 2: Calculating closest_enemy and closest_resource before checking unit type is inefficient.
+ * Todo: Calculating closest_enemy and closest_resource before checking unit type is inefficient.
  */
 void Unit::MakeDecision(Request& request) {
-    //auto request = Request();
-    //request.type = RequestType::NONE;
-
     // Attacking is prioritized
     auto closest_enemy = FindClosestEnemy();
+    //auto closest_enemy = FindClosestEnemy();
     if (closest_enemy and (type == UnitType::BASE or type == UnitType::FIGHTER or type == UnitType::BRUTE)) {
         request.type = RequestType::ATTACK;
         request.int_data[0] = static_cast<int>(closest_enemy->owner_id);
@@ -86,8 +84,6 @@ void Unit::MakeDecision(Request& request) {
             request.float_data[1] = wander_position.y;
         }
     }
-
-    //return request;
 }
 
 /**
@@ -136,8 +132,8 @@ inline double Unit::CalculateDistanceTo(sf::Vector2f target_position) {
  */
 inline sf::Vector2f Unit::RandomWanderLocation() {
     // Choose a random angle (0 to 2*PI) and calculate position based off direction * wander_range
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    static std::mt19937 gen(seed);
     std::uniform_real_distribution<> dis(0, 2*PI);
     double random_angle = dis(gen);
     std::uniform_real_distribution<> dis2(0, owner->wander_range);
@@ -177,7 +173,6 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
             // Attack has finished
             if (target_unit)
                 target_unit->health[0].fetch_add(-1 * CalculateAttackDamage());
-                //target_unit->pending_damage.fetch_add(-1 * CalculateAttackDamage());
             action = ActionType::IDLE;
         } else {
             action_duration += duration;
@@ -203,16 +198,22 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
 }
 
 /**
- * Returns shared_ptr to closest enemy, otherwise returns nullptr.
+ * Returns shared_ptr to closest unit, otherwise returns nullptr. Ignores players of "PlayerType ignore". Mainly used
+ * as a helper class.
  */
-std::shared_ptr<Unit> Unit::FindClosestEnemy() {
-    // Game state is read-only (except for requests), so can parallel find closest unit
-    // Iterate through every other player to find which unit is the closest
+std::shared_ptr<Unit> Unit::FindClosestUnit(PlayerType ignore) {
     std::pair<double, std::shared_ptr<Unit>> closest_unit = std::make_pair(std::numeric_limits<double>::max(), nullptr);
     for (auto& player : world->players) {
-        if (player.first != owner_id) {
+        if (player.first != owner_id and player.second->type != ignore) {
             for (auto& unit : player.second->units) {
-                if (unit.second->health[0] > 0) {
+                int required_amount = 0;
+                if (ignore == PlayerType::RESOURCES)
+                    required_amount = unit.second->health[0];
+                else
+                    return nullptr; // Todo: Implement resources still
+                    //required_amount = unit.second->resource_value;
+
+                if (required_amount > 0) {
                     auto distance = CalculateDistanceTo(unit.second->position);
                     if (distance < closest_unit.first) {
                         closest_unit = std::make_pair(distance, unit.second);
@@ -226,9 +227,15 @@ std::shared_ptr<Unit> Unit::FindClosestEnemy() {
 }
 
 /**
- * Returns shared_ptr to closest resource, otherwise returns nullptr.
+ * Returns shared_ptr to closest enemy in world.
+ */
+std::shared_ptr<Unit> Unit::FindClosestEnemy() {
+    return FindClosestUnit(PlayerType::RESOURCES);
+}
+
+/**
+ * Returns shared_ptr to closest resource in world.
  */
 std::shared_ptr<Unit> Unit::FindClosestResource() {
-
-    return nullptr;
+    return FindClosestUnit(PlayerType::NONE);
 }

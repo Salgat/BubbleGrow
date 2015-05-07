@@ -15,6 +15,7 @@
 #include <queue>
 #include <cmath>
 #include <random>
+#include <chrono>
 
 // SFML
 #include <SFML/Audio.hpp>
@@ -55,6 +56,13 @@ enum class AiType {
     EASY,
     NORMAL,
     HARD,
+    NONE
+};
+
+enum class PlayerType {
+    PLAYER,
+    COMPUTER,
+    RESOURCES,
     NONE
 };
 

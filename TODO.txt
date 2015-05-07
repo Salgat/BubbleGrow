@@ -1,0 +1,18 @@
+This document holds an informal list of work planned to do.
+	- Add resource player subclass
+		- Simply holds (and possibly creates?) resources on the map, which are units that can be mined
+	- Implement gathering resources
+	- Add controls to move
+	- Add basic player AI (for computer opponents)
+
+Later,
+	- Artwork
+	- Menu
+	- Sounds
+
+Way later...
+	- Networking (servers and clients)
+	
+	
+Notes:
+	- Have mouse movement (distance from center point) toggle-able by pressing space bar (to let players click buttons).

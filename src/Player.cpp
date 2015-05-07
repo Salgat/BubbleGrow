@@ -12,6 +12,7 @@ Player::Player()
     , army_value(0)
     , resources(0)
     , unit_ids(0)
+    , type (PlayerType::PLAYER)
     , ai_type(AiType::NONE)
     , wander_range(20.0) {
     // Default to having no units
