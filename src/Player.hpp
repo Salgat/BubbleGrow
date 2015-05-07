@@ -49,6 +49,7 @@ public:
     virtual void Update(double duration);
     void ProcessRequests(double duration); // Duration is in seconds (example: 0.01666 == 60fps)
     void MakeDecisions();
+    virtual void RemoveExpiredUnits();
     void CreateUnits(int amount, UnitType type);
 };
 

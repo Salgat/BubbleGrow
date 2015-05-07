@@ -22,13 +22,14 @@ enum class RequestType {
     NONE
 };
 
-std::size_t const REQUEST_ARRAY_SIZE = 10;
+std::size_t const REQUEST_ARRAY_SIZE = 2; // Has to be large enough to hold all request formats.
 
 /**
  *
  */
 struct Request {
     RequestType type;
+
     std::array<int, REQUEST_ARRAY_SIZE> int_data;
     std::array<float, REQUEST_ARRAY_SIZE> float_data;
 };

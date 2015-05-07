@@ -19,6 +19,7 @@ public:
     Resources();
 
     virtual void Update(double duration);
+    virtual void RemoveExpiredUnits();
     void CreateResources(unsigned int amount, float radius, float density);
 };
 

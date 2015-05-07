@@ -16,13 +16,13 @@ Unit::Unit()
     , type(UnitType::BASE)
     , position(sf::Vector2f(0.0, 0.0))
     , size(1.0)
-    , walk_speed(BASE_WALK_SPEED)
-    , attack_speed(BASE_ATTACK_SPEED)
-    , attack_damage(BASE_ATTACK_DAMAGE)
+    , walk_speed(kBaseWalkSpeed)
+    , attack_speed(kBaseAttackSpeed)
+    , attack_damage(kBaseAttackDamage)
     , action(ActionType::NONE)
     , pending_damage(0.0) {
-    health[0] = BASE_MAX_HEALTH;
-    health[1] = BASE_MAX_HEALTH;
+    health[0] = kBaseMaxHealth;
+    health[1] = kBaseMaxHealth;
 }
 
 /**
@@ -44,15 +44,24 @@ void Unit::ProcessRequest(Request& request, double duration) {
         }
     } else if (request.type == RequestType::WALK) {
         // Commands a unit to start walking in the direction provided
-        if (action == ActionType::WALK or action == ActionType::IDLE or action == ActionType::NONE) {
+        //if (action == ActionType::WALK or action == ActionType::IDLE or action == ActionType::NONE) {
             WalkTo(sf::Vector2f(request.float_data[0], request.float_data[1]), duration, true);
-        }
+        //}
     } else if (request.type == RequestType::ATTACK) {
         // Commands unit to attack a unit if within attack range, if not within range will instead walk towards unit
         if (action == ActionType::WALK or action == ActionType::IDLE or action == ActionType::NONE or
             action == ActionType::ATTACK) {
             Attack(static_cast<uint64_t>(request.int_data[1]), static_cast<uint64_t>(request.int_data[0]), duration);
         }
+    } else if (request.type == RequestType::GATHER) {
+        // Commands a unit to gather the resources of the specified unit.
+        if (action == ActionType::WALK or action == ActionType::IDLE or action == ActionType::NONE or
+            action == ActionType::GATHER) {
+            Gather(static_cast<uint64_t>(request.int_data[1]), static_cast<uint64_t>(request.int_data[0]), duration);
+        }
+    } else {
+        // With no requests, just default to idle
+        action = ActionType::IDLE;
     }
 }
 
@@ -90,37 +99,60 @@ void Unit::MakeDecision(Request& request) {
  * Helper function that returns walk speed base on unit's type.
  */
 double Unit::CalculateWalkSpeed() {
-    if (type == UnitType::BASE) {
-        return BASE_WALK_SPEED;
-    }
-
+    if (static_cast<std::size_t>(type) < static_cast<std::size_t>(UnitType::NONE))
+        return static_cast<double>(kWalkSpeed[static_cast<std::size_t>(type)]);
     return 0.0;
 }
 
+/**
+ * Returns attack speed (attacks/second) for current unit type.
+ */
 double Unit::CalculateAttackSpeed() {
-    if (type == UnitType::BASE) {
-        return BASE_ATTACK_SPEED;
-    }
-
+    // Note: This is kind of ugly, but avoids switch/if conditionals...
+    if (static_cast<std::size_t>(type) < static_cast<std::size_t>(UnitType::NONE))
+        return static_cast<double>(kAttackSpeed[static_cast<std::size_t>(type)]);
     return 0.0;
 }
 
+/**
+ * Returns attack damage (damage/attack) for current unit type.
+ */
 int Unit::CalculateAttackDamage() {
-    if (type == UnitType::BASE) {
-        return BASE_ATTACK_DAMAGE;
-    }
-
+    if (static_cast<std::size_t>(type) < static_cast<std::size_t>(UnitType::NONE))
+        return static_cast<int>(kAttackDamage[static_cast<std::size_t>(type)]);
     return 0;
 }
 
+/**
+ * Returns attack range (meters) for current unit type.
+ */
 inline double Unit::CalculateAttackRange() {
-    if (type == UnitType::BASE) {
-        return BASE_ATTACK_RANGE;
-    }
-
+    if (static_cast<std::size_t>(type) < static_cast<std::size_t>(UnitType::NONE))
+        return static_cast<double>(kAttackRange[static_cast<std::size_t>(type)]);
     return 0.0;
 }
 
+/**
+ * Returns gather speed (gathers/second) for current unit type.
+ */
+inline double Unit::CalculateGatherSpeed() {
+    if (static_cast<std::size_t>(type) < static_cast<std::size_t>(UnitType::NONE))
+        return static_cast<double>(kGatherSpeed[static_cast<std::size_t>(type)]);
+    return 0.0;
+}
+
+/**
+ * Returns gather amount (resources/gather) for current unit type.
+ */
+inline int Unit::CalculateGatherAmount() {
+    if (static_cast<std::size_t>(type) < static_cast<std::size_t>(UnitType::NONE))
+        return static_cast<int>(kGatherAmount[static_cast<std::size_t>(type)]);
+    return 0;
+}
+
+/**
+ * Returns distance (meters) from current unit to target position.
+ */
 inline double Unit::CalculateDistanceTo(sf::Vector2f target_position) {
     double x_difference = target_position.x - position.x;
     double y_difference = target_position.y - position.y;
@@ -162,7 +194,7 @@ void Unit::WalkTo(sf::Vector2f destination, double duration, bool update_action)
 }
 
 /**
- * Helper function to process an attack (either a new attack, or an ongoing attack).
+ * Processes an attack (either a new attack, or an ongoing attack).
  */
 void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
     auto target_unit = world->FindUnit(target_owner, target);
@@ -177,7 +209,7 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
         } else {
             action_duration += duration;
         }
-    } else if (target_unit) {
+    } else if (target_unit and target_unit->health[0] > 0) {
         auto target_position = target_unit->position;
         auto range = CalculateDistanceTo(target_position);
         if (CalculateAttackRange() >= range) {
@@ -193,6 +225,30 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
         }
     } else {
         // No enemy, set action back to idle
+        action = ActionType::IDLE;
+    }
+}
+
+/**
+ * Processes a grow request (either a new gather or an ongoing gather).
+ */
+void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
+    auto target_unit = world->FindUnit(target_owner, target);
+
+    if (action == ActionType::GATHER) {
+        // Complete current gather (regardless of what the new target is)
+        if (action_duration >= CalculateAttackSpeed()) {
+            // Attack has finished
+            if (target_unit)
+                target_unit->health[0].fetch_add(-1 * CalculateAttackDamage());
+            action = ActionType::IDLE;
+        } else {
+            action_duration += duration;
+        }
+    } else if (target_unit) {
+
+    } else {
+        // No resource, set action back to idle
         action = ActionType::IDLE;
     }
 }

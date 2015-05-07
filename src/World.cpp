@@ -16,8 +16,6 @@ World::World()
  * Processes the game for the given duration, including unit AI, user input, request processing, etc.
  */
 void World::UpdateAndProcess(double duration) {
-    //std::cout << "Update Frequency: " << 1.0/duration << std::endl;
-
     // Update each unit
     for (auto& player : players) {
         player.second->Update(duration);
@@ -36,7 +34,9 @@ void World::UpdateAndProcess(double duration) {
     }
 
     // Add and remove any new/expired units
-
+    for (auto& player : players) {
+        player.second->RemoveExpiredUnits();
+    }
 }
 
 /**

@@ -31,6 +31,25 @@ void Resources::Update(double duration) {
 }
 
 /**
+ * Removes units that no longer have any resources.
+ */
+void Resources::RemoveExpiredUnits() {
+    std::stack<uint64_t> units_to_remove;
+    for (auto& unit : units) {
+        if (unit.second->resource_value <= 0) {
+            units_to_remove.push(unit.first);
+            number_of_units[static_cast<std::size_t>(unit.second->type)] -= 1;
+        }
+    }
+
+    while(!units_to_remove.empty()) {
+        units.erase(units_to_remove.top());
+        unit_requests.erase(units_to_remove.top());
+        units_to_remove.pop();
+    }
+}
+
+/**
  * Creates resources on the map randomly distributed from (0.0,0.0) to radius, scaled by density (resources/m^2).
  */
 void Resources::CreateResources(unsigned int amount, float radius, float density) {
@@ -64,5 +83,7 @@ void Resources::CreateResources(unsigned int amount, float radius, float density
         units[new_unit->id] = new_unit;
         unit_requests[new_unit->id] = Request();
         unit_requests[new_unit->id].type = RequestType::NONE;
+
+        number_of_units[static_cast<std::size_t>(UnitType::GROW)] += 1;
     }
 }

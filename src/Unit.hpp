@@ -17,6 +17,9 @@ private:
     inline double CalculateAttackSpeed();
     inline int CalculateAttackDamage();
     inline double CalculateAttackRange();
+    inline double CalculateGatherSpeed();
+    inline int CalculateGatherAmount();
+
     inline double CalculateDistanceTo(sf::Vector2f target_position);
 
     inline sf::Vector2f RandomWanderLocation();
@@ -27,6 +30,7 @@ private:
 
     void WalkTo(sf::Vector2f destination, double duration, bool update_action);
     void Attack(uint64_t target, uint64_t target_owner, double duration);
+    void Gather(uint64_t target, uint64_t target_owner, double duration);
 
 public:
     uint64_t id; // Each id/owner_id pair is assumed to be unique, in that no two units will ever have the same pair

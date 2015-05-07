@@ -55,21 +55,50 @@ void Player::MakeDecisions() {
 }
 
 /**
+ * Removes from the units map any expired units (usually because they are dead).
+ */
+void Player::RemoveExpiredUnits() {
+    std::stack<uint64_t> units_to_remove;
+    for (auto& unit : units) {
+        if (unit.second->health[0] <= 0) {
+            units_to_remove.push(unit.first);
+            number_of_units[static_cast<std::size_t>(unit.second->type)] -= 1;
+        }
+    }
+
+    while(!units_to_remove.empty()) {
+        units.erase(units_to_remove.top());
+        unit_requests.erase(units_to_remove.top());
+        units_to_remove.pop();
+    }
+}
+
+/**
  * Creates new units based on given parameters. This function is executed in a sequential manner (for thread-safety).
  */
 void Player::CreateUnits(int amount, UnitType type) {
+    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    static std::mt19937 gen(seed);
+    std::uniform_real_distribution<> distribution_radius(0, wander_range);
+    std::uniform_real_distribution<> distribution_angle(0, 2*PI);
+
     if (type == UnitType::BASE) {
-        auto resource_cost = amount * BASE_RESOURCE_COST;
+        auto resource_cost = amount * kBaseResourceCost;
         if (resource_cost > resources) {
             // Can't afford to create requested amount, create maximum we can afford
-            amount = resources / BASE_RESOURCE_COST;
+            amount = resources / kBaseResourceCost;
         }
 
+        number_of_units[static_cast<std::size_t>(type)] += amount;
         while (amount-- > 0) {
+            double random_radius = distribution_radius(gen);
+            double random_angle = distribution_angle(gen);
+
             // Initialize a new unit
-            resources -= BASE_RESOURCE_COST;
+            resources -= kBaseResourceCost;
             auto new_unit = std::make_shared<Unit>();
-            new_unit->position = position;
+            new_unit->position = sf::Vector2f(position.x + static_cast<float>(random_radius*std::cos(random_angle)),
+                                              position.y + static_cast<float>(random_radius*std::sin(random_angle)));
             new_unit->id = ++unit_ids;
             new_unit->owner_id = id;
             new_unit->owner = shared_from_this();

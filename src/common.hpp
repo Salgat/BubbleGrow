@@ -16,6 +16,7 @@
 #include <cmath>
 #include <random>
 #include <chrono>
+#include <stack>
 
 // SFML
 #include <SFML/Audio.hpp>
@@ -76,55 +77,128 @@ unsigned int const VERSION = 0;
 unsigned int const SUB_VERSION = 1;
 
 // Health
-int const BASE_MAX_HEALTH = 100;
-int const GATHERER_MAX_HEALTH = 100;
-int const FIGHTER_MAX_HEALTH = 150;
-int const BRUTE_MAX_HEALTH = 200;
-int const SCOUT_MAX_HEALTH = 50;
+int const kBaseMaxHealth = 100;
+int const kGathererMaxHealth = 100;
+int const kFighterMaxHealth = 150;
+int const kBruteMaxHealth = 200;
+int const kScoutMaxHealth = 50;
 
 // Walk speed (meters/second)
-double const BASE_WALK_SPEED = 20.0;
-double const GATHERER_WALK_SPEED = 1.0;
-double const FIGHTER_WALK_SPEED = 1.0;
-double const BRUTE_WALK_SPEED = 0.7;
-double const SCOUT_WALK_SPEED = 1.5;
+double const kBaseWalkSpeed = 20.0;
+double const kGathererWalkSpeed = 1.0;
+double const kFighterWalkSpeed = 1.0;
+double const kBruteWalkSpeed = 0.7;
+double const kScoutWalkSpeed = 1.5;
 
 // Attack speed (attacks/second)
-double const BASE_ATTACK_SPEED = 0.5;
-double const GATHERER_ATTACK_SPEED = 0.1;
-double const FIGHTER_ATTACK_SPEED = 1.0;
-double const BRUTE_ATTACK_SPEED = 0.7;
-double const SCOUT_ATTACK_SPEED = 1.5;
+double const kBaseAttackSpeed = 0.5;
+double const kGathererAttackSpeed = 0.1;
+double const kFighterAttackSpeed = 1.0;
+double const kBruteAttackSpeed = 0.7;
+double const kScoutAttackSpeed = 1.5;
 
 // Attack damage (health/attack)
-int const BASE_ATTACK_DAMAGE = 20;
-int const GATHERER_ATTACK_DAMAGE = 1;
-int const FIGHTER_ATTACK_DAMAGE = 15;
-int const BRUTE_ATTACK_DAMAGE = 35;
-int const SCOUT_ATTACK_DAMAGE = 5;
+int const kBaseAttackDamage = 20;
+int const kGathererAttackDamage = 1;
+int const kFighterAttackDamage = 15;
+int const kBruteAttackDamage = 35;
+int const kScoutAttackDamage = 5;
 
 // Attack range (meters from unit position)
-double const BASE_ATTACK_RANGE = 1.0;
-double const GATHERER_ATTACK_RANGE = 1.0;
-double const FIGHTER_ATTACK_RANGE = 1.0;
-double const BRUTE_ATTACK_RANGE = 2.0;
-double const SCOUT_ATTACK_RANGE = 0.5;
+double const kBaseAttackRange = 1.0;
+double const kGathererAttackRange = 1.0;
+double const kFighterAttackRange = 1.0;
+double const kBruteAttackRange = 2.0;
+double const kScoutAttackRange = 0.5;
 
 // Unit Size (radius in meters)
-double const BASE_SIZE = 1.0;
-double const GATHERER_SIZE = 1.0;
-double const FIGHTER_SIZE = 1.0;
-double const BRUTE_SIZE = 2.0;
-double const SCOUT_SIZE = 0.5;
+double const kBaseSize = 1.0;
+double const kGathererSize = 1.0;
+double const kFighterSize = 1.0;
+double const kBruteSize = 2.0;
+double const kScoutSize = 0.5;
 
 // Resource requirements (resources/unit)
-int const BASE_RESOURCE_COST = 10;
-int const GATHERER_RESOURCE_COST = 5;
-int const FIGHTER_RESOURCE_COST = 5;
-int const BRUTE_RESOURCE_COST = 10;
-int const SCOUT_RESOURCE_COST = 0;
+int const kBaseResourceCost = 10;
+int const kGathererResourceCost = 5;
+int const kFighterResourceCost = 5;
+int const kBruteResourceCost = 10;
+int const kScoutResourceCost = 0;
+
+// Gather speed (gathers/second)
+double const kBaseGatherSpeed = 0.5;
+double const kGathererGatherSpeed = 1.0;
+double const kFighterGatherSpeed = 0.1;
+double const kBruteGatherSpeed = 0.1;
+double const kScoutGatherSpeed = 0.2;
+
+// Gather amount (resources/gather)
+int const kBaseGatherAmount = 10;
+int const kGathererGatherAmount = 10;
+int const kFighterGatherAmount = 10;
+int const kBruteGatherAmount = 10;
+int const kScoutGatherAmount = 10;
+
+// Constant Arrays for values. It's important that the order of the entries match the order of the entries in UnitType.
+std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kMaxHealth = {kBaseMaxHealth,
+                                                                                    kGathererMaxHealth,
+                                                                                    kFighterMaxHealth,
+                                                                                    kBruteMaxHealth,
+                                                                                    kScoutMaxHealth};
+
+std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kWalkSpeed = {kBaseWalkSpeed,
+                                                                                       kGathererWalkSpeed,
+                                                                                       kFighterWalkSpeed,
+                                                                                       kBruteWalkSpeed,
+                                                                                       kScoutWalkSpeed};
+
+std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kAttackSpeed = {kBaseAttackSpeed,
+                                                                                         kGathererAttackSpeed,
+                                                                                         kFighterAttackSpeed,
+                                                                                         kBruteAttackSpeed,
+                                                                                         kScoutAttackSpeed};
+
+std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kAttackDamage = {kBaseAttackDamage,
+                                                                                       kGathererAttackDamage,
+                                                                                       kFighterAttackDamage,
+                                                                                       kBruteAttackDamage,
+                                                                                       kScoutAttackDamage};
+
+std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kAttackRange = {kBaseAttackRange,
+                                                                                         kGathererAttackRange,
+                                                                                         kFighterAttackRange,
+                                                                                         kBruteAttackRange,
+                                                                                         kScoutAttackRange};
+
+std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kSize = {kBaseSize,
+                                                                                  kGathererSize,
+                                                                                  kFighterSize,
+                                                                                  kBruteSize,
+                                                                                  kScoutSize};
+
+std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kResourceCost = {kBaseResourceCost,
+                                                                                       kGathererResourceCost,
+                                                                                       kFighterResourceCost,
+                                                                                       kBruteResourceCost,
+                                                                                       kScoutResourceCost};
+
+std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kGatherSpeed = {kBaseGatherSpeed,
+                                                                                         kGathererGatherSpeed,
+                                                                                         kFighterGatherSpeed,
+                                                                                         kBruteGatherSpeed,
+                                                                                         kScoutGatherSpeed};
+
+std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kGatherAmount = {kBaseGatherAmount,
+                                                                                       kGathererGatherAmount,
+                                                                                       kFighterGatherAmount,
+                                                                                       kBruteGatherAmount,
+                                                                                       kScoutGatherAmount};
 
 // Unit conversion requirements
 
 
 #endif //BUBBLEGROW_COMMON_HPP
+
+/**
+ * Note: Use https://google-styleguide.googlecode.com/svn/trunk/cppguide.html (Google C++) style guide.
+ */
