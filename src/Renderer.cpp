@@ -22,6 +22,26 @@ bool Renderer::PollEvents() {
         if (event.type == sf::Event::Closed) {
             window->close();
             return false;
+        } else if (event.type == sf::Event::KeyPressed) {
+            // Todo: This is just a test, move this to ProcessInputs() and instead use the distance of the cursor
+            //       from the center to tell it which direction to go. Possibly can add a third float_data which
+            //       gives a value between 0.0 and 1.0 to scale speed.
+            Request move_request;
+            move_request.type = RequestType::PLAYER_WALK;
+            move_request.float_data[0] = player->position.x;
+            move_request.float_data[1] = player->position.y;
+
+            if (event.key.code == sf::Keyboard::Up) {
+                move_request.float_data[1] -= 2.0;
+            } else if (event.key.code == sf::Keyboard::Down) {
+                move_request.float_data[1] += 2.0;
+            } else if (event.key.code == sf::Keyboard::Left) {
+                move_request.float_data[0] -= 2.0;
+            } else if (event.key.code == sf::Keyboard::Right) {
+                move_request.float_data[0] += 2.0;
+            }
+
+            player->requests_array[static_cast<std::size_t>(RequestType::PLAYER_WALK)] = move_request;
         }
     }
 

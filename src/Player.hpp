@@ -25,6 +25,7 @@ public:
     std::shared_ptr<World> world;
 
     std::queue<Request> requests; // Requests for the player class to process (typically based on input from player)
+    std::array<Request, static_cast<std::size_t>(RequestType::PLAYER_END_REQUESTS)> requests_array;
 
     /* These containers are special, since they will be accessed concurrently. The rule is, when a new unit is created,
    a new entry is added for this unit (in a thread safe area). We can concurrently access this map
@@ -46,6 +47,7 @@ public:
 
     Player();
 
+    void ProcessPlayerRequests(double duration);
     virtual void Update(double duration);
     void ProcessRequests(double duration); // Duration is in seconds (example: 0.01666 == 60fps)
     void MakeDecisions();

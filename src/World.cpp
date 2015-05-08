@@ -16,6 +16,11 @@ World::World()
  * Processes the game for the given duration, including unit AI, user input, request processing, etc.
  */
 void World::UpdateAndProcess(double duration) {
+    // Execute requests for player
+    for (auto& player : players) {
+        player.second->ProcessPlayerRequests(duration);
+    }
+
     // Update each unit
     for (auto& player : players) {
         player.second->Update(duration);

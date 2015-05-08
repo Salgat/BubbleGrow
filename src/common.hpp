@@ -69,6 +69,7 @@ enum class PlayerType {
 
 // Constants
 // Todo: May want to set this in a config file
+double const kPlayerWalkSpeed = 10.0;
 
 double const PI = 3.141592653589793238463;
 unsigned int const RESOLUTION_X = 1280;

@@ -8,16 +8,18 @@
 #include "common.hpp"
 
 enum class RequestType {
+    // Player requests
+    PLAYER_WALK,
+    CREATE_BASE_UNITS, // Create base units using resources
+    CONVERT_UNITS, // Converts units to desired type
+    PLAYER_END_REQUESTS,
+
     // Unit requests
     WALK,
     ATTACK,
     GATHER,
     CAST,
     IDLE,
-
-    // Player requests
-    CREATE_BASE_UNITS, // Create base units using resources
-    CONVERT_UNITS, // Converts units to desired type
 
     NONE
 };
@@ -38,6 +40,7 @@ struct Request {
 
 /**
  * Request formats:
+ * Units,
  *  WALK:
  *   - type = RequestType::WALK
  *   - float_data[0] = x coordinate destination
@@ -52,4 +55,10 @@ struct Request {
  *   - type = RequestType::GATHER
  *   - int_data[0] = target owner id
  *   - int_data[1] = target id
+ *
+ * Players,
+ *   PLAYER_WALK:
+ *    - type = RequestType::PLAYER_WALK
+ *   - float_data[0] = x coordinate destination
+ *   - float_data[1] = y coordinate destination
  */
