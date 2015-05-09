@@ -74,14 +74,17 @@ void Unit::MakeDecision(Request& request) {
     // Attacking is prioritized
     auto closest_enemy = FindClosestEnemy();
     //auto closest_enemy = FindClosestEnemy();
-    if (closest_enemy and (type == UnitType::BASE or type == UnitType::FIGHTER or type == UnitType::BRUTE)) {
+    if (closest_enemy and (type == UnitType::BASE or type == UnitType::FIGHTER or type == UnitType::BRUTE) and
+            CalculateDistanceTo(closest_enemy->position, true) < owner->wander_range) {
         request.type = RequestType::ATTACK;
         request.int_data[0] = static_cast<int>(closest_enemy->owner_id);
         request.int_data[1] = static_cast<int>(closest_enemy->id);
     } else {
         // No enemies, try to find resource to gather
         auto closest_resource = FindClosestResource();
-        if (closest_resource and (type == UnitType::BASE or type == UnitType::GATHERER)) {
+        if (closest_resource and (type == UnitType::BASE or type == UnitType::GATHERER) and
+                CalculateDistanceTo(closest_resource->position, true) < owner->wander_range) {
+            //std::cout << "Making a gather request" << std::endl;
             request.type = RequestType::GATHER;
             request.int_data[0] = static_cast<int>(closest_resource->owner_id);
             request.int_data[1] = static_cast<int>(closest_resource->id);
@@ -153,9 +156,15 @@ inline int Unit::CalculateGatherAmount() {
 /**
  * Returns distance (meters) from current unit to target position.
  */
-inline double Unit::CalculateDistanceTo(sf::Vector2f target_position) {
-    double x_difference = target_position.x - position.x;
-    double y_difference = target_position.y - position.y;
+inline double Unit::CalculateDistanceTo(sf::Vector2f target_position, bool use_owner_position) {
+    sf::Vector2f from_position;
+    if (use_owner_position)
+        from_position = owner->position;
+    else
+        from_position = position;
+
+    double x_difference = target_position.x - from_position.x;
+    double y_difference = target_position.y - from_position.y;
     return std::sqrt(x_difference*x_difference + y_difference*y_difference);
 }
 
@@ -212,13 +221,13 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
     } else if (target_unit and target_unit->health[0] > 0) {
         auto target_position = target_unit->position;
         auto range = CalculateDistanceTo(target_position);
-        if (CalculateAttackRange() >= range) {
+        if (CalculateAttackRange() >= range-target_unit->size/10.0) {
             // Start a new attack
             action = ActionType::ATTACK;
             action_target = target;
             action_duration = 0.0;
 
-            Attack(target, target_owner,duration);
+            Attack(target, target_owner, duration);
         } else {
             // Outside attack range, walk towards target
             WalkTo(target_position, duration, false);
@@ -231,22 +240,36 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
 
 /**
  * Processes a grow request (either a new gather or an ongoing gather).
+ *
+ * Todo: This and Attack() are very similar; consider combining into a single function.
  */
 void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
     auto target_unit = world->FindUnit(target_owner, target);
 
     if (action == ActionType::GATHER) {
         // Complete current gather (regardless of what the new target is)
-        if (action_duration >= CalculateAttackSpeed()) {
-            // Attack has finished
+        if (action_duration >= CalculateGatherSpeed()) {
+            // Gather has finished
             if (target_unit)
-                target_unit->health[0].fetch_add(-1 * CalculateAttackDamage());
+                target_unit->resource_value.fetch_add(-1 * CalculateGatherAmount());
             action = ActionType::IDLE;
         } else {
             action_duration += duration;
         }
-    } else if (target_unit) {
+    } else if (target_unit and target_unit->resource_value > 0) {
+        auto target_position = target_unit->position;
+        auto range = CalculateDistanceTo(target_position);
+        if (CalculateAttackRange() >= range-target_unit->size/6.0) {
+            // Start a new gather
+            action = ActionType::GATHER;
+            action_target = target;
+            action_duration = 0.0;
 
+            Gather(target, target_owner, duration);
+        } else {
+            // Outside attack range, walk towards target
+            WalkTo(target_position, duration, false);
+        }
     } else {
         // No resource, set action back to idle
         action = ActionType::IDLE;
@@ -266,8 +289,7 @@ std::shared_ptr<Unit> Unit::FindClosestUnit(PlayerType ignore) {
                 if (ignore == PlayerType::RESOURCES)
                     required_amount = unit.second->health[0];
                 else
-                    return nullptr; // Todo: Implement resources still
-                    //required_amount = unit.second->resource_value;
+                    required_amount = unit.second->resource_value;
 
                 if (required_amount > 0) {
                     auto distance = CalculateDistanceTo(unit.second->position);

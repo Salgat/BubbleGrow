@@ -13,7 +13,7 @@ class Player;
 
 class Renderer {
 private:
-
+    bool mouse_movement;
 
 public:
     std::shared_ptr<sf::RenderWindow> window;

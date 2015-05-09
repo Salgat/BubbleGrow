@@ -14,7 +14,7 @@ Player::Player()
     , unit_ids(0)
     , type (PlayerType::PLAYER)
     , ai_type(AiType::NONE)
-    , wander_range(20.0) {
+    , wander_range(25.0) {
     // Default to having no units
     for (auto& entry : number_of_units) {
         entry = 0;
@@ -34,7 +34,7 @@ void Player::ProcessPlayerRequests(double duration) {
     for (auto& request : requests_array) {
         if (request.type == RequestType::PLAYER_WALK) {
             auto destination = sf::Vector2f(request.float_data[0], request.float_data[1]);
-            double distance_traveled = duration * kPlayerWalkSpeed; // distance = time * speed
+            double distance_traveled = duration * kPlayerWalkSpeed * request.float_data[2]; // distance = time * speed
 
             // First make sure unit isn't already at position
             double x_difference = destination.x - position.x;
@@ -53,39 +53,16 @@ void Player::ProcessPlayerRequests(double duration) {
 }
 
 /**
- * Handles player requests in queue.
+ * Updated the walk request for the player.
  */
-/*
-void Player::ProcessPlayerRequests(double duration) {
-    std::map<RequestType, bool> request_types_processed;
-    std::queue<Request> renewed_requests;
-    while (!requests.empty()) {
-        auto request = requests.front();
-
-        if (request.type == RequestType::PLAYER_WALK and !request_types_processed.count(RequestType::PLAYER_WALK)) {
-            auto destination = sf::Vector2f(request.float_data[0], request.float_data[1]);
-            double distance_traveled = duration * kPlayerWalkSpeed; // distance = time * speed
-
-            // First make sure unit isn't already at position
-            double x_difference = destination.x - position.x;
-            double y_difference = destination.y - position.y;
-            auto distance_to =  std::sqrt(x_difference*x_difference + y_difference*y_difference);
-            if (distance_to < distance_traveled) {
-                requests.pop();
-                return;
-            }
-
-            double angle = atan2(destination.y - position.y, destination.x - position.x);
-            position = sf::Vector2f(static_cast<float>(position.x + distance_traveled*cos(angle)),
-                                    static_cast<float>(position.y + distance_traveled*sin(angle)));
-            renewed_requests.push(request);
-        }
-
-        requests.pop();
-    }
-
-    requests = renewed_requests;
-}*/
+void Player::PlayerMoveRequest(sf::Vector2f destination, double speed) {
+    Request move_request;
+    move_request.type = RequestType::PLAYER_WALK;
+    move_request.float_data[0] = destination.x;
+    move_request.float_data[1] = destination.y;
+    move_request.float_data[2] = speed;
+    requests_array[static_cast<std::size_t>(RequestType::PLAYER_WALK)] = move_request;
+}
 
 /**
  * Update the stats of all units owned by player.

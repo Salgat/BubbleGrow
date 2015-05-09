@@ -1,7 +1,9 @@
 This document holds an informal list of work planned to do.
-	- Add resource player subclass
+	- X Add resource player subclass
 		- Simply holds (and possibly creates?) resources on the map, which are units that can be mined
 	- Implement gathering resources
+		- Having an issue where the unit should be gathering but just sitting still
+	- Correct size to distance, since they aren't proportional.
 	- Add controls to move
 	- Add basic player AI (for computer opponents)
 

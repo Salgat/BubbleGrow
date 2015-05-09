@@ -120,25 +120,25 @@ double const kBruteSize = 2.0;
 double const kScoutSize = 0.5;
 
 // Resource requirements (resources/unit)
-int const kBaseResourceCost = 10;
+int const kBaseResourceCost = 100;
 int const kGathererResourceCost = 5;
 int const kFighterResourceCost = 5;
 int const kBruteResourceCost = 10;
 int const kScoutResourceCost = 0;
 
 // Gather speed (gathers/second)
-double const kBaseGatherSpeed = 0.5;
+double const kBaseGatherSpeed = 0.2;
 double const kGathererGatherSpeed = 1.0;
 double const kFighterGatherSpeed = 0.1;
 double const kBruteGatherSpeed = 0.1;
 double const kScoutGatherSpeed = 0.2;
 
 // Gather amount (resources/gather)
-int const kBaseGatherAmount = 10;
-int const kGathererGatherAmount = 10;
-int const kFighterGatherAmount = 10;
-int const kBruteGatherAmount = 10;
-int const kScoutGatherAmount = 10;
+int const kBaseGatherAmount = 1;
+int const kGathererGatherAmount = 1;
+int const kFighterGatherAmount = 1;
+int const kBruteGatherAmount = 1;
+int const kScoutGatherAmount = 1;
 
 // Constant Arrays for values. It's important that the order of the entries match the order of the entries in UnitType.
 std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kMaxHealth = {kBaseMaxHealth,

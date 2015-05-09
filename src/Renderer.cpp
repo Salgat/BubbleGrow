@@ -7,7 +7,8 @@
 #include "Player.hpp"
 #include "Unit.hpp"
 
-Renderer::Renderer() {
+Renderer::Renderer()
+    : mouse_movement(true) {
     std::string title = "BubbleGrow V" + std::to_string(VERSION) + "." + std::to_string(SUB_VERSION);
     window = std::make_shared<sf::RenderWindow>(sf::VideoMode(RESOLUTION_X, RESOLUTION_Y), title);
     //window->setFramerateLimit(60);
@@ -23,25 +24,13 @@ bool Renderer::PollEvents() {
             window->close();
             return false;
         } else if (event.type == sf::Event::KeyPressed) {
-            // Todo: This is just a test, move this to ProcessInputs() and instead use the distance of the cursor
-            //       from the center to tell it which direction to go. Possibly can add a third float_data which
-            //       gives a value between 0.0 and 1.0 to scale speed.
-            Request move_request;
-            move_request.type = RequestType::PLAYER_WALK;
-            move_request.float_data[0] = player->position.x;
-            move_request.float_data[1] = player->position.y;
+            if (event.key.code == sf::Keyboard::Space) {
+                // Toggle movement based on mouse cursor
+                mouse_movement = !mouse_movement;
 
-            if (event.key.code == sf::Keyboard::Up) {
-                move_request.float_data[1] -= 2.0;
-            } else if (event.key.code == sf::Keyboard::Down) {
-                move_request.float_data[1] += 2.0;
-            } else if (event.key.code == sf::Keyboard::Left) {
-                move_request.float_data[0] -= 2.0;
-            } else if (event.key.code == sf::Keyboard::Right) {
-                move_request.float_data[0] += 2.0;
+                // Reset move request so player stops moving
+                player->PlayerMoveRequest(player->position, 0.0);
             }
-
-            player->requests_array[static_cast<std::size_t>(RequestType::PLAYER_WALK)] = move_request;
         }
     }
 
@@ -52,7 +41,23 @@ bool Renderer::PollEvents() {
  * Handles non-event input handling.
  */
 void Renderer::ProcessInputs() {
+    if (mouse_movement) {
+        // Movement based on cursor's position from center of screen.
+        auto mouse_position = sf::Mouse::getPosition(*window);
+        auto distance_x = static_cast<int>(mouse_position.x) - static_cast<int>(RESOLUTION_X/2);
+        auto distance_y = static_cast<int>(mouse_position.y) - static_cast<int>(RESOLUTION_Y/2);
+        float distance_from_center = std::sqrt(distance_x*distance_x + distance_y*distance_y);
 
+        // Speed is based on the cursor's distance from the center (with a small area in the center where there is no
+        // speed).
+        float speed = (distance_from_center-50.0)/200.0;
+        if (speed > 1.0)
+            speed = 1.0;
+        else if (speed < 0.0)
+            speed = 0.0;
+
+        player->PlayerMoveRequest(sf::Vector2f(player->position.x + distance_x, player->position.y + distance_y), speed);
+    }
 }
 
 /**

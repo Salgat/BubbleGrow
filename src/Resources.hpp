@@ -20,7 +20,7 @@ public:
 
     virtual void Update(double duration);
     virtual void RemoveExpiredUnits();
-    void CreateResources(unsigned int amount, float radius, float density);
+    void CreateResources(unsigned int amount, float range, float density);
 };
 
 #endif //BUBBLEGROW_RESOURCES_HPP

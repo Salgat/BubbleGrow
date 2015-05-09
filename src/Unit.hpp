@@ -20,7 +20,7 @@ private:
     inline double CalculateGatherSpeed();
     inline int CalculateGatherAmount();
 
-    inline double CalculateDistanceTo(sf::Vector2f target_position);
+    inline double CalculateDistanceTo(sf::Vector2f target_position, bool use_owner_position = false);
 
     inline sf::Vector2f RandomWanderLocation();
 

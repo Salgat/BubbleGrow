@@ -25,6 +25,7 @@ void Resources::Update(double duration) {
     unsigned int updated_resources = 0;
     for (auto& unit : units) {
         // Update total resource count
+        unit.second->size = unit.second->resource_value/6.0;
         updated_resources += unit.second->resource_value;
     }
     resources = updated_resources;
@@ -52,18 +53,19 @@ void Resources::RemoveExpiredUnits() {
 /**
  * Creates resources on the map randomly distributed from (0.0,0.0) to radius, scaled by density (resources/m^2).
  */
-void Resources::CreateResources(unsigned int amount, float radius, float density) {
+void Resources::CreateResources(unsigned int amount, float range, float density) {
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     static std::mt19937 gen(seed);
-    std::uniform_real_distribution<> distribution_radius(0, radius);
+    std::uniform_real_distribution<> distribution_range(-1.0* range, range);
     std::uniform_real_distribution<> distribution_angle(0, 2*PI);
     // The resource amount of each unit is inversely proportional to area.
-    std::uniform_real_distribution<> distribution_amount(0, amount * density / (radius*radius));
+    std::uniform_real_distribution<> distribution_amount(0, 0.5 * amount * density / (range * range));
 
     int current_amount = amount;
     while (current_amount > 0) {
         // Initialize a new resource unit
-        double random_radius = distribution_radius(gen);
+        double random_x = distribution_range(gen);
+        double random_y = distribution_range(gen);
         double random_angle = distribution_angle(gen);
         unsigned int random_amount = distribution_amount(gen);
         current_amount -= random_amount;
@@ -72,8 +74,9 @@ void Resources::CreateResources(unsigned int amount, float radius, float density
         new_unit->type = UnitType::GROW;
         new_unit->resource_value = random_amount;
         new_unit->size = random_amount/6.0;
-        new_unit->position = sf::Vector2f(static_cast<float>(random_radius*std::cos(random_angle)),
-                                          static_cast<float>(random_radius*std::sin(random_angle)));
+        //new_unit->position = sf::Vector2f(static_cast<float>(random_radius*std::cos(random_angle)),
+        //                                  static_cast<float>(random_radius*std::sin(random_angle)));
+        new_unit->position = sf::Vector2f(random_x, random_y);
         new_unit->id = ++unit_ids;
         new_unit->owner_id = id;
         new_unit->owner = shared_from_this();
