@@ -25,6 +25,65 @@
 #include <SFML/System.hpp>
 
 // Enumerations
+enum class GameMode {
+    MENU,
+    IN_GAME,
+    NONE
+};
+
+enum class MenuType {
+    MAIN,
+    GAME_MENU,
+    BACK,
+
+    // Main submenus
+    QUICK_MATCH,
+    VERSUS,
+    TUTORIAL,
+    EXIT_GAME,
+
+    // Versus submenus
+    COMPUTER_CHALLENGE,
+    MULTI_PLAYER,
+
+    // Game submenu
+    LEAVE_GAME,
+
+    NONE
+};
+
+// Submenu definitions
+std::array<MenuType const, 4> const kMainSubMenus = {MenuType::QUICK_MATCH,
+                                                     MenuType::VERSUS,
+                                                     MenuType::TUTORIAL,
+                                                     MenuType::EXIT_GAME};
+
+std::array<MenuType const, 3> const kVersusSubMenus = {MenuType::COMPUTER_CHALLENGE,
+                                                        MenuType::MULTI_PLAYER,
+                                                        MenuType::BACK};
+
+std::array<MenuType const, 2> const kGameSubMenus = {MenuType::LEAVE_GAME,
+                                                     MenuType::BACK};
+
+// Defines the string representation of the corresponding menu entry
+std::array<std::string const, static_cast<std::size_t>(MenuType::NONE)> const kMenuStrings = {"Main Menu",
+                                                                                              "Game Menu",
+                                                                                              "Back",
+                                                                                              "Quick Match",
+                                                                                              "Versus Mode",
+                                                                                              "Tutorial",
+                                                                                              "Exit Game",
+                                                                                              "Computer Challenge",
+                                                                                              "Multiplayer Mode",
+                                                                                              "Leave Game"};
+
+// Standard Font Sizes
+enum TextSize {
+    GAME_MENU = 144,
+    RESOURCE_COUNTER = 24,
+    NONE
+};
+
 enum class ActionType {
     ATTACK,
     GATHER,

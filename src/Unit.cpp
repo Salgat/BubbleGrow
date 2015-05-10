@@ -250,8 +250,11 @@ void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
         // Complete current gather (regardless of what the new target is)
         if (action_duration >= CalculateGatherSpeed()) {
             // Gather has finished
-            if (target_unit)
+            if (target_unit) {
                 target_unit->resource_value.fetch_add(-1 * CalculateGatherAmount());
+                owner->resources.fetch_add(CalculateGatherAmount());
+            }
+
             action = ActionType::IDLE;
         } else {
             action_duration += duration;

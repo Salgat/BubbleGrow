@@ -8,14 +8,32 @@
 #include "Unit.hpp"
 
 Renderer::Renderer()
-    : mouse_movement(true) {
+    : mouse_movement(true)
+    , current_menu(MenuType::MAIN)
+    , mode(GameMode::IN_GAME)
+    , show_ingame_menu(false) {
     std::string title = "BubbleGrow V" + std::to_string(VERSION) + "." + std::to_string(SUB_VERSION);
     window = std::make_shared<sf::RenderWindow>(sf::VideoMode(RESOLUTION_X, RESOLUTION_Y), title);
     //window->setFramerateLimit(60);
+
+    if (!font.loadFromFile("data/fonts/Sile.ttf")) {
+
+    } else {
+        text.setFont(font);
+        text.setCharacterSize(24);
+    }
+
+    // Calculate pixel heights of each font size (is there a way to better automate this?)
+    text.setString("Testing");
+
+    text.setCharacterSize(TextSize::GAME_MENU);
+    text_heights[TextSize::GAME_MENU] = text.getLocalBounds().height;
+    text.setCharacterSize(TextSize::RESOURCE_COUNTER);
+    text_heights[TextSize::RESOURCE_COUNTER] = text.getLocalBounds().height;
 }
 
 /**
- * Handles pending events created by the input.
+ * Handles pending events created by the input. Returns false to end game loop.
  */
 bool Renderer::PollEvents() {
     sf::Event event;
@@ -23,17 +41,41 @@ bool Renderer::PollEvents() {
         if (event.type == sf::Event::Closed) {
             window->close();
             return false;
-        } else if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Space) {
-                // Toggle movement based on mouse cursor
-                mouse_movement = !mouse_movement;
-
-                // Reset move request so player stops moving
-                player->PlayerMoveRequest(player->position, 0.0);
-            }
+        } else if (mode == GameMode::IN_GAME) {
+            if(!GamePollEvents(event))
+                return false;
+        } else if (mode == GameMode::MENU) {
+            if(!MenuPollEvents(event))
+                return false;
         }
     }
 
+    return true;
+}
+
+/**
+ * Handles pending events for in-game.
+ */
+bool Renderer::GamePollEvents(sf::Event& event) {
+    if (event.type == sf::Event::KeyPressed) {
+        if (event.key.code == sf::Keyboard::Space) {
+            // Toggle movement based on mouse cursor
+            mouse_movement = !mouse_movement;
+
+            // Reset move request so player stops moving
+            player->PlayerMoveRequest(player->position, 0.0);
+        } else if (event.key.code == sf::Keyboard::Escape) {
+            show_ingame_menu = !show_ingame_menu;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Handles pending events for menu.
+ */
+bool Renderer::MenuPollEvents(sf::Event& event) {
     return true;
 }
 
@@ -61,14 +103,19 @@ void Renderer::ProcessInputs() {
 }
 
 /**
- * Render the current game world.
+ * Render the game.
  */
-void Renderer::RenderWorld() {
+void Renderer::RenderGame() {
     window->clear(sf::Color(255, 255, 255));
 
-    RenderMap();
-    RenderUnits();
-    RenderInterface();
+    // Render based on if the player is using the menu (no active game) or playing a game
+    if (mode == GameMode::IN_GAME) {
+        RenderMap();
+        RenderUnits();
+        RenderInterface();
+    } else if (mode == GameMode::MENU) {
+        RenderMenu();
+    }
 
     window->display();
 }
@@ -77,6 +124,8 @@ void Renderer::RenderWorld() {
  * Render the land for the game.
  */
 void Renderer::RenderMap() {
+    // Idea: Have a tilemap randomly generated (for example, use 9 tiles of 1024x1024 size with a 2d array to
+    //       tell what to display for background).
 
 }
 
@@ -112,12 +161,70 @@ void Renderer::RenderUnits() {
         }
         count++;
     }
+
 }
 
 /**
  * Render the interface for the game.
  */
 void Renderer::RenderInterface() {
+    // Display resource count
+    RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
+
+    if (show_ingame_menu) {
+        current_menu = MenuType::GAME_MENU;
+        RenderMenuText(current_menu);
+    }
+
+}
+
+/**
+ * Renders the menu.
+ */
+void Renderer::RenderMenu() {
+
+}
+
+/**
+ * Renders text at specified location.
+ */
+void Renderer::RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color) {
+    text.setString(display_text);
+    text.setStyle(sf::Text::Regular);
+    text.setColor(color);
+    text.setPosition(location);
+    text.setCharacterSize(font_size);
+    text.setOrigin(0.0, 0.0);
+    window->draw(text);
+}
+
+/**
+ * Renders the text for the current menu selection.
+ */
+void Renderer::RenderMenuText(MenuType selection) {
+    // Setup a list of all entries to be rendered for current menu.
+    std::vector<MenuType> menu_entries;
+    float text_height;
+    if (selection == MenuType::GAME_MENU) {
+        for (auto entry : kGameSubMenus) {
+            menu_entries.push_back(entry);
+        }
+
+        text.setCharacterSize(TextSize::GAME_MENU);
+        text_height = text_heights[TextSize::GAME_MENU];
+    }
+
+    auto menu_height = menu_entries.size() * text_height;
+    auto y_offset = RESOLUTION_Y/2 - menu_height/2;
+
+    // Draw each menu entry
+    for (auto entry : menu_entries) {
+        text.setString(kMenuStrings[static_cast<std::size_t>(entry)]);
+        text.setOrigin(text.getLocalBounds().width/2.0, text.getLocalBounds().height/2.0);
+        text.setPosition(sf::Vector2f(RESOLUTION_X/2, y_offset));
+        window->draw(text);
+        y_offset += text_height;
+    }
 
 }
 

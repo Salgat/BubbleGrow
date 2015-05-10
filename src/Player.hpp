@@ -42,7 +42,7 @@ public:
     sf::Vector2f position;
     std::array<unsigned int, static_cast<std::size_t>(UnitType::NONE)> number_of_units;
     unsigned int army_value; // The "score" based on number of units and their types
-    unsigned int resources; // Used to create more base units
+    std::atomic<int> resources; // Used to create more base units
     double wander_range; // Radius in meters that units will wander
 
     Player();

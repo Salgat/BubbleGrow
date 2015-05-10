@@ -14,8 +14,17 @@ class Player;
 class Renderer {
 private:
     bool mouse_movement;
+    MenuType current_menu;
+
+    bool show_ingame_menu; // Toggles in-game menu
+
+    sf::Font font;
+    sf::Text text;
+    std::map<unsigned int, float> text_heights; // text_heights[font_size] = pixel_height
 
 public:
+    GameMode mode;
+
     std::shared_ptr<sf::RenderWindow> window;
 
     std::shared_ptr<World> world;
@@ -26,12 +35,23 @@ public:
     bool PollEvents();
     void ProcessInputs(); // Use player->requests to add input requests
 
-    void RenderWorld();
+    bool GamePollEvents(sf::Event& event);
+    bool MenuPollEvents(sf::Event& event);
 
+    void RenderGame();
+
+    // Rendering functions for an active game world
     void RenderMap();
     void RenderUnits();
     //void RenderMiniMap();
     void RenderInterface();
+
+    // Rendering functions for the menu
+    void RenderMenu();
+    void RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color = sf::Color::Black);
+    void RenderMenuText(MenuType selection);
+
+
 };
 
 #endif //BUBBLEGROW_RENDERER_HPP

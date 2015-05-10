@@ -15,7 +15,6 @@ class Resources : public Player {
 private:
 
 public:
-
     Resources();
 
     virtual void Update(double duration);

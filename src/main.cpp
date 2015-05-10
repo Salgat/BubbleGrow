@@ -13,7 +13,7 @@ int main() {
         player->position = sf::Vector2f(0.0, 0.0);
         player->name = "Test_Player";
         player->resources = 100000;
-        player->CreateUnits(100, UnitType::BASE);
+        player->CreateUnits(10, UnitType::BASE);
 
         enemy_player->position = sf::Vector2f(10.0, 10.0);
         enemy_player->name = "Test_Computer_Player";
@@ -23,7 +23,7 @@ int main() {
         //return 1;
     }
 
-    // Setup SFML renderer
+    // Initialize SFML renderer
     auto renderer = std::make_shared<Renderer>();
     renderer->world = world;
     renderer->player = player;
@@ -35,9 +35,11 @@ int main() {
         running = renderer->PollEvents();
         renderer->ProcessInputs();
 
-        world->UpdateAndProcess(clock.restart().asSeconds());
+        // Only update the game if one is running (otherwise, the player is at the menu).
+        if (renderer->mode == GameMode::IN_GAME)
+            world->UpdateAndProcess(clock.restart().asSeconds());
 
-        renderer->RenderWorld();
+        renderer->RenderGame();
     }
 
     return 0;
