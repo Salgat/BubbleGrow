@@ -244,6 +244,10 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
  * Todo: This and Attack() are very similar; consider combining into a single function.
  */
 void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
+    // Initialize random function
+    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    static std::mt19937 gen(seed);
+
     auto target_unit = world->FindUnit(target_owner, target);
 
     if (action == ActionType::GATHER) {
@@ -257,7 +261,13 @@ void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
 
             action = ActionType::IDLE;
         } else {
-            action_duration += duration;
+            // When adding current duration of gather action, add some random variance to smooth out the size
+            // reduction of resource bubbles (otherwise it looks really bad when a bunch of bubbles are gathering
+            // the same resource).
+            std::uniform_real_distribution<> duration_distribution(duration * 0.9, duration * 1.1);
+            double random_duration = duration_distribution(gen);
+
+            action_duration += random_duration;
         }
     } else if (target_unit and target_unit->resource_value > 0) {
         auto target_position = target_unit->position;
