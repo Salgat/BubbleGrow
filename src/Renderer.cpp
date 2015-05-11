@@ -66,6 +66,11 @@ bool Renderer::GamePollEvents(sf::Event& event) {
             player->PlayerMoveRequest(player->position, 0.0);
         } else if (event.key.code == sf::Keyboard::Escape) {
             show_ingame_menu = !show_ingame_menu;
+            if (show_ingame_menu) {
+                mouse_movement = false;
+            } else {
+                mouse_movement = true;
+            }
         }
     }
 
@@ -99,6 +104,8 @@ void Renderer::ProcessInputs() {
             speed = 0.0;
 
         player->PlayerMoveRequest(sf::Vector2f(player->position.x + distance_x, player->position.y + distance_y), speed);
+    } else {
+        player->PlayerMoveRequest(sf::Vector2f(player->position.x, player->position.y), 1.0);
     }
 }
 
@@ -161,11 +168,10 @@ void Renderer::RenderUnits() {
         }
         count++;
     }
-
 }
 
 /**
- * Render the interface for the game.
+ * Render the interface for in-game.
  */
 void Renderer::RenderInterface() {
     // Display resource count
@@ -179,14 +185,14 @@ void Renderer::RenderInterface() {
 }
 
 /**
- * Renders the menu.
+ * Renders the start menu (not the in-game menu).
  */
 void Renderer::RenderMenu() {
 
 }
 
 /**
- * Renders text at specified location.
+ * Renders text at specified location and attributes.
  */
 void Renderer::RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color) {
     text.setString(display_text);
@@ -225,6 +231,5 @@ void Renderer::RenderMenuText(MenuType selection) {
         window->draw(text);
         y_offset += text_height;
     }
-
 }
 
