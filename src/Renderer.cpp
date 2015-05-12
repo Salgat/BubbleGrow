@@ -10,14 +10,14 @@
 Renderer::Renderer()
     : mouse_movement(true)
     , current_menu(MenuType::MAIN)
-    , mode(GameMode::IN_GAME)
+    , last_menu(MenuType::NONE)
+    , mode(GameMode::MENU)
     , show_ingame_menu(false) {
     std::string title = "BubbleGrow V" + std::to_string(VERSION) + "." + std::to_string(SUB_VERSION);
     window = std::make_shared<sf::RenderWindow>(sf::VideoMode(RESOLUTION_X, RESOLUTION_Y), title);
     //window->setFramerateLimit(60);
 
     if (!font.loadFromFile("data/fonts/Sile.ttf")) {
-
     } else {
         text.setFont(font);
         text.setCharacterSize(24);
@@ -30,6 +30,15 @@ Renderer::Renderer()
     text_heights[TextSize::GAME_MENU] = text.getLocalBounds().height;
     text.setCharacterSize(TextSize::RESOURCE_COUNTER);
     text_heights[TextSize::RESOURCE_COUNTER] = text.getLocalBounds().height;
+
+    text.setCharacterSize(TextSize::MAIN);
+    text_heights[TextSize::MAIN] = text.getLocalBounds().height;
+    text.setCharacterSize(TextSize::VERSUS);
+    text_heights[TextSize::VERSUS] = text.getLocalBounds().height;
+
+    // Load textures to be used by the game
+    textures[ImageId::LOGO] = std::make_unique<sf::Texture>();
+    textures[ImageId::LOGO]->loadFromFile("data/artwork/logo.png");
 }
 
 /**
@@ -57,6 +66,8 @@ bool Renderer::PollEvents() {
  * Handles pending events for in-game.
  */
 bool Renderer::GamePollEvents(sf::Event& event) {
+    static MenuType last_menu_item_clicked = MenuType::NONE;
+
     if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::Space) {
             // Toggle movement based on mouse cursor
@@ -72,6 +83,33 @@ bool Renderer::GamePollEvents(sf::Event& event) {
                 mouse_movement = true;
             }
         }
+    } else if (event.type == sf::Event::MouseButtonPressed) {
+        if (event.mouseButton.button == sf::Mouse::Left) {
+            // Check if mouse is clicking on any menu selection
+            last_menu_item_clicked = MouseOverWhichMenuOption(sf::Vector2f(event.mouseButton.x, event.mouseButton.y));
+        }
+    } else if (event.type == sf::Event::MouseButtonReleased) {
+        if (event.mouseButton.button == sf::Mouse::Left) {
+            auto menu_item_released_at = MouseOverWhichMenuOption(sf::Vector2f(event.mouseButton.x, event.mouseButton.y));
+            if (menu_item_released_at == last_menu_item_clicked and last_menu_item_clicked != MenuType::NONE) {
+                // Menu item has been pressed (we checked if the mouse click and release is on the same menu item)
+                if (menu_item_released_at == MenuType::LEAVE_GAME) {
+                    // Leave the game and go back to the main menu (and do any cleanup)
+                    world = nullptr;
+                    player = nullptr;
+
+                    show_ingame_menu = false;
+                    mouse_movement = true;
+
+                    current_menu = MenuType::MAIN;
+                    mode = GameMode::MENU;
+                } else if (menu_item_released_at == MenuType::BACK) {
+                    // Close the menu
+                    show_ingame_menu = false;
+                    mouse_movement = true;
+                }
+            }
+        }
     }
 
     return true;
@@ -81,6 +119,51 @@ bool Renderer::GamePollEvents(sf::Event& event) {
  * Handles pending events for menu.
  */
 bool Renderer::MenuPollEvents(sf::Event& event) {
+    // Check if any menu options are clicked
+    static MenuType last_menu_item_clicked = MenuType::NONE;
+    if (event.type == sf::Event::MouseButtonPressed) {
+        if (event.mouseButton.button == sf::Mouse::Left) {
+            // Check if mouse is clicking on any menu selection
+            last_menu_item_clicked = MouseOverWhichMenuOption(sf::Vector2f(event.mouseButton.x, event.mouseButton.y));
+        }
+    } else if (event.type == sf::Event::MouseButtonReleased) {
+        if (event.mouseButton.button == sf::Mouse::Left) {
+            auto menu_item_released_at = MouseOverWhichMenuOption(sf::Vector2f(event.mouseButton.x, event.mouseButton.y));
+            if (menu_item_released_at == last_menu_item_clicked and last_menu_item_clicked != MenuType::NONE) {
+                // Menu item has been pressed (we checked if the mouse click and release is on the same menu item)
+                if (menu_item_released_at == MenuType::QUICK_MATCH) {
+                    // Quick Match clicked, setup a game for the player
+                    // Todo: Set this up into a function with customizable parameters
+                    world = std::make_shared<World>();
+                    player = world->AddPlayer();
+                    auto enemy_player = world->AddPlayer();
+                    auto resource_player = world->AddResources(1000*10*10, 50*10, 500);
+
+                    player->position = sf::Vector2f(0.0, 0.0);
+                    player->name = "Test_Player";
+                    player->resources = 100000;
+                    player->CreateUnits(10, UnitType::BASE);
+
+                    enemy_player->position = sf::Vector2f(10.0, 10.0);
+                    enemy_player->name = "Test_Computer_Player";
+                    enemy_player->resources = 100000;
+                    enemy_player->CreateUnits(1, UnitType::BASE);
+
+                    current_menu = MenuType::GAME_MENU;
+                    mode = GameMode::IN_GAME;
+                } else if (menu_item_released_at == MenuType::EXIT_GAME) {
+                    // Exit and close game
+                    return false;
+                } else if (menu_item_released_at == MenuType::VERSUS) {
+                    current_menu = MenuType::VERSUS;
+                    last_menu = MenuType::MAIN;
+                } else if (menu_item_released_at == MenuType::BACK) {
+                    current_menu = MenuType::MAIN;
+                }
+            }
+        }
+    }
+
     return true;
 }
 
@@ -88,24 +171,26 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
  * Handles non-event input handling.
  */
 void Renderer::ProcessInputs() {
-    if (mouse_movement) {
-        // Movement based on cursor's position from center of screen.
-        auto mouse_position = sf::Mouse::getPosition(*window);
-        auto distance_x = static_cast<int>(mouse_position.x) - static_cast<int>(RESOLUTION_X/2);
-        auto distance_y = static_cast<int>(mouse_position.y) - static_cast<int>(RESOLUTION_Y/2);
-        float distance_from_center = std::sqrt(distance_x*distance_x + distance_y*distance_y);
+    if (mode == GameMode::IN_GAME) {
+        if (mouse_movement) {
+            // Movement based on cursor's position from center of screen.
+            auto mouse_position = sf::Mouse::getPosition(*window);
+            auto distance_x = static_cast<int>(mouse_position.x) - static_cast<int>(RESOLUTION_X/2);
+            auto distance_y = static_cast<int>(mouse_position.y) - static_cast<int>(RESOLUTION_Y/2);
+            float distance_from_center = std::sqrt(distance_x*distance_x + distance_y*distance_y);
 
-        // Speed is based on the cursor's distance from the center (with a small area in the center where there is no
-        // speed).
-        float speed = (distance_from_center-50.0)/200.0;
-        if (speed > 1.0)
-            speed = 1.0;
-        else if (speed < 0.0)
-            speed = 0.0;
+            // Speed is based on the cursor's distance from the center (with a small area in the center where there is no
+            // speed).
+            float speed = (distance_from_center-50.0)/200.0;
+            if (speed > 1.0)
+                speed = 1.0;
+            else if (speed < 0.0)
+                speed = 0.0;
 
-        player->PlayerMoveRequest(sf::Vector2f(player->position.x + distance_x, player->position.y + distance_y), speed);
-    } else {
-        player->PlayerMoveRequest(sf::Vector2f(player->position.x, player->position.y), 1.0);
+            player->PlayerMoveRequest(sf::Vector2f(player->position.x + distance_x, player->position.y + distance_y), speed);
+        } else {
+            player->PlayerMoveRequest(sf::Vector2f(player->position.x, player->position.y), 1.0);
+        }
     }
 }
 
@@ -188,7 +273,13 @@ void Renderer::RenderInterface() {
  * Renders the start menu (not the in-game menu).
  */
 void Renderer::RenderMenu() {
+    // Render Logo
+    sprite.setTexture(*textures[ImageId::LOGO]);
+    sprite.setPosition(RESOLUTION_X/2 - sprite.getLocalBounds().width/2.0, 10.0);
+    window->draw(sprite);
 
+    // Render menu options
+    RenderMenuText(current_menu);
 }
 
 /**
@@ -211,25 +302,83 @@ void Renderer::RenderMenuText(MenuType selection) {
     // Setup a list of all entries to be rendered for current menu.
     std::vector<MenuType> menu_entries;
     float text_height;
+    double y_offset = 0.0;
+    TextSize text_size;
     if (selection == MenuType::GAME_MENU) {
+        // Todo: Simplify this section (too repetitive)
         for (auto entry : kGameSubMenus) {
             menu_entries.push_back(entry);
         }
 
+        text_size = TextSize::GAME_MENU;
         text.setCharacterSize(TextSize::GAME_MENU);
         text_height = text_heights[TextSize::GAME_MENU];
+    } else if (selection == MenuType::MAIN) {
+        for (auto entry : kMainSubMenus) {
+            menu_entries.push_back(entry);
+        }
+
+        text_size = TextSize::MAIN;
+        text.setCharacterSize(TextSize::MAIN);
+        text_height = text_heights[TextSize::MAIN];
+
+        // Offset y to make room for Logo
+        y_offset += 100.0;
+    } else if (selection == MenuType::VERSUS) {
+        for (auto entry : kVersusSubMenus) {
+            menu_entries.push_back(entry);
+        }
+
+        text_size = TextSize::MAIN;
+        text.setCharacterSize(TextSize::MAIN);
+        text_height = text_heights[TextSize::MAIN];
+
+        // Offset y to make room for Logo
+        y_offset += 100.0;
     }
 
     auto menu_height = menu_entries.size() * text_height;
-    auto y_offset = RESOLUTION_Y/2 - menu_height/2;
+    y_offset += RESOLUTION_Y/2 - menu_height/2;
 
     // Draw each menu entry
+    menu_text_entries.clear();
     for (auto entry : menu_entries) {
-        text.setString(kMenuStrings[static_cast<std::size_t>(entry)]);
-        text.setOrigin(text.getLocalBounds().width/2.0, text.getLocalBounds().height/2.0);
-        text.setPosition(sf::Vector2f(RESOLUTION_X/2, y_offset));
-        window->draw(text);
+        sf::Text menu_entry;
+        menu_entry.setFont(font);
+        menu_entry.setString(kMenuStrings[static_cast<std::size_t>(entry)]);
+        menu_entry.setColor(sf::Color::Black);
+        menu_entry.setCharacterSize(text_size);
+        menu_entry.setOrigin(menu_entry.getLocalBounds().width/2.0, menu_entry.getLocalBounds().height/2.0);
+        menu_entry.setPosition(sf::Vector2f(RESOLUTION_X/2, y_offset));
+        menu_text_entries.push_back(std::pair<MenuType, sf::Text>(entry, menu_entry));
+
+        window->draw(menu_entry);
+
         y_offset += text_height;
     }
 }
 
+/**
+ * Returns true if the provided sf::Text object contains the location provided.
+ */
+bool Renderer::IsMouseOverText(sf::Text& text_object, sf::Vector2f cursor_location) {
+    auto bounding_box = text_object.getGlobalBounds();
+    if (bounding_box.contains(cursor_location))
+        return true;
+    return false;
+}
+
+/**
+ * Returns the MenuType menu option that contains the location provided. Returns MenuType::NONE if none of the
+ * menu options contain the location.
+ */
+MenuType Renderer::MouseOverWhichMenuOption(sf::Vector2f cursor_location) {
+    // Iterate through each menu option to see if any contain the cursor location
+    for (auto& entry : menu_text_entries) {
+        if (IsMouseOverText(entry.second, sf::Vector2f(cursor_location.x, cursor_location.y))) {
+            return entry.first;
+        }
+    }
+
+    return MenuType::NONE;
+}

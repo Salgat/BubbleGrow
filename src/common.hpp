@@ -18,6 +18,9 @@
 #include <chrono>
 #include <stack>
 
+//#define NDEBUG
+#include <cassert>
+
 // SFML
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
@@ -81,6 +84,18 @@ std::array<std::string const, static_cast<std::size_t>(MenuType::NONE)> const kM
 enum TextSize {
     GAME_MENU = 144,
     RESOURCE_COUNTER = 24,
+
+    MAIN = 144,
+    VERSUS = 144,
+
+
+    NONE
+};
+
+// Image IDs
+
+enum class ImageId {
+    LOGO,
     NONE
 };
 
@@ -128,7 +143,7 @@ enum class PlayerType {
 
 // Constants
 // Todo: May want to set this in a config file
-double const kPlayerWalkSpeed = 10.0;
+double const kPlayerWalkSpeed = 20.0;
 
 double const PI = 3.141592653589793238463;
 unsigned int const RESOLUTION_X = 1280;

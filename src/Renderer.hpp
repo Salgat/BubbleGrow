@@ -15,12 +15,21 @@ class Renderer {
 private:
     bool mouse_movement;
     MenuType current_menu;
+    MenuType last_menu; // This is only updated when a main menu selection includes a back button on the next menu
 
     bool show_ingame_menu; // Toggles in-game menu
 
     sf::Font font;
     sf::Text text;
+    std::vector<std::pair<MenuType, sf::Text>> menu_text_entries; // Holds the sf::Text for all current menu options
     std::map<unsigned int, float> text_heights; // text_heights[font_size] = pixel_height
+
+    sf::Sprite sprite;
+    std::map<ImageId, std::unique_ptr<sf::Texture>> textures;
+
+    // Helper functions
+    inline bool IsMouseOverText(sf::Text& text_object, sf::Vector2f cursor_location);
+    inline MenuType MouseOverWhichMenuOption(sf::Vector2f cursor_location);
 
 public:
     GameMode mode;
