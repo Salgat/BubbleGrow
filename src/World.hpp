@@ -20,6 +20,7 @@ private:
 
 public:
     std::unordered_map<uint64_t, std::shared_ptr<Player>> players;
+    double map_radius; // The distance from (0.0, 0.0) that the game world extends to
 
     World();
 

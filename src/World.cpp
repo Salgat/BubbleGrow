@@ -8,7 +8,8 @@
 
 
 World::World()
-    : player_id_count(0) {
+    : player_id_count(0)
+    , map_radius(1000.0) {
 
 }
 
@@ -29,7 +30,7 @@ void World::UpdateAndProcess(double duration) {
     // Have each unit make a decision
     for (auto& player : players) {
         if (player.second->type != PlayerType::RESOURCES)
-            player.second->MakeDecisions();
+            player.second->MakeDecisions(duration);
     }
 
     // Execute request for each unit
@@ -39,8 +40,16 @@ void World::UpdateAndProcess(double duration) {
     }
 
     // Add and remove any new/expired units
+    std::vector<uint64_t> players_to_remove;
     for (auto& player : players) {
         player.second->RemoveExpiredUnits();
+        if (player.second->units.size() == 0) {
+            players_to_remove.push_back(player.first);
+        }
+    }
+
+    for (auto& player : players_to_remove) {
+        players.erase(player);
     }
 }
 

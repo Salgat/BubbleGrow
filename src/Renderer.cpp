@@ -145,8 +145,9 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                     player->resources = 100000;
                     player->CreateUnits(10, UnitType::BASE);
 
-                    enemy_player->position = sf::Vector2f(10.0, 10.0);
+                    enemy_player->position = sf::Vector2f(300.0, 300.0);
                     enemy_player->name = "Test_Computer_Player";
+                    enemy_player->ai_type = AiType::EASY;
                     enemy_player->resources = 100000;
                     enemy_player->CreateUnits(1, UnitType::BASE);
 

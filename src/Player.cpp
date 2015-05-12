@@ -7,13 +7,15 @@
 #include "World.hpp"
 
 Player::Player()
-    : name("No Name")
+    : action_duration(0.0)
+    , name("No Name")
     , id(0)
     , army_value(0)
     , resources(0)
     , unit_ids(0)
     , type (PlayerType::PLAYER)
     , ai_type(AiType::NONE)
+    , ai_destination(position)
     , wander_range(25.0) {
     // Default to having no units
     for (auto& entry : number_of_units) {
@@ -89,12 +91,14 @@ void Player::ProcessRequests(double duration) {
 /**
  * Process the decisions for each unit.
  */
-void Player::MakeDecisions() {
+void Player::MakeDecisions(double duration) {
     // Todo: Parallelize
     for (auto& unit : units) {
         if (unit.second->health[0] > 0)
             unit.second->MakeDecision(unit_requests.find(unit.first)->second);
     }
+
+    MakePlayerDecision(duration);
 }
 
 /**
@@ -153,4 +157,86 @@ void Player::CreateUnits(int amount, UnitType type) {
             unit_requests[new_unit->id].type = RequestType::NONE;
         }
     }
+}
+
+/**
+ * Returns distance (meters) from current unit to target position.
+ */
+inline double Player::CalculateDistanceTo(sf::Vector2f target_position) {
+    double x_difference = target_position.x - position.x;
+    double y_difference = target_position.y - position.y;
+    return std::sqrt(x_difference*x_difference + y_difference*y_difference);
+}
+
+/**
+ * Modifies requests with a decision made by the Player's AI.
+ */
+void Player::MakePlayerDecision(double duration) {
+    if (ai_type == AiType::PLAYER) {
+        return;
+    } else if (ai_type == AiType::EASY) {
+        EasyAiDecision(duration);
+    } else if (ai_type == AiType::MEDIUM) {
+        //MediumAiDecision();
+    } else if (ai_type == AiType::HARD) {
+        //HardAiDecision();
+    } else if (ai_type == AiType::INSANE) {
+        //InsaneAiDecision();
+    }
+}
+
+/**
+ * Makes a player decision at the Easy level.
+ */
+void Player::EasyAiDecision(double duration) {
+    // Easy AI simply wanders around randomly and only engages other players if they approach nearby distance
+    // First determine if there are nearby enemy players
+    for (auto& player : world->players) {
+        if (player.second->type != PlayerType::RESOURCES and player.first != id) {
+            double player_distance = player_distance = CalculateDistanceTo(player.second->position);
+            if (player_distance < 5.0 * wander_range) {
+                // Nearby player found, head towards him to fight
+                PlayerMoveRequest(player.second->position, 1.0);
+                return;
+            }
+        }
+    }
+
+    // No nearby players found, so just wander around
+    if (CalculateDistanceTo(ai_destination) < 1.0 and action_duration >= kEasyAiIdleTime) {
+        ai_destination = MoveTowards(RandomWanderLocation(), 100.0);
+        PlayerMoveRequest(ai_destination, 1.0);
+        action_duration = 0.0;
+    } else if (CalculateDistanceTo(ai_destination) < 1.0) {
+        action_duration += duration;
+    }
+}
+
+/**
+ * Provides a random location where units can wonder to.
+ */
+inline sf::Vector2f Player::RandomWanderLocation() {
+    // Choose a random angle (0 to 2*PI) and calculate position based off direction * wander_range
+    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    static std::mt19937 gen(seed);
+    std::uniform_real_distribution<> dis(0, 2*PI);
+    double random_angle = dis(gen);
+    std::uniform_real_distribution<> dis2(0, world->map_radius);
+    double wander_range = dis2(gen);
+
+    return sf::Vector2f(static_cast<float>(wander_range*std::cos(random_angle)),
+                        static_cast<float>(wander_range*std::sin(random_angle)));
+}
+
+/**
+ * Returns the position in the direction of the destination at the provided distance from the current player.
+ */
+sf::Vector2f Player::MoveTowards(sf::Vector2f destination, double distance) {
+    // Find direction, normalize it, multiply it by the scalar (distance), and add to current position
+    double x_difference = destination.x - position.x;
+    double y_difference = destination.y - position.y;
+    double magnitude = std::sqrt(x_difference*x_difference + y_difference*y_difference);
+    auto normalized_direction = sf::Vector2f(x_difference/magnitude, y_difference/magnitude);
+
+    return sf::Vector2f(position.x + distance*normalized_direction.x, position.y + distance*normalized_direction.y);
 }

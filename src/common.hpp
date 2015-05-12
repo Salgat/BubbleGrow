@@ -128,11 +128,15 @@ enum class UnitType {
 };
 
 enum class AiType {
+    PLAYER, // Player AI means just skipping the process of making a decision (and leaves that up to the user input)
     EASY,
-    NORMAL,
+    MEDIUM,
     HARD,
+    INSANE, // Insane difficulty is allowed to cheat
     NONE
 };
+
+double const kEasyAiIdleTime = 6.0;
 
 enum class PlayerType {
     PLAYER,

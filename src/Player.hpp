@@ -13,6 +13,18 @@ class World;
 
 class Player : public std::enable_shared_from_this<Player> {
 private:
+    inline double CalculateDistanceTo(sf::Vector2f target_position);
+    inline sf::Vector2f MoveTowards(sf::Vector2f destination, double distance);
+
+    // Player AI
+    // Todo: Consider encapsulating the AI state and logic into a separate class
+    double action_duration;
+    sf::Vector2f ai_destination;
+
+    void MakePlayerDecision(double duration);
+    void EasyAiDecision(double duration);
+
+    inline sf::Vector2f RandomWanderLocation();
 
 public:
     // Player information
@@ -52,7 +64,7 @@ public:
 
     virtual void Update(double duration);
     void ProcessRequests(double duration); // Duration is in seconds (example: 0.01666 == 60fps)
-    void MakeDecisions();
+    void MakeDecisions(double duration);
     virtual void RemoveExpiredUnits();
 
     void CreateUnits(int amount, UnitType type);
