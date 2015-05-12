@@ -264,7 +264,7 @@ void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
             // When adding current duration of gather action, add some random variance to smooth out the size
             // reduction of resource bubbles (otherwise it looks really bad when a bunch of bubbles are gathering
             // the same resource).
-            std::uniform_real_distribution<> duration_distribution(duration * 0.9, duration * 1.1);
+            std::uniform_real_distribution<> duration_distribution(duration * 0.8, duration * 1.2);
             double random_duration = duration_distribution(gen);
 
             action_duration += random_duration;
@@ -296,7 +296,13 @@ void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
 std::shared_ptr<Unit> Unit::FindClosestUnit(PlayerType ignore) {
     std::pair<double, std::shared_ptr<Unit>> closest_unit = std::make_pair(std::numeric_limits<double>::max(), nullptr);
     for (auto& player : world->players) {
-        if (player.first != owner_id and player.second->type != ignore) {
+        double player_distance = 0.0;
+        if (ignore == PlayerType::RESOURCES) {
+            // When finding units to attack, ignore players that are obviously outside the range to attack
+            player_distance = CalculateDistanceTo(player.second->position);
+        }
+
+        if (player.first != owner_id and player.second->type != ignore and player_distance < 3.0*owner->wander_range) {
             for (auto& unit : player.second->units) {
                 int required_amount = 0;
                 if (ignore == PlayerType::RESOURCES)

@@ -79,11 +79,13 @@ std::shared_ptr<Unit> World::FindUnit(uint64_t owner_id, uint64_t unit_id) {
     for (auto& player : players) {
         if (player.first == owner_id) {
             auto unit = player.second->units.find(unit_id);
-            if (unit != player.second->units.end())
+            if (unit != player.second->units.end()) {
                 return unit->second;
+            } else{
+                break;
+            }
         }
     }
 
     return nullptr;
 }
-

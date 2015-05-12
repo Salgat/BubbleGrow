@@ -68,6 +68,7 @@ bool Renderer::PollEvents() {
 bool Renderer::GamePollEvents(sf::Event& event) {
     static MenuType last_menu_item_clicked = MenuType::NONE;
 
+    // Todo: Might want to encapsulate the mouse click check into a function?
     if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::Space) {
             // Toggle movement based on mouse cursor
