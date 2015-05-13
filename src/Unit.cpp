@@ -30,6 +30,9 @@ Unit::Unit()
  */
 void Unit::Update(double duration) {
     health[0] += pending_damage.load();
+
+    // Todo: Calculate distance from owner and reduce life based on distance from owner beyond a certain range
+    // (this is to prevent people from just constantly running away and not fighting)
 }
 
 /**

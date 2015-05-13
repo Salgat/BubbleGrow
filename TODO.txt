@@ -10,6 +10,7 @@ This document holds an informal list of work planned to do.
 	- Add arrows pointing to other players
 	- Add ability to purchase other elements
 	- Add "const" where needed, same goes for inline only in the headers
+	- Add an end game screen for if the player dies or if the player wins by being the only one left (goes back to main screen)
 
 Later,
 	- Artwork

@@ -197,13 +197,6 @@ double const kFighterSize = 1.0;
 double const kBruteSize = 2.0;
 double const kScoutSize = 0.5;
 
-// Resource requirements (resources/unit)
-int const kBaseResourceCost = 100;
-int const kGathererResourceCost = 5;
-int const kFighterResourceCost = 5;
-int const kBruteResourceCost = 10;
-int const kScoutResourceCost = 0;
-
 // Gather speed (gathers/second)
 double const kBaseGatherSpeed = 0.2;
 double const kGathererGatherSpeed = 1.0;
@@ -255,12 +248,6 @@ std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kSize =
                                                                                   kBruteSize,
                                                                                   kScoutSize};
 
-std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kResourceCost = {kBaseResourceCost,
-                                                                                       kGathererResourceCost,
-                                                                                       kFighterResourceCost,
-                                                                                       kBruteResourceCost,
-                                                                                       kScoutResourceCost};
-
 std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kGatherSpeed = {kBaseGatherSpeed,
                                                                                          kGathererGatherSpeed,
                                                                                          kFighterGatherSpeed,
@@ -273,7 +260,48 @@ std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kGatherAmo
                                                                                        kBruteGatherAmount,
                                                                                        kScoutGatherAmount};
 
-// Unit conversion requirements
+// Unit cost requirements
+// Resource requirements (resources/unit)
+int const kBaseResourceCost = 100;
+int const kGathererResourceCost = 0;
+int const kFighterResourceCost = 0;
+int const kBruteResourceCost = 0;
+int const kScoutResourceCost = 0;
+
+// Unit Type cost
+UnitType const kBaseUnitTypeCost = UnitType::NONE;
+UnitType const kGathererUnitTypeCost = UnitType::BASE;
+UnitType const kFighterUnitTypeCost = UnitType::BASE;
+UnitType const kBruteUnitTypeCost = UnitType::FIGHTER;
+UnitType const kScoutUnitTypeCost = UnitType::BASE;
+
+// Unit cost requirements (units/new unit)
+int const kBaseUnitCost = 0;
+int const kGathererUnitCost = 5;
+int const kFighterUnitCost = 5;
+int const kBruteUnitCost = 5;
+int const kScoutUnitCost = 5;
+
+// Determines cost in resources of the unit type
+std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kResourceCost = {kBaseResourceCost,
+                                                                                       kGathererResourceCost,
+                                                                                       kFighterResourceCost,
+                                                                                       kBruteResourceCost,
+                                                                                       kScoutResourceCost};
+
+// Determines the type of unit for "unit costs"
+std::array<UnitType const, static_cast<std::size_t>(UnitType::NONE)> const kUnitTypeCost = {kBaseUnitTypeCost,
+                                                                                       kGathererUnitTypeCost,
+                                                                                       kFighterUnitTypeCost,
+                                                                                       kBruteUnitTypeCost,
+                                                                                       kScoutUnitTypeCost};
+
+// Determines the cost in units
+std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kUnitCost = {kBaseUnitCost,
+                                                                                   kGathererUnitCost,
+                                                                                   kFighterUnitCost,
+                                                                                   kBruteUnitCost,
+                                                                                   kScoutUnitCost};
 
 
 #endif //BUBBLEGROW_COMMON_HPP

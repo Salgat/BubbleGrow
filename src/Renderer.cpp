@@ -83,6 +83,8 @@ bool Renderer::GamePollEvents(sf::Event& event) {
             } else {
                 mouse_movement = true;
             }
+        } else if (event.key.code == sf::Keyboard::Num1) {
+            player->PurchaseUnits(10, UnitType::BASE);
         }
     } else if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {
@@ -136,20 +138,22 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                     // Quick Match clicked, setup a game for the player
                     // Todo: Set this up into a function with customizable parameters
                     world = std::make_shared<World>();
-                    player = world->AddPlayer();
-                    auto enemy_player = world->AddPlayer();
                     auto resource_player = world->AddResources(1000*10*10, 50*10, 500);
 
+                    player = world->AddPlayer();
                     player->position = sf::Vector2f(0.0, 0.0);
                     player->name = "Test_Player";
                     player->resources = 100000;
                     player->CreateUnits(10, UnitType::BASE);
 
-                    enemy_player->position = sf::Vector2f(300.0, 300.0);
-                    enemy_player->name = "Test_Computer_Player";
-                    enemy_player->ai_type = AiType::EASY;
-                    enemy_player->resources = 100000;
-                    enemy_player->CreateUnits(1, UnitType::BASE);
+                    for (unsigned int count = 0; count < 4; ++count) {
+                        auto enemy_player = world->AddPlayer();
+                        enemy_player->position = enemy_player->RandomWanderLocation();
+                        enemy_player->name = "Test_Computer_Player";
+                        enemy_player->ai_type = AiType::EASY;
+                        enemy_player->resources = 100000;
+                        enemy_player->CreateUnits(10, UnitType::BASE);
+                    }
 
                     current_menu = MenuType::GAME_MENU;
                     mode = GameMode::IN_GAME;
@@ -234,7 +238,8 @@ void Renderer::RenderUnits() {
     double scale = 20.0;
 
     // For now just drawing tiny circles until we can get real graphics done
-    sf::Color player_colors[] = {sf::Color::Red, sf::Color::Green, sf::Color::Blue, sf::Color::Yellow};
+    sf::Color player_colors[] = {sf::Color::Red, sf::Color::Green, sf::Color::Blue, sf::Color::Yellow,
+                                 sf::Color::Cyan, sf::Color::Magenta};
     std::size_t count = 0;
     sf::CircleShape circle(10);
     for (auto& player_reference : world->players) {

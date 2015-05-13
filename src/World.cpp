@@ -9,7 +9,7 @@
 
 World::World()
     : player_id_count(0)
-    , map_radius(1000.0) {
+    , map_radius(400.0) {
 
 }
 

@@ -215,7 +215,7 @@ void Player::EasyAiDecision(double duration) {
 /**
  * Provides a random location where units can wonder to.
  */
-inline sf::Vector2f Player::RandomWanderLocation() {
+sf::Vector2f Player::RandomWanderLocation() {
     // Choose a random angle (0 to 2*PI) and calculate position based off direction * wander_range
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     static std::mt19937 gen(seed);
@@ -239,4 +239,57 @@ sf::Vector2f Player::MoveTowards(sf::Vector2f destination, double distance) {
     auto normalized_direction = sf::Vector2f(x_difference/magnitude, y_difference/magnitude);
 
     return sf::Vector2f(position.x + distance*normalized_direction.x, position.y + distance*normalized_direction.y);
+}
+
+/**
+ * Creates up to the amount designated of the type specified (either at the cost of resources, units, or both).
+ */
+void Player::PurchaseUnits(unsigned int amount, UnitType purchase_type) {
+    // Todo: There is a bug where it won't buy unless it can afford at least the amount (instead of buying up to the
+    // amount)
+    // Initialize all costs
+    int resource_cost = kResourceCost[static_cast<std::size_t>(purchase_type)];
+    UnitType unit_cost_type = kUnitTypeCost[static_cast<std::size_t>(purchase_type)];
+    int unit_cost_amount = kUnitCost[static_cast<std::size_t>(purchase_type)];
+
+    // Find the number of units, up to amount, that can be created
+    int units_to_purchase = amount;
+    auto total_resource_cost = amount * resource_cost;
+    if (total_resource_cost > resources) {
+        units_to_purchase = resources / resource_cost;
+    }
+
+    auto number_of_cost_type = number_of_units[static_cast<std::size_t>(unit_cost_type)];
+    auto total_unit_cost = units_to_purchase * unit_cost_amount;
+    if (total_unit_cost > number_of_cost_type) {
+        units_to_purchase = number_of_cost_type / unit_cost_amount;
+    }
+
+    total_resource_cost = units_to_purchase * resource_cost;
+    total_unit_cost = units_to_purchase * unit_cost_amount;
+
+    // Remove costs (units and resources) from current player
+    resources.fetch_sub(total_resource_cost);
+    number_of_units[static_cast<std::size_t>(unit_cost_type)] -= total_unit_cost;
+
+    std::stack<uint64_t> units_to_remove;
+    for (auto& unit : units) {
+        if (unit.second->type == unit_cost_type) {
+            units_to_remove.push(unit.first);
+            --total_unit_cost;
+        }
+
+        if (total_unit_cost == 0)
+            break;
+    }
+
+    while(!units_to_remove.empty()) {
+        units.erase(units_to_remove.top());
+        unit_requests.erase(units_to_remove.top());
+        units_to_remove.pop();
+    }
+
+    // Create newly purchased units
+    std::cout << "Creating units: " << units_to_purchase << ", for amount: " << amount << std::endl;
+    CreateUnits(units_to_purchase, purchase_type);
 }

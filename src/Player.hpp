@@ -24,8 +24,6 @@ private:
     void MakePlayerDecision(double duration);
     void EasyAiDecision(double duration);
 
-    inline sf::Vector2f RandomWanderLocation();
-
 public:
     // Player information
     std::string name; // Visible name to all players
@@ -69,7 +67,9 @@ public:
 
     void CreateUnits(int amount, UnitType type);
 
+    sf::Vector2f RandomWanderLocation();
 
+    void PurchaseUnits(unsigned int amount, UnitType purchase_type);
 };
 
 #endif //BUBBLEGROW_PLAYER_HPP
