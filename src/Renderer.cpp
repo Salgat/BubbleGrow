@@ -84,7 +84,7 @@ bool Renderer::GamePollEvents(sf::Event& event) {
                 mouse_movement = true;
             }
         } else if (event.key.code == sf::Keyboard::Num1) {
-            player->PurchaseUnits(10, UnitType::BASE);
+            player->PlayerPurchaseRequest(10, UnitType::BASE);
         }
     } else if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {

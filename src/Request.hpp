@@ -10,8 +10,7 @@
 enum class RequestType {
     // Player requests
     PLAYER_WALK,
-    CREATE_BASE_UNITS, // Create base units using resources
-    CONVERT_UNITS, // Converts units to desired type
+    PURCHASE_UNITS,
     PLAYER_END_REQUESTS,
 
     // Unit requests
@@ -57,8 +56,13 @@ struct Request {
  *   - int_data[1] = target id
  *
  * Players,
- *   PLAYER_WALK:
- *    - type = RequestType::PLAYER_WALK
+ *  PLAYER_WALK:
+ *   - type = RequestType::PLAYER_WALK
  *   - float_data[0] = x coordinate destination
  *   - float_data[1] = y coordinate destination
+ *
+ *  PURCHASE_UNITS:
+ *   - type = RequestType::PURCHASE_UNITS
+ *   - int_data[0] = static_cast<int>(UnitType::(type to purchase))
+ *   - int_data[1] = amount to purchase
  */

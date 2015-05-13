@@ -59,6 +59,7 @@ public:
 
     void ProcessPlayerRequests(double duration);
     void PlayerMoveRequest(sf::Vector2f destination, double speed);
+    void PlayerPurchaseRequest(unsigned int purchase_amount, UnitType purchase_type);
 
     virtual void Update(double duration);
     void ProcessRequests(double duration); // Duration is in seconds (example: 0.01666 == 60fps)

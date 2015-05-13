@@ -44,12 +44,17 @@ void Player::ProcessPlayerRequests(double duration) {
             auto distance_to =  std::sqrt(x_difference*x_difference + y_difference*y_difference);
             if (distance_to < distance_traveled) {
                 request.type = RequestType::NONE;
-                return;
+                continue;
             }
 
             double angle = atan2(destination.y - position.y, destination.x - position.x);
             position = sf::Vector2f(static_cast<float>(position.x + distance_traveled*cos(angle)),
                                     static_cast<float>(position.y + distance_traveled*sin(angle)));
+        } else if (request.type == RequestType::PURCHASE_UNITS) {
+            auto purchase_type = static_cast<UnitType>(request.int_data[0]);
+            auto purchase_amount = request.int_data[1];
+            PurchaseUnits(purchase_amount, purchase_type);
+            request.type = RequestType::NONE;
         }
     }
 }
@@ -64,6 +69,14 @@ void Player::PlayerMoveRequest(sf::Vector2f destination, double speed) {
     move_request.float_data[1] = destination.y;
     move_request.float_data[2] = speed;
     requests_array[static_cast<std::size_t>(RequestType::PLAYER_WALK)] = move_request;
+}
+
+void Player::PlayerPurchaseRequest(unsigned int purchase_amount, UnitType purchase_type) {
+    Request purchase_request;
+    purchase_request.type = RequestType::PURCHASE_UNITS;
+    purchase_request.int_data[0] = static_cast<int>(purchase_type);
+    purchase_request.int_data[1] = purchase_amount;
+    requests_array[static_cast<std::size_t>(RequestType::PURCHASE_UNITS)] = purchase_request;
 }
 
 /**
@@ -290,6 +303,5 @@ void Player::PurchaseUnits(unsigned int amount, UnitType purchase_type) {
     }
 
     // Create newly purchased units
-    std::cout << "Creating units: " << units_to_purchase << ", for amount: " << amount << std::endl;
     CreateUnits(units_to_purchase, purchase_type);
 }
