@@ -203,7 +203,14 @@ void Player::MakePlayerDecision(double duration) {
  */
 void Player::EasyAiDecision(double duration) {
     // Easy AI simply wanders around randomly and only engages other players if they approach nearby distance
-    // First determine if there are nearby enemy players
+    // Purchase more units if it can afford it
+    if (resources > kResourceCost[static_cast<std::size_t>(UnitType::BASE)]) {
+        // Since we just want to spend all the resources, it doesn't matter how many we request (pick an
+        // arbitrarily big number)
+        PlayerPurchaseRequest(10, UnitType::BASE);
+    }
+
+    // Determine if there are nearby enemy players
     for (auto& player : world->players) {
         if (player.second->type != PlayerType::RESOURCES and player.first != id) {
             double player_distance = player_distance = CalculateDistanceTo(player.second->position);

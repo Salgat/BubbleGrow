@@ -143,7 +143,7 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                     player = world->AddPlayer();
                     player->position = sf::Vector2f(0.0, 0.0);
                     player->name = "Test_Player";
-                    player->resources = 100000;
+                    player->resources = 1000;
                     player->CreateUnits(10, UnitType::BASE);
 
                     for (unsigned int count = 0; count < 4; ++count) {
@@ -151,7 +151,7 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                         enemy_player->position = enemy_player->RandomWanderLocation();
                         enemy_player->name = "Test_Computer_Player";
                         enemy_player->ai_type = AiType::EASY;
-                        enemy_player->resources = 100000;
+                        enemy_player->resources = 1000;
                         enemy_player->CreateUnits(10, UnitType::BASE);
                     }
 
