@@ -97,6 +97,7 @@ enum TextSize {
 enum class ImageId {
     LOGO,
     BUBBLE,
+    ARROW,
     NONE
 };
 

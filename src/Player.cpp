@@ -289,7 +289,7 @@ void Player::PurchaseUnits(unsigned int amount, UnitType purchase_type) {
     total_unit_cost = units_to_purchase * unit_cost_amount;
 
     // Remove costs (units and resources) from current player
-    resources.fetch_sub(total_resource_cost);
+    //resources.fetch_sub(total_resource_cost);
     number_of_units[static_cast<std::size_t>(unit_cost_type)] -= total_unit_cost;
 
     std::stack<uint64_t> units_to_remove;

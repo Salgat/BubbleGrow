@@ -44,6 +44,8 @@ Renderer::Renderer()
     textures[ImageId::LOGO].loadFromFile("data/artwork/logo.png");
     textures[ImageId::BUBBLE] = sf::Texture();
     textures[ImageId::BUBBLE].loadFromFile("data/artwork/bubble.png");
+    textures[ImageId::ARROW] = sf::Texture();
+    textures[ImageId::ARROW].loadFromFile("data/artwork/arrow.png");
 
     // Load tile textures
     std::size_t counter = 0;
@@ -162,7 +164,7 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                     // Quick Match clicked, setup a game for the player
                     // Todo: Set this up into a function with customizable parameters
                     world = std::make_shared<World>();
-                    auto resource_player = world->AddResources(1000*10*10, 50*10, 500);
+                    auto resource_player = world->AddResources(1000*10*10*2, 50*10*2, 500);
                     resource_player->color = sf::Color::Green;
 
                     sf::Color player_colors[] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow,
@@ -288,7 +290,7 @@ void Renderer::RenderUnits() {
     auto player_position = player->position;
     double scale = 0.1;
     std::vector<std::shared_ptr<Player>> non_resource_players;
-    for (auto& player_reference : world->players) {
+    for (auto const& player_reference : world->players) {
         if (player_reference.second->type == PlayerType::RESOURCES) {
             // Draw Resources first since they are to displayed underneath everything else
             RenderPlayer(player_reference.second, player_position);
@@ -298,7 +300,7 @@ void Renderer::RenderUnits() {
         }
     }
 
-    for (auto& non_resource_player : non_resource_players) {
+    for (auto const& non_resource_player : non_resource_players) {
         RenderPlayer(non_resource_player, player_position);
     }
 }
@@ -321,7 +323,7 @@ void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vecto
  * Draws all units for given Player type.
  */
 void Renderer::RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector2f main_player_position) {
-    for (auto &unit : player_to_render->units) {
+    for (auto const& unit : player_to_render->units) {
         RenderUnit(unit.second, player_to_render->type, main_player_position, player_to_render->color);
     }
 }
@@ -338,6 +340,53 @@ void Renderer::RenderInterface() {
         RenderMenuText(current_menu);
     }
 
+    // Display arrows for other players
+    sf::Sprite arrow_sprite;
+    arrow_sprite.setTexture(textures[ImageId::ARROW]);
+    arrow_sprite.setScale(0.2, 0.2);
+    for (auto const& player_reference : world->players) {
+        arrow_sprite.setColor(player_reference.second->color);
+        if (player_reference.second->type == PlayerType::PLAYER and player_reference.second != player) {
+            // Determine the distance and angle to the player and scale the distance of the arrow by the distance
+            auto distance_x = player_reference.second->position.x - player->position.x;
+            auto distance_y = player_reference.second->position.y - player->position.y;
+            auto distance_from_player = std::sqrt(distance_x*distance_x + distance_y*distance_y);
+            auto angle = atan2(distance_y, distance_x);
+
+            auto render_distance = distance_from_player;
+            if (render_distance > 10.0) {
+                // Only render arrows for players that aren't within fighting distance (since you'll otherwise already
+                // be seeing them on the screen).
+
+                // Set direction and position based on which of the 4 sides of the screen the arrow is on
+                double sprite_rotation;
+                sf::Vector2f arrow_position;
+                if (angle > -1.0 * PI/4.0 and angle <= PI/4.0) {
+                    // -45 to 45 degrees, right wall
+                    sprite_rotation = 90.0;
+                    arrow_position = sf::Vector2f(RESOLUTION_X, RESOLUTION_Y * std::sin(angle));
+                } else if (angle > PI/4.0 and angle <= 3.0*PI/4.0) {
+                    // 45 to 135 degrees, bottom wall
+                    sprite_rotation = 180.0;
+                    arrow_position = sf::Vector2f(RESOLUTION_X * std::cos(angle), RESOLUTION_Y);
+                } else if (angle > 3.0*PI/4.0 and angle <= 5.0*PI/4.0) {
+                    // 135 to 225 degrees, left wall
+                    sprite_rotation = -90.0;
+                    arrow_position = sf::Vector2f(0.0, RESOLUTION_Y * std::sin(angle));
+                } else {
+                    // 225 to 315 (-45) degrees, top wall
+                    sprite_rotation = 0.0;
+                    arrow_position = sf::Vector2f(RESOLUTION_X * std::cos(angle), 0.0);
+                }
+
+                arrow_sprite.setOrigin(arrow_sprite.getLocalBounds().width/2.0, 0.0);
+                arrow_sprite.setPosition(arrow_position);
+                arrow_sprite.setRotation(sprite_rotation);
+
+                window->draw(arrow_sprite);
+            }
+        }
+    }
 }
 
 /**
@@ -345,6 +394,9 @@ void Renderer::RenderInterface() {
  */
 void Renderer::RenderMenu() {
     // Render Logo
+    sprite.setOrigin(0.0,0.0);
+    sprite.setRotation(0.0);
+    sprite.setColor(sf::Color::White);
     sprite.setTexture(textures[ImageId::LOGO]);
     double scale = 0.4;
     sprite.setScale(scale, scale);
