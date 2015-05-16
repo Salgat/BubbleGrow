@@ -15,7 +15,7 @@ Unit::Unit()
     , owner_id(0)
     , type(UnitType::BASE)
     , position(sf::Vector2f(0.0, 0.0))
-    , size(1.0)
+    , size(2.0)
     , walk_speed(kBaseWalkSpeed)
     , attack_speed(kBaseAttackSpeed)
     , attack_damage(kBaseAttackDamage)
@@ -275,7 +275,7 @@ void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
     } else if (target_unit and target_unit->resource_value > 0) {
         auto target_position = target_unit->position;
         auto range = CalculateDistanceTo(target_position);
-        if (CalculateAttackRange() >= range-target_unit->size/6.0) {
+        if (CalculateAttackRange() >= range-target_unit->size/2.0) {
             // Start a new gather
             action = ActionType::GATHER;
             action_target = target;

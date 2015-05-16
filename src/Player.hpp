@@ -55,6 +55,10 @@ public:
     std::atomic<int> resources; // Used to create more base units
     double wander_range; // Radius in meters that units will wander
 
+    // Render details
+    sf::Color color;
+    //SymbolType symbol;
+
     Player();
 
     void ProcessPlayerRequests(double duration);

@@ -54,6 +54,9 @@ public:
     std::atomic<int> pending_damage; // Damage to apply to unit from other sources
     std::atomic<int> resource_value; // Value if the unit is a resource
 
+    // Renderer Attributes
+    sf::Sprite sprite;
+
     Unit();
     void Update(double duration);
     void MakeDecision(Request& request);

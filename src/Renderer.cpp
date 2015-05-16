@@ -6,6 +6,7 @@
 #include "World.hpp"
 #include "Player.hpp"
 #include "Unit.hpp"
+#include "Resources.hpp"
 
 Renderer::Renderer()
     : mouse_movement(true)
@@ -14,7 +15,9 @@ Renderer::Renderer()
     , mode(GameMode::MENU)
     , show_ingame_menu(false) {
     std::string title = "BubbleGrow V" + std::to_string(VERSION) + "." + std::to_string(SUB_VERSION);
-    window = std::make_shared<sf::RenderWindow>(sf::VideoMode(RESOLUTION_X, RESOLUTION_Y), title);
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    window = std::make_shared<sf::RenderWindow>(sf::VideoMode(RESOLUTION_X, RESOLUTION_Y), title, sf::Style::Default, settings);
     //window->setFramerateLimit(60);
 
     if (!font.loadFromFile("data/fonts/Sile.ttf")) {
@@ -37,8 +40,29 @@ Renderer::Renderer()
     text_heights[TextSize::VERSUS] = text.getLocalBounds().height;
 
     // Load textures to be used by the game
-    textures[ImageId::LOGO] = std::make_unique<sf::Texture>();
-    textures[ImageId::LOGO]->loadFromFile("data/artwork/logo.png");
+    textures[ImageId::LOGO] = sf::Texture();
+    textures[ImageId::LOGO].loadFromFile("data/artwork/logo.png");
+    textures[ImageId::BUBBLE] = sf::Texture();
+    textures[ImageId::BUBBLE].loadFromFile("data/artwork/bubble.png");
+
+    // Load tile textures
+    std::size_t counter = 0;
+    for (auto& tile_filename : kTileStrings) {
+        background_tiles.push_back(sf::Texture());
+        background_tiles[counter].loadFromFile("data/artwork/" + tile_filename);
+        ++counter;
+    }
+    tile_count = background_tiles.size();
+
+    // Generate random background map (regardless of map size, background map size is the same for simplicity)
+    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    static std::mt19937 random_generator(seed);
+    std::uniform_real_distribution<> distribution_tilemap(0, kTileStrings.size());
+    for (auto& column : background_map) {
+        for (auto& entry : column) {
+            entry = distribution_tilemap(random_generator);
+        }
+    }
 }
 
 /**
@@ -139,8 +163,13 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                     // Todo: Set this up into a function with customizable parameters
                     world = std::make_shared<World>();
                     auto resource_player = world->AddResources(1000*10*10, 50*10, 500);
+                    resource_player->color = sf::Color::Green;
+
+                    sf::Color player_colors[] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow,
+                                                 sf::Color::Cyan, sf::Color::Magenta};
 
                     player = world->AddPlayer();
+                    player->color = player_colors[0];
                     player->position = sf::Vector2f(0.0, 0.0);
                     player->name = "Test_Player";
                     player->resources = 1000;
@@ -148,6 +177,7 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
 
                     for (unsigned int count = 0; count < 4; ++count) {
                         auto enemy_player = world->AddPlayer();
+                        enemy_player->color = player_colors[count+1];
                         enemy_player->position = enemy_player->RandomWanderLocation();
                         enemy_player->name = "Test_Computer_Player";
                         enemy_player->ai_type = AiType::EASY;
@@ -208,7 +238,7 @@ void Renderer::RenderGame() {
 
     // Render based on if the player is using the menu (no active game) or playing a game
     if (mode == GameMode::IN_GAME) {
-        RenderMap();
+        RenderBackground();
         RenderUnits();
         RenderInterface();
     } else if (mode == GameMode::MENU) {
@@ -219,12 +249,33 @@ void Renderer::RenderGame() {
 }
 
 /**
- * Render the land for the game.
+ * Render the background for the game.
  */
-void Renderer::RenderMap() {
-    // Idea: Have a tilemap randomly generated (for example, use 9 tiles of 1024x1024 size with a 2d array to
-    //       tell what to display for background).
+void Renderer::RenderBackground() {
+    auto player_position = player->position;
 
+    double scale = 0.7;
+    int start_x = -1 * static_cast<int>(tilemap_dimensions)/2;
+    int start_y = -1 * static_cast<int>(tilemap_dimensions)/2;
+
+    // Go through and draw each tile, which is offset by its position in background_map
+    sf::Sprite background_sprite;
+    for (auto const& column : background_map) {
+        for (auto const entry : column) {
+            background_sprite.setTexture(background_tiles[entry]);
+            background_sprite.setScale(scale, scale);
+            background_sprite.setPosition(background_sprite.getLocalBounds().width * scale * start_x -
+                                          player->position.x * parallax_strength,
+                                          background_sprite.getLocalBounds().height * scale * start_y -
+                                          player->position.y * parallax_strength);
+
+            window->draw(background_sprite);
+
+            ++start_y;
+        }
+        ++start_x;
+        start_y = -1 * static_cast<int>(tilemap_dimensions)/2;
+    }
 }
 
 /**
@@ -235,30 +286,43 @@ void Renderer::RenderUnits() {
         return;
 
     auto player_position = player->position;
-    double scale = 20.0;
-
-    // For now just drawing tiny circles until we can get real graphics done
-    sf::Color player_colors[] = {sf::Color::Red, sf::Color::Green, sf::Color::Blue, sf::Color::Yellow,
-                                 sf::Color::Cyan, sf::Color::Magenta};
-    std::size_t count = 0;
-    sf::CircleShape circle(10);
+    double scale = 0.1;
+    std::vector<std::shared_ptr<Player>> non_resource_players;
     for (auto& player_reference : world->players) {
-        for (auto& unit : player_reference.second->units) {
-            if (unit.second->health[0] > 0) {
-                circle.setFillColor(player_colors[count % sizeof(player_colors)]);
-            } else {
-                circle.setFillColor(sf::Color::Black);
-            }
-
-            auto radius = unit.second->size*10.0;
-            circle.setRadius(radius);
-            circle.setOrigin(circle.getLocalBounds().width/2.0, circle.getLocalBounds().height/2.0);
-            circle.setPosition((unit.second->position.x - player_position.x)*scale + RESOLUTION_X/2,
-                               (unit.second->position.y - player_position.y)*scale + RESOLUTION_Y/2);
-
-            window->draw(circle);
+        if (player_reference.second->type == PlayerType::RESOURCES) {
+            // Draw Resources first since they are to displayed underneath everything else
+            RenderPlayer(player_reference.second, player_position);
+        } else {
+            // Defer regular players (not resources) to be drawn last
+            non_resource_players.push_back(player_reference.second);
         }
-        count++;
+    }
+
+    for (auto& non_resource_player : non_resource_players) {
+        RenderPlayer(non_resource_player, player_position);
+    }
+}
+
+/**
+ * Draws a unit for the given Player type.
+ */
+void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vector2f player_position, sf::Color color) {
+    unit->sprite.setTexture(textures[ImageId::BUBBLE]);
+    unit->sprite.setOrigin(unit->sprite.getLocalBounds().width/2.0, unit->sprite.getLocalBounds().height/2.0);
+    unit->sprite.setPosition((unit->position.x - player_position.x)*20.0 + RESOLUTION_X/2,
+                             (unit->position.y - player_position.y)*20.0 + RESOLUTION_Y/2);
+    unit->sprite.setColor(color);
+    unit->sprite.setScale(unit->size/20.0, unit->size/20.0);
+
+    window->draw(unit->sprite);
+}
+
+/**
+ * Draws all units for given Player type.
+ */
+void Renderer::RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector2f main_player_position) {
+    for (auto &unit : player_to_render->units) {
+        RenderUnit(unit.second, player_to_render->type, main_player_position, player_to_render->color);
     }
 }
 
@@ -281,8 +345,10 @@ void Renderer::RenderInterface() {
  */
 void Renderer::RenderMenu() {
     // Render Logo
-    sprite.setTexture(*textures[ImageId::LOGO]);
-    sprite.setPosition(RESOLUTION_X/2 - sprite.getLocalBounds().width/2.0, 10.0);
+    sprite.setTexture(textures[ImageId::LOGO]);
+    double scale = 0.4;
+    sprite.setScale(scale, scale);
+    sprite.setPosition(RESOLUTION_X/2 - sprite.getLocalBounds().width/(2.0/scale), 75.0);
     window->draw(sprite);
 
     // Render menu options
@@ -353,7 +419,8 @@ void Renderer::RenderMenuText(MenuType selection) {
         sf::Text menu_entry;
         menu_entry.setFont(font);
         menu_entry.setString(kMenuStrings[static_cast<std::size_t>(entry)]);
-        menu_entry.setColor(sf::Color::Black);
+        //menu_entry.setColor(sf::Color::Black);
+        menu_entry.setColor(sf::Color(0, 0, 50));
         menu_entry.setCharacterSize(text_size);
         menu_entry.setOrigin(menu_entry.getLocalBounds().width/2.0, menu_entry.getLocalBounds().height/2.0);
         menu_entry.setPosition(sf::Vector2f(RESOLUTION_X/2, y_offset));

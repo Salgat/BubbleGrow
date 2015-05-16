@@ -10,6 +10,7 @@
 
 class World;
 class Player;
+class Unit;
 
 class Renderer {
 private:
@@ -24,8 +25,12 @@ private:
     std::vector<std::pair<MenuType, sf::Text>> menu_text_entries; // Holds the sf::Text for all current menu options
     std::map<unsigned int, float> text_heights; // text_heights[font_size] = pixel_height
 
+    std::vector<sf::Texture> background_tiles;
+    std::size_t tile_count;
+    std::array<std::array<std::size_t, tilemap_dimensions>, tilemap_dimensions> background_map;
+
     sf::Sprite sprite;
-    std::map<ImageId, std::unique_ptr<sf::Texture>> textures;
+    std::map<ImageId, sf::Texture> textures;
 
     // Helper functions
     inline bool IsMouseOverText(sf::Text& text_object, sf::Vector2f cursor_location);
@@ -50,8 +55,10 @@ public:
     void RenderGame();
 
     // Rendering functions for an active game world
-    void RenderMap();
+    void RenderBackground();
     void RenderUnits();
+    void RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vector2f player_position, sf::Color color);
+    void RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector2f main_player_position);
     //void RenderMiniMap();
     void RenderInterface();
 
