@@ -340,45 +340,62 @@ void Renderer::RenderInterface() {
         RenderMenuText(current_menu);
     }
 
-    // Display arrows for other players
+    // Display arrows pointing to other players
+    RenderDirectionArrows();
+}
+
+/**
+ * Renders arrows that indicate direction of other players.
+ */
+void Renderer::RenderDirectionArrows() {
     sf::Sprite arrow_sprite;
     arrow_sprite.setTexture(textures[ImageId::ARROW]);
     arrow_sprite.setScale(0.2, 0.2);
     for (auto const& player_reference : world->players) {
-        arrow_sprite.setColor(player_reference.second->color);
         if (player_reference.second->type == PlayerType::PLAYER and player_reference.second != player) {
             // Determine the distance and angle to the player and scale the distance of the arrow by the distance
-            auto distance_x = player_reference.second->position.x - player->position.x;
-            auto distance_y = player_reference.second->position.y - player->position.y;
-            auto distance_from_player = std::sqrt(distance_x*distance_x + distance_y*distance_y);
-            auto angle = atan2(distance_y, distance_x);
+            auto player_screen_position = sf::Vector2f(RESOLUTION_X/2, RESOLUTION_Y);
+            auto target_screen_position = sf::Vector2f((player_reference.second->position.x - player->position.x)*20.0 + RESOLUTION_X/2,
+                                                       (player_reference.second->position.y - player->position.y)*20.0 + RESOLUTION_Y/2);
+            double angle = std::atan2(target_screen_position.y - player_screen_position.y,
+                                      target_screen_position.x - player_screen_position.x);
 
-            auto render_distance = distance_from_player;
-            if (render_distance > 10.0) {
+            auto distance_x = target_screen_position.x - player_screen_position.x;
+            auto distance_y = target_screen_position.y - player_screen_position.y;
+            auto render_distance = std::sqrt(distance_x*distance_x + distance_y*distance_y);
+            if (render_distance > RESOLUTION_X) {
                 // Only render arrows for players that aren't within fighting distance (since you'll otherwise already
                 // be seeing them on the screen).
+                double magnitude;
+                double abs_cos_angle = std::abs(std::cos(angle));
+                double abs_sin_angle = std::abs(std::sin(angle));
 
-                // Set direction and position based on which of the 4 sides of the screen the arrow is on
-                double sprite_rotation;
-                sf::Vector2f arrow_position;
-                if (angle > -1.0 * PI/4.0 and angle <= PI/4.0) {
-                    // -45 to 45 degrees, right wall
-                    sprite_rotation = 90.0;
-                    arrow_position = sf::Vector2f(RESOLUTION_X, RESOLUTION_Y * std::sin(angle));
-                } else if (angle > PI/4.0 and angle <= 3.0*PI/4.0) {
-                    // 45 to 135 degrees, bottom wall
-                    sprite_rotation = 180.0;
-                    arrow_position = sf::Vector2f(RESOLUTION_X * std::cos(angle), RESOLUTION_Y);
-                } else if (angle > 3.0*PI/4.0 and angle <= 5.0*PI/4.0) {
-                    // 135 to 225 degrees, left wall
-                    sprite_rotation = -90.0;
-                    arrow_position = sf::Vector2f(0.0, RESOLUTION_Y * std::sin(angle));
+                if (RESOLUTION_X/2.0*abs_sin_angle <= RESOLUTION_Y/2.0*abs_cos_angle) {
+                    magnitude = RESOLUTION_X/2.0/abs_cos_angle;
                 } else {
-                    // 225 to 315 (-45) degrees, top wall
-                    sprite_rotation = 0.0;
-                    arrow_position = sf::Vector2f(RESOLUTION_X * std::cos(angle), 0.0);
+                    magnitude = RESOLUTION_Y/2.0/abs_sin_angle;
                 }
 
+                double x_position = magnitude*std::cos(angle) + RESOLUTION_X/2;
+                double y_position = magnitude*std::sin(angle) + RESOLUTION_Y/2;
+                auto arrow_position = sf::Vector2f(x_position, y_position);
+
+                double sprite_rotation;
+                if (x_position > static_cast<double>(RESOLUTION_X)-1.0) {
+                    // Right wall
+                    sprite_rotation = 90.0;
+                } else if (x_position < 1.0) {
+                    // Left wall
+                    sprite_rotation = -90.0;
+                } else if (y_position > static_cast<double>(RESOLUTION_Y)-1.0) {
+                    // Bottom wall
+                    sprite_rotation = 180.0;
+                } else {
+                    // Top wall
+                    sprite_rotation = 0.0;
+                }
+
+                arrow_sprite.setColor(player_reference.second->color);
                 arrow_sprite.setOrigin(arrow_sprite.getLocalBounds().width/2.0, 0.0);
                 arrow_sprite.setPosition(arrow_position);
                 arrow_sprite.setRotation(sprite_rotation);

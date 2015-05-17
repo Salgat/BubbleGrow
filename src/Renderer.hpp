@@ -12,6 +12,9 @@ class World;
 class Player;
 class Unit;
 
+/**
+ * Renders game and handles user input.
+ */
 class Renderer {
 private:
     bool mouse_movement;
@@ -61,6 +64,7 @@ public:
     void RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector2f main_player_position);
     //void RenderMiniMap();
     void RenderInterface();
+    void RenderDirectionArrows();
 
     // Rendering functions for the menu
     void RenderMenu();
@@ -71,3 +75,5 @@ public:
 };
 
 #endif //BUBBLEGROW_RENDERER_HPP
+
+// Todo: Need to split up this class into smaller sections; possibly move input operations to their own class.
