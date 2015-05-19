@@ -13,7 +13,8 @@
 Unit::Unit()
     : id(0)
     , owner_id(0)
-    , type(UnitType::BASE)
+    , main_type(UnitMainType::BASE)
+    , type(UnitType::BASE_LV1)
     , position(sf::Vector2f(0.0, 0.0))
     , size(2.0)
     , walk_speed(kBaseWalkSpeed)
@@ -77,7 +78,7 @@ void Unit::MakeDecision(Request& request) {
     // Attacking is prioritized
     auto closest_enemy = FindClosestEnemy();
     //auto closest_enemy = FindClosestEnemy();
-    if (closest_enemy and (type == UnitType::BASE or type == UnitType::FIGHTER or type == UnitType::BRUTE) and
+    if (closest_enemy and (type == UnitType::BASE_LV1 or type == UnitType::FIGHTER_LV1 or type == UnitType::FIGHTER_LV2) and
             CalculateDistanceTo(closest_enemy->position, true) < owner->wander_range) {
         request.type = RequestType::ATTACK;
         request.int_data[0] = static_cast<int>(closest_enemy->owner_id);
@@ -85,7 +86,7 @@ void Unit::MakeDecision(Request& request) {
     } else {
         // No enemies, try to find resource to gather
         auto closest_resource = FindClosestResource();
-        if (closest_resource and (type == UnitType::BASE or type == UnitType::GATHERER) and
+        if (closest_resource and (type == UnitType::BASE_LV1 or type == UnitType::GATHERER_LV1) and
                 CalculateDistanceTo(closest_resource->position, true) < owner->wander_range) {
             //std::cout << "Making a gather request" << std::endl;
             request.type = RequestType::GATHER;

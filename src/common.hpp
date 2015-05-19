@@ -97,6 +97,15 @@ enum TextSize {
 enum class ImageId {
     LOGO,
     BUBBLE,
+    BASE_LV1,
+    BASE_LV2,
+    BASE_LV3,
+    GATHERER_LV1,
+    GATHERER_LV2,
+    GATHERER_LV3,
+    FIGHTER_LV1,
+    FIGHTER_LV2,
+    FIGHTER_LV3,
     ARROW,
     NONE
 };
@@ -109,23 +118,38 @@ enum class ActionType {
     NONE
 };
 
+
 enum class UnitType {
-    BASE,
+    BASE_LV1,
+    BASE_LV2,
+    BASE_LV3,
 
     // Collector
-    GATHERER,
+    GATHERER_LV1,
+    GATHERER_LV2,
+    GATHERER_LV3,
 
     // Fighting
-    FIGHTER,
-    BRUTE,
+    FIGHTER_LV1,
+    FIGHTER_LV2,
+    FIGHTER_LV3,
 
     // Explorer
     SCOUT,
 
     // Resources
-    GROW,
-    SUPER_GROW, // A more valuable resource
+    RESOURCE,
+    SUPER_RESOURCE, // A more valuable resource
 
+    NONE
+};
+
+// A less specific classifier for units based on their role
+enum class UnitMainType {
+    BASE,
+    GATHERER,
+    FIGHTER,
+    RESOURCE,
     NONE
 };
 
@@ -272,10 +296,10 @@ int const kScoutResourceCost = 0;
 
 // Unit Type cost
 UnitType const kBaseUnitTypeCost = UnitType::NONE;
-UnitType const kGathererUnitTypeCost = UnitType::BASE;
-UnitType const kFighterUnitTypeCost = UnitType::BASE;
-UnitType const kBruteUnitTypeCost = UnitType::FIGHTER;
-UnitType const kScoutUnitTypeCost = UnitType::BASE;
+UnitType const kGathererUnitTypeCost = UnitType::BASE_LV1;
+UnitType const kFighterUnitTypeCost = UnitType::BASE_LV1;
+UnitType const kBruteUnitTypeCost = UnitType::FIGHTER_LV1;
+UnitType const kScoutUnitTypeCost = UnitType::BASE_LV1;
 
 // Unit cost requirements (units/new unit)
 int const kBaseUnitCost = 0;

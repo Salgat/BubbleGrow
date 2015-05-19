@@ -38,6 +38,7 @@ public:
     std::shared_ptr<Player> owner; // Used to gain knowledge like current location of player (owner)
     std::shared_ptr<World> world;
 
+    UnitMainType main_type;
     UnitType type;
     sf::Vector2f position;
     float size; // Radius of unit (meters)

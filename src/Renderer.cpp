@@ -20,7 +20,7 @@ Renderer::Renderer()
     window = std::make_shared<sf::RenderWindow>(sf::VideoMode(RESOLUTION_X, RESOLUTION_Y), title, sf::Style::Default, settings);
     //window->setFramerateLimit(60);
 
-    if (!font.loadFromFile("data/fonts/Sile.ttf")) {
+    if (!font.loadFromFile("../../data/fonts/Sile.ttf")) {
     } else {
         text.setFont(font);
         text.setCharacterSize(24);
@@ -41,17 +41,35 @@ Renderer::Renderer()
 
     // Load textures to be used by the game
     textures[ImageId::LOGO] = sf::Texture();
-    textures[ImageId::LOGO].loadFromFile("data/artwork/logo.png");
+    textures[ImageId::LOGO].loadFromFile("../../data/artwork/logo.png");
     textures[ImageId::BUBBLE] = sf::Texture();
-    textures[ImageId::BUBBLE].loadFromFile("data/artwork/bubble.png");
+    textures[ImageId::BUBBLE].loadFromFile("../../data/artwork/bubble.png");
+    textures[ImageId::BASE_LV1] = sf::Texture();
+    textures[ImageId::BASE_LV1].loadFromFile("../../data/artwork/Bubble_Base_LV1.png");
+    textures[ImageId::BASE_LV2] = sf::Texture();
+    textures[ImageId::BASE_LV2].loadFromFile("../../data/artwork/Bubble_Base_LV2.png");
+    textures[ImageId::BASE_LV3] = sf::Texture();
+    textures[ImageId::BASE_LV3].loadFromFile("../../data/artwork/Bubble_Base_LV3.png");
+    textures[ImageId::FIGHTER_LV1] = sf::Texture();
+    textures[ImageId::FIGHTER_LV1].loadFromFile("../../data/artwork/Bubble_Fighter_LV1.png");
+    textures[ImageId::FIGHTER_LV2] = sf::Texture();
+    textures[ImageId::FIGHTER_LV2].loadFromFile("../../data/artwork/Bubble_Fighter_LV2.png");
+    textures[ImageId::FIGHTER_LV3] = sf::Texture();
+    textures[ImageId::FIGHTER_LV3].loadFromFile("../../data/artwork/Bubble_Fighter_LV3.png");
+    textures[ImageId::GATHERER_LV1] = sf::Texture();
+    textures[ImageId::GATHERER_LV1].loadFromFile("../../data/artwork/Bubble_Gatherer_LV1.png");
+    textures[ImageId::GATHERER_LV2] = sf::Texture();
+    textures[ImageId::GATHERER_LV2].loadFromFile("../../data/artwork/Bubble_Gatherer_LV2.png");
+    textures[ImageId::GATHERER_LV3] = sf::Texture();
+    textures[ImageId::GATHERER_LV3].loadFromFile("../../data/artwork/Bubble_Gatherer_LV3.png");
     textures[ImageId::ARROW] = sf::Texture();
-    textures[ImageId::ARROW].loadFromFile("data/artwork/arrow.png");
+    textures[ImageId::ARROW].loadFromFile("../../data/artwork/arrow.png");
 
     // Load tile textures
     std::size_t counter = 0;
     for (auto& tile_filename : kTileStrings) {
         background_tiles.push_back(sf::Texture());
-        background_tiles[counter].loadFromFile("data/artwork/" + tile_filename);
+        background_tiles[counter].loadFromFile("../../data/artwork/" + tile_filename);
         ++counter;
     }
     tile_count = background_tiles.size();
@@ -110,7 +128,7 @@ bool Renderer::GamePollEvents(sf::Event& event) {
                 mouse_movement = true;
             }
         } else if (event.key.code == sf::Keyboard::Num1) {
-            player->PlayerPurchaseRequest(10, UnitType::BASE);
+            player->PlayerPurchaseRequest(10, UnitType::BASE_LV1);
         }
     } else if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {
@@ -175,7 +193,7 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                     player->position = sf::Vector2f(0.0, 0.0);
                     player->name = "Test_Player";
                     player->resources = 1000;
-                    player->CreateUnits(10, UnitType::BASE);
+                    player->CreateUnits(10, UnitType::BASE_LV1);
 
                     for (unsigned int count = 0; count < 4; ++count) {
                         auto enemy_player = world->AddPlayer();
@@ -184,7 +202,7 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                         enemy_player->name = "Test_Computer_Player";
                         enemy_player->ai_type = AiType::EASY;
                         enemy_player->resources = 1000;
-                        enemy_player->CreateUnits(10, UnitType::BASE);
+                        enemy_player->CreateUnits(10, UnitType::BASE_LV1);
                     }
 
                     current_menu = MenuType::GAME_MENU;
@@ -294,8 +312,8 @@ void Renderer::RenderUnits() {
         if (player_reference.second->type == PlayerType::RESOURCES) {
             // Draw Resources first since they are to displayed underneath everything else
             RenderPlayer(player_reference.second, player_position);
-        } else {
-            // Defer regular players (not resources) to be drawn last
+        } else if (RenderDistanceTo(player_reference.second->position) < RESOLUTION_X*2) {
+            // Only render players within view distance
             non_resource_players.push_back(player_reference.second);
         }
     }
@@ -309,7 +327,12 @@ void Renderer::RenderUnits() {
  * Draws a unit for the given Player type.
  */
 void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vector2f player_position, sf::Color color) {
-    unit->sprite.setTexture(textures[ImageId::BUBBLE]);
+    if (unit->type == UnitType::BASE_LV1) {
+        unit->sprite.setTexture(textures[ImageId::BASE_LV1]);
+    } else if (unit->type == UnitType::RESOURCE or true) {
+        unit->sprite.setTexture(textures[ImageId::BUBBLE]);
+    }
+
     unit->sprite.setOrigin(unit->sprite.getLocalBounds().width/2.0, unit->sprite.getLocalBounds().height/2.0);
     unit->sprite.setPosition((unit->position.x - player_position.x)*20.0 + RESOLUTION_X/2,
                              (unit->position.y - player_position.y)*20.0 + RESOLUTION_Y/2);
@@ -324,6 +347,9 @@ void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vecto
  */
 void Renderer::RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector2f main_player_position) {
     for (auto const& unit : player_to_render->units) {
+        if (player_to_render->type == PlayerType::RESOURCES and RenderDistanceTo(unit.second->position) > RESOLUTION_X*2)
+            continue;
+
         RenderUnit(unit.second, player_to_render->type, main_player_position, player_to_render->color);
     }
 }
@@ -332,6 +358,9 @@ void Renderer::RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector
  * Render the interface for in-game.
  */
 void Renderer::RenderInterface() {
+    // Display arrows pointing to other players
+    RenderDirectionArrows();
+
     // Display resource count
     RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
 
@@ -339,9 +368,6 @@ void Renderer::RenderInterface() {
         current_menu = MenuType::GAME_MENU;
         RenderMenuText(current_menu);
     }
-
-    // Display arrows pointing to other players
-    RenderDirectionArrows();
 }
 
 /**
@@ -524,4 +550,16 @@ MenuType Renderer::MouseOverWhichMenuOption(sf::Vector2f cursor_location) {
     }
 
     return MenuType::NONE;
+}
+
+/**
+ * Returns pixel distance from player position to destination (provided in game world coordinates).
+ */
+inline double Renderer::RenderDistanceTo(sf::Vector2f destination) {
+    auto player_screen_position = sf::Vector2f(RESOLUTION_X/2, RESOLUTION_Y);
+    auto target_screen_position = sf::Vector2f((destination.x - player->position.x)*20.0 + RESOLUTION_X/2,
+                                               (destination.y - player->position.y)*20.0 + RESOLUTION_Y/2);
+    auto distance_x = target_screen_position.x - player_screen_position.x;
+    auto distance_y = target_screen_position.y - player_screen_position.y;
+    return std::sqrt(distance_x*distance_x + distance_y*distance_y);
 }

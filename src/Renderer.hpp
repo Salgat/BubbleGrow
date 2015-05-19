@@ -38,6 +38,7 @@ private:
     // Helper functions
     inline bool IsMouseOverText(sf::Text& text_object, sf::Vector2f cursor_location);
     inline MenuType MouseOverWhichMenuOption(sf::Vector2f cursor_location);
+    inline double RenderDistanceTo(sf::Vector2f destination);
 
 public:
     GameMode mode;

@@ -71,7 +71,8 @@ void Resources::CreateResources(unsigned int amount, float range, float density)
         current_amount -= random_amount;
 
         auto new_unit = std::make_shared<Unit>();
-        new_unit->type = UnitType::GROW;
+        new_unit->main_type = UnitMainType::RESOURCE;
+        new_unit->type = UnitType::RESOURCE;
         new_unit->resource_value = random_amount;
         new_unit->size = random_amount/6.0;
         //new_unit->position = sf::Vector2f(static_cast<float>(random_radius*std::cos(random_angle)),
@@ -87,6 +88,6 @@ void Resources::CreateResources(unsigned int amount, float range, float density)
         unit_requests[new_unit->id] = Request();
         unit_requests[new_unit->id].type = RequestType::NONE;
 
-        number_of_units[static_cast<std::size_t>(UnitType::GROW)] += 1;
+        number_of_units[static_cast<std::size_t>(UnitType::RESOURCE)] += 1;
     }
 }

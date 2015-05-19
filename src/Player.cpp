@@ -142,7 +142,7 @@ void Player::CreateUnits(int amount, UnitType type) {
     std::uniform_real_distribution<> distribution_radius(0, wander_range);
     std::uniform_real_distribution<> distribution_angle(0, 2*PI);
 
-    if (type == UnitType::BASE) {
+    if (type == UnitType::BASE_LV1) {
         auto resource_cost = amount * kBaseResourceCost;
         if (resource_cost > resources) {
             // Can't afford to create requested amount, create maximum we can afford
@@ -204,10 +204,10 @@ void Player::MakePlayerDecision(double duration) {
 void Player::EasyAiDecision(double duration) {
     // Easy AI simply wanders around randomly and only engages other players if they approach nearby distance
     // Purchase more units if it can afford it
-    if (resources > kResourceCost[static_cast<std::size_t>(UnitType::BASE)]) {
+    if (resources > kResourceCost[static_cast<std::size_t>(UnitType::BASE_LV1)]) {
         // Since we just want to spend all the resources, it doesn't matter how many we request (pick an
         // arbitrarily big number)
-        PlayerPurchaseRequest(10, UnitType::BASE);
+        PlayerPurchaseRequest(10, UnitType::BASE_LV1);
     }
 
     // Determine if there are nearby enemy players
