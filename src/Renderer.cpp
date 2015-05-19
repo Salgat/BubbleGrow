@@ -253,14 +253,14 @@ void Renderer::ProcessInputs() {
 /**
  * Render the game.
  */
-void Renderer::RenderGame() {
+void Renderer::RenderGame(double duration) {
     window->clear(sf::Color(255, 255, 255));
 
     // Render based on if the player is using the menu (no active game) or playing a game
     if (mode == GameMode::IN_GAME) {
         RenderBackground();
         RenderUnits();
-        RenderInterface();
+        RenderInterface(duration);
     } else if (mode == GameMode::MENU) {
         RenderMenu();
     }
@@ -357,12 +357,13 @@ void Renderer::RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector
 /**
  * Render the interface for in-game.
  */
-void Renderer::RenderInterface() {
+void Renderer::RenderInterface(double duration) {
     // Display arrows pointing to other players
     RenderDirectionArrows();
 
     // Display resource count
-    RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
+    RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(RESOLUTION_X/2, 10.0), TextSize::RESOURCE_COUNTER);
+    RenderText("FPS: " + std::to_string(1.0/duration), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
 
     if (show_ingame_menu) {
         current_menu = MenuType::GAME_MENU;

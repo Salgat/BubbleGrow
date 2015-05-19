@@ -15,10 +15,11 @@ int main() {
         renderer->ProcessInputs();
 
         // Only update the game if one is running (otherwise, the player is at the menu).
+        double duration = clock.restart().asSeconds();
         if (renderer->mode == GameMode::IN_GAME)
-            renderer->world->UpdateAndProcess(clock.restart().asSeconds());
+            renderer->world->UpdateAndProcess(duration);
 
-        renderer->RenderGame();
+        renderer->RenderGame(duration);
     }
 
     return 0;

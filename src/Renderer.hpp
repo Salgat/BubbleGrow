@@ -56,7 +56,7 @@ public:
     bool GamePollEvents(sf::Event& event);
     bool MenuPollEvents(sf::Event& event);
 
-    void RenderGame();
+    void RenderGame(double duration);
 
     // Rendering functions for an active game world
     void RenderBackground();
@@ -64,7 +64,7 @@ public:
     void RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vector2f player_position, sf::Color color);
     void RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector2f main_player_position);
     //void RenderMiniMap();
-    void RenderInterface();
+    void RenderInterface(double duration);
     void RenderDirectionArrows();
 
     // Rendering functions for the menu
