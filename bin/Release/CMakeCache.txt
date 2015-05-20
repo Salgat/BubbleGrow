@@ -37,20 +37,17 @@ CMAKE_CXX_COMPILER:FILEPATH=C:/MinGW/bin/g++.exe
 CMAKE_CXX_FLAGS:STRING=
 
 //Flags used by the compiler during debug builds.
-CMAKE_CXX_FLAGS_DEBUG:STRING=-g
+CMAKE_CXX_FLAGS_DEBUG:STRING=
 
 //Flags used by the compiler during release builds for minimum
 // size.
-CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG
+CMAKE_CXX_FLAGS_MINSIZEREL:STRING=
 
 //Flags used by the compiler during release builds.
-CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
+CMAKE_CXX_FLAGS_RELEASE:STRING=
 
 //Flags used by the compiler during release builds with debug info.
-CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
-
-//Libraries linked by default with all C++ applications.
-CMAKE_CXX_STANDARD_LIBRARIES:STRING=-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=
 
 //C compiler.
 CMAKE_C_COMPILER:FILEPATH=C:/MinGW/bin/gcc.exe
@@ -59,20 +56,17 @@ CMAKE_C_COMPILER:FILEPATH=C:/MinGW/bin/gcc.exe
 CMAKE_C_FLAGS:STRING=
 
 //Flags used by the compiler during debug builds.
-CMAKE_C_FLAGS_DEBUG:STRING=-g
+CMAKE_C_FLAGS_DEBUG:STRING=
 
 //Flags used by the compiler during release builds for minimum
 // size.
-CMAKE_C_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG
+CMAKE_C_FLAGS_MINSIZEREL:STRING=
 
 //Flags used by the compiler during release builds.
-CMAKE_C_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
+CMAKE_C_FLAGS_RELEASE:STRING=
 
 //Flags used by the compiler during release builds with debug info.
-CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
-
-//Libraries linked by default with all C applications.
-CMAKE_C_STANDARD_LIBRARIES:STRING=-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=
 
 //Flags used by the linker.
 CMAKE_EXE_LINKER_FLAGS:STRING=
@@ -92,9 +86,6 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 //Enable/Disable output of compile commands during generation.
 CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=OFF
 
-//Convert GNU import libraries to MS format (requires Visual Studio)
-CMAKE_GNUtoMS:BOOL=OFF
-
 //Install path prefix, prepended onto install directories.
 CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/BubbleGrow
 
@@ -102,7 +93,7 @@ CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/BubbleGrow
 CMAKE_LINKER:FILEPATH=C:/MinGW/bin/ld.exe
 
 //Path to a program.
-CMAKE_MAKE_PROGRAM:FILEPATH=C:/MinGW/bin/make.exe
+CMAKE_MAKE_PROGRAM:FILEPATH=C:/make/make.exe
 
 //Flags used by the linker during the creation of modules.
 CMAKE_MODULE_LINKER_FLAGS:STRING=
@@ -133,12 +124,6 @@ CMAKE_PROJECT_NAME:STATIC=BubbleGrow
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=C:/MinGW/bin/ranlib.exe
-
-//RC compiler
-CMAKE_RC_COMPILER:FILEPATH=C:/MinGW/bin/windres.exe
-
-//Flags for Windows Resource Compiler.
-CMAKE_RC_FLAGS:STRING=' '
 
 //Flags used by the linker during the creation of dll's.
 CMAKE_SHARED_LINKER_FLAGS:STRING=
@@ -224,8 +209,6 @@ CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS_RELWITHDEBINFO
 CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_CXX_STANDARD_LIBRARIES
-CMAKE_CXX_STANDARD_LIBRARIES-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_COMPILER
 CMAKE_C_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_FLAGS
@@ -238,8 +221,6 @@ CMAKE_C_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_C_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_FLAGS_RELWITHDEBINFO
 CMAKE_C_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_STANDARD_LIBRARIES
-CMAKE_C_STANDARD_LIBRARIES-ADVANCED:INTERNAL=1
 //Path to cache edit program executable.
 CMAKE_EDIT_COMMAND:INTERNAL=C:/Program Files (x86)/CMake/bin/cmake-gui.exe
 //Executable file format
@@ -291,11 +272,6 @@ CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 CMAKE_OBJDUMP-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_RANLIB
 CMAKE_RANLIB-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_RC_COMPILER
-CMAKE_RC_COMPILER-ADVANCED:INTERNAL=1
-CMAKE_RC_COMPILER_WORKS:INTERNAL=1
-//ADVANCED property for variable: CMAKE_RC_FLAGS
-CMAKE_RC_FLAGS-ADVANCED:INTERNAL=1
 //Path to CMake installation.
 CMAKE_ROOT:INTERNAL=C:/Program Files (x86)/CMake/share/cmake-3.2
 //ADVANCED property for variable: CMAKE_SHARED_LINKER_FLAGS

@@ -44,35 +44,12 @@ Renderer::Renderer()
     textures[ImageId::LOGO].loadFromFile("../../data/artwork/logo.png");
     textures[ImageId::BUBBLE] = sf::Texture();
     textures[ImageId::BUBBLE].loadFromFile("../../data/artwork/bubble.png");
-    textures[ImageId::BASE_LV1] = sf::Texture();
-    textures[ImageId::BASE_LV1].loadFromFile("../../data/artwork/Bubble_Base_LV1.png");
-    textures[ImageId::BASE_LV2] = sf::Texture();
-    textures[ImageId::BASE_LV2].loadFromFile("../../data/artwork/Bubble_Base_LV2.png");
-    textures[ImageId::BASE_LV3] = sf::Texture();
-    textures[ImageId::BASE_LV3].loadFromFile("../../data/artwork/Bubble_Base_LV3.png");
-    textures[ImageId::FIGHTER_LV1] = sf::Texture();
-    textures[ImageId::FIGHTER_LV1].loadFromFile("../../data/artwork/Bubble_Fighter_LV1.png");
-    textures[ImageId::FIGHTER_LV2] = sf::Texture();
-    textures[ImageId::FIGHTER_LV2].loadFromFile("../../data/artwork/Bubble_Fighter_LV2.png");
-    textures[ImageId::FIGHTER_LV3] = sf::Texture();
-    textures[ImageId::FIGHTER_LV3].loadFromFile("../../data/artwork/Bubble_Fighter_LV3.png");
-    textures[ImageId::GATHERER_LV1] = sf::Texture();
-    textures[ImageId::GATHERER_LV1].loadFromFile("../../data/artwork/Bubble_Gatherer_LV1.png");
-    textures[ImageId::GATHERER_LV2] = sf::Texture();
-    textures[ImageId::GATHERER_LV2].loadFromFile("../../data/artwork/Bubble_Gatherer_LV2.png");
-    textures[ImageId::GATHERER_LV3] = sf::Texture();
-    textures[ImageId::GATHERER_LV3].loadFromFile("../../data/artwork/Bubble_Gatherer_LV3.png");
+    textures[ImageId::BUBBLE_TYPES] = sf::Texture();
+    textures[ImageId::BUBBLE_TYPES].loadFromFile("../../data/artwork/Bubble_Types.png");
+    textures[ImageId::PLAYER_SYMBOLS] = sf::Texture();
+    textures[ImageId::PLAYER_SYMBOLS].loadFromFile("../../data/artwork/Player_Symbols.png");
     textures[ImageId::ARROW] = sf::Texture();
     textures[ImageId::ARROW].loadFromFile("../../data/artwork/arrow.png");
-
-    // Load tile textures
-    std::size_t counter = 0;
-    for (auto& tile_filename : kTileStrings) {
-        background_tiles.push_back(sf::Texture());
-        background_tiles[counter].loadFromFile("../../data/artwork/" + tile_filename);
-        ++counter;
-    }
-    tile_count = background_tiles.size();
 
     // Generate random background map (regardless of map size, background map size is the same for simplicity)
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -83,6 +60,9 @@ Renderer::Renderer()
             entry = distribution_tilemap(random_generator);
         }
     }
+
+    // Initialize background batch drawer
+    background_batch = BatchDrawer("../../data/artwork/BG_Tile1.png", 1, 1);
 }
 
 /**
@@ -279,23 +259,24 @@ void Renderer::RenderBackground() {
     int start_y = -1 * static_cast<int>(tilemap_dimensions)/2;
 
     // Go through and draw each tile, which is offset by its position in background_map
-    sf::Sprite background_sprite;
+    std::vector<std::tuple<sf::Vector2f, unsigned int, double>> sprites;
     for (auto const& column : background_map) {
         for (auto const entry : column) {
-            background_sprite.setTexture(background_tiles[entry]);
-            background_sprite.setScale(scale, scale);
-            background_sprite.setPosition(background_sprite.getLocalBounds().width * scale * start_x -
-                                          player->position.x * parallax_strength,
-                                          background_sprite.getLocalBounds().height * scale * start_y -
-                                          player->position.y * parallax_strength);
-
-            window->draw(background_sprite);
+            auto screen_location = sf::Vector2f(background_batch.sprite_pixel_width * scale * start_x -
+                                                player->position.x * parallax_strength,
+                                                background_batch.sprite_pixel_height * scale * start_y -
+                                                player->position.y * parallax_strength);
+            unsigned int sprite_index = entry;
+            sprites.push_back(std::make_tuple(screen_location, sprite_index, scale));
 
             ++start_y;
         }
         ++start_x;
         start_y = -1 * static_cast<int>(tilemap_dimensions)/2;
     }
+
+    background_batch.UpdateTextures(sprites);
+    window->draw(background_batch);
 }
 
 /**
@@ -328,7 +309,8 @@ void Renderer::RenderUnits() {
  */
 void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vector2f player_position, sf::Color color) {
     if (unit->type == UnitType::BASE_LV1) {
-        unit->sprite.setTexture(textures[ImageId::BASE_LV1]);
+        //unit->sprite.setTexture(textures[ImageId::BASE_LV1]);
+        unit->sprite.setTexture(textures[ImageId::BUBBLE]);
     } else if (unit->type == UnitType::RESOURCE or true) {
         unit->sprite.setTexture(textures[ImageId::BUBBLE]);
     }
@@ -362,8 +344,8 @@ void Renderer::RenderInterface(double duration) {
     RenderDirectionArrows();
 
     // Display resource count
-    RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(RESOLUTION_X/2, 10.0), TextSize::RESOURCE_COUNTER);
-    RenderText("FPS: " + std::to_string(1.0/duration), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
+    RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
+    RenderText("FPS: " + std::to_string(1.0/duration), sf::Vector2f(10.0, 30.0), TextSize::RESOURCE_COUNTER);
 
     if (show_ingame_menu) {
         current_menu = MenuType::GAME_MENU;

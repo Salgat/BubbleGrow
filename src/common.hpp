@@ -17,6 +17,8 @@
 #include <random>
 #include <chrono>
 #include <stack>
+#include <tuple>
+#include <functional>
 
 //#define NDEBUG
 #include <cassert>
@@ -87,27 +89,38 @@ enum TextSize {
 
     MAIN = 144,
     VERSUS = 144,
-
-
-    NONE
 };
 
 // Image IDs
 
-enum class ImageId {
+enum ImageId {
+    // Indexes for each of the Bubble Unit types: BASE_LV1 = (0, 0), FIGHTER_LV2 = (std::floor(7/3), 7%3)
+    BASE_LV1 = 0,
+    BASE_LV2 = 1,
+    BASE_LV3 = 2,
+    GATHERER_LV1 = 3,
+    GATHERER_LV2 = 4,
+    GATHERER_LV3 = 5,
+    FIGHTER_LV1 = 6,
+    FIGHTER_LV2 = 7,
+    FIGHTER_LV3 = 8,
+
+    // Indexes for each of the Player symbols: Circle = (0, 0), Triangle = (std::floor(7/3), 7%3)
+    CIRCLE = 0,
+    CRESCENT = 1,
+    DIAMOND = 2,
+    EYE = 3,
+    SHAMROCK = 4,
+    SQUARE = 5,
+    STAR = 6,
+    TRIANGLE = 7,
+
     LOGO,
     BUBBLE,
-    BASE_LV1,
-    BASE_LV2,
-    BASE_LV3,
-    GATHERER_LV1,
-    GATHERER_LV2,
-    GATHERER_LV3,
-    FIGHTER_LV1,
-    FIGHTER_LV2,
-    FIGHTER_LV3,
-    ARROW,
-    NONE
+    BUBBLE_TYPES, // Sprite sheet for Bubble Units
+    PLAYER_SYMBOLS, // Sprite sheet for Player Symbols
+
+    ARROW
 };
 
 enum class ActionType {

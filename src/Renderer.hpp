@@ -7,6 +7,7 @@
 
 #include "common.hpp"
 #include "Request.hpp"
+#include "BatchDrawer.hpp"
 
 class World;
 class Player;
@@ -28,9 +29,8 @@ private:
     std::vector<std::pair<MenuType, sf::Text>> menu_text_entries; // Holds the sf::Text for all current menu options
     std::map<unsigned int, float> text_heights; // text_heights[font_size] = pixel_height
 
-    std::vector<sf::Texture> background_tiles;
-    std::size_t tile_count;
     std::array<std::array<std::size_t, tilemap_dimensions>, tilemap_dimensions> background_map;
+    BatchDrawer background_batch;
 
     sf::Sprite sprite;
     std::map<ImageId, sf::Texture> textures;
