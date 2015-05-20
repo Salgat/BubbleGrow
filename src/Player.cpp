@@ -83,15 +83,9 @@ void Player::PlayerPurchaseRequest(unsigned int purchase_amount, UnitType purcha
  * Update the stats of all units owned by player.
  */
 void Player::Update(double duration) {
-    #pragma omp parallel
-    #pragma omp single
-    {
-        for(auto it = units.begin(); it != units.end(); ++it)
-            if (it->second->health[0] > 0) {
-                #pragma omp task firstprivate(it)
-                it->second->Update(duration);
-            }
-        #pragma omp taskwait
+    for (auto& unit : units) {
+        if (unit.second->health[0] > 0)
+            unit.second->Update(duration);
     }
 }
 
@@ -99,17 +93,10 @@ void Player::Update(double duration) {
  * Handle the requests provided.
  */
 void Player::ProcessRequests(double duration) {
-    #pragma omp parallel
-    #pragma omp single
-    {
-        for(auto it = unit_requests.begin(); it != unit_requests.end(); ++it) {
-            auto unit = units.find(it->first)->second;
-            if (unit->health[0] > 0) {
-                #pragma omp task firstprivate(it)
-                unit->ProcessRequest(it->second, duration);
-            }
-        }
-        #pragma omp taskwait
+    for (auto& request : unit_requests) {
+        auto unit = units.find(request.first)->second;
+        if (unit->health[0] > 0)
+            unit->ProcessRequest(request.second, duration);
     }
 }
 
@@ -117,15 +104,9 @@ void Player::ProcessRequests(double duration) {
  * Process the decisions for each unit.
  */
 void Player::MakeDecisions(double duration) {
-    #pragma omp parallel
-    #pragma omp single
-    {
-        for(auto it = units.begin(); it != units.end(); ++it)
-            if (it->second->health[0] > 0) {
-                #pragma omp task firstprivate(it)
-                it->second->MakeDecision(unit_requests.find(it->first)->second);
-            }
-        #pragma omp taskwait
+    for (auto& unit : units) {
+        if (unit.second->health[0] > 0)
+            unit.second->MakeDecision(unit_requests.find(unit.first)->second);
     }
 
     MakePlayerDecision(duration);

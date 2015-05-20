@@ -18,25 +18,47 @@ World::World()
  */
 void World::UpdateAndProcess(double duration) {
     // Execute requests for player
-    for (auto& player : players) {
-        player.second->ProcessPlayerRequests(duration);
+    #pragma omp parallel
+    #pragma omp single
+    {
+        for(auto it = players.begin(); it != players.end(); ++it)
+                #pragma omp task firstprivate(it)
+                it->second->ProcessPlayerRequests(duration);
+        #pragma omp taskwait
     }
 
     // Update each unit
-    for (auto& player : players) {
-        player.second->Update(duration);
+    #pragma omp parallel
+    #pragma omp single
+    {
+        for(auto it = players.begin(); it != players.end(); ++it)
+                #pragma omp task firstprivate(it)
+                it->second->Update(duration);
+        #pragma omp taskwait
     }
 
     // Have each unit make a decision
-    for (auto& player : players) {
-        if (player.second->type != PlayerType::RESOURCES)
-            player.second->MakeDecisions(duration);
+    #pragma omp parallel
+    #pragma omp single
+    {
+        for(auto it = players.begin(); it != players.end(); ++it)
+            if (it->second->type != PlayerType::RESOURCES) {
+                #pragma omp task firstprivate(it)
+                it->second->MakeDecisions(duration);
+            }
+        #pragma omp taskwait
     }
 
     // Execute request for each unit
-    for (auto& player : players) {
-        if (player.second->type != PlayerType::RESOURCES)
-            player.second->ProcessRequests(duration);
+    #pragma omp parallel
+    #pragma omp single
+    {
+        for(auto it = players.begin(); it != players.end(); ++it)
+            if (it->second->type != PlayerType::RESOURCES) {
+                #pragma omp task firstprivate(it)
+                it->second->ProcessRequests(duration);
+            }
+        #pragma omp taskwait
     }
 
     // Add and remove any new/expired units
