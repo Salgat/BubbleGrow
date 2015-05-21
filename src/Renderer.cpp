@@ -8,8 +8,12 @@
 #include "Unit.hpp"
 #include "Resources.hpp"
 
+unsigned int ResolutionX = 1280;
+unsigned int ResolutionY = 1024;
+
 Renderer::Renderer()
     : mouse_movement(true)
+    , view_scale(1.0)
     , current_menu(MenuType::MAIN)
     , last_menu(MenuType::NONE)
     , mode(GameMode::MENU)
@@ -17,7 +21,7 @@ Renderer::Renderer()
     std::string title = "BubbleGrow V" + std::to_string(VERSION) + "." + std::to_string(SUB_VERSION);
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    window = std::make_shared<sf::RenderWindow>(sf::VideoMode(RESOLUTION_X, RESOLUTION_Y), title, sf::Style::Default, settings);
+    window = std::make_shared<sf::RenderWindow>(sf::VideoMode(ResolutionX, ResolutionY), title, sf::Style::Default, settings);
     //window->setFramerateLimit(60);
 
     if (!font.loadFromFile("../../data/fonts/Sile.ttf")) {
@@ -76,6 +80,26 @@ bool Renderer::PollEvents() {
         if (event.type == sf::Event::Closed) {
             window->close();
             return false;
+        } else if (event.type == sf::Event::Resized) {
+            // Adjust resolution recognized by the game to the resized window resolution.
+            ResolutionX = event.size.width;
+            ResolutionY = event.size.height;
+
+            /*
+            if (ResolutionX < 1280) {
+                view_scale = 1280.0 / ResolutionX;
+            } else {
+                view_scale = 1.0;
+            }*/
+
+            auto view = window->getDefaultView();
+            view.setSize(event.size.width, event.size.height);
+            view.setCenter(event.size.width/2.0, event.size.height/2.0);
+            //view.zoom(view_scale);
+            window->setView(view);
+
+            //sf::FloatRect visible_area(0, 0, event.size.width, event.size.height);
+            //window->setView(sf::View(visible_area));
         } else if (mode == GameMode::IN_GAME) {
             if(!GamePollEvents(event))
                 return false;
@@ -213,8 +237,8 @@ void Renderer::ProcessInputs() {
         if (mouse_movement) {
             // Movement based on cursor's position from center of screen.
             auto mouse_position = sf::Mouse::getPosition(*window);
-            auto distance_x = static_cast<int>(mouse_position.x) - static_cast<int>(RESOLUTION_X/2);
-            auto distance_y = static_cast<int>(mouse_position.y) - static_cast<int>(RESOLUTION_Y/2);
+            auto distance_x = static_cast<int>(mouse_position.x) - static_cast<int>(ResolutionX /2);
+            auto distance_y = static_cast<int>(mouse_position.y) - static_cast<int>(ResolutionY /2);
             float distance_from_center = std::sqrt(distance_x*distance_x + distance_y*distance_y);
 
             // Speed is based on the cursor's distance from the center (with a small area in the center where there is no
@@ -297,7 +321,7 @@ void Renderer::RenderUnits() {
         if (player_reference.second->type == PlayerType::RESOURCES) {
             // Draw Resources first since they are to displayed underneath everything else
             RenderPlayer(player_reference.second, player_position);
-        } else if (RenderDistanceTo(player_reference.second->position) < RESOLUTION_X*2) {
+        } else if (RenderDistanceTo(player_reference.second->position) < ResolutionX *2) {
             // Only render players within view distance
             non_resource_players.push_back(player_reference.second);
         }
@@ -320,8 +344,8 @@ void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vecto
         sprite_index = static_cast<unsigned int>(unit->type);
     }
 
-    auto screen_location = sf::Vector2f((unit->position.x - player_position.x)*20.0 + RESOLUTION_X/2,
-                                        (unit->position.y - player_position.y)*20.0 + RESOLUTION_Y/2);
+    auto screen_location = sf::Vector2f((unit->position.x - player_position.x)*20.0 + ResolutionX /2,
+                                        (unit->position.y - player_position.y)*20.0 + ResolutionY /2);
     double scale = unit->size/20.0;
 
     BatchEntry unit_sprite(screen_location, sprite_index, scale, color, true);
@@ -333,7 +357,7 @@ void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vecto
  */
 void Renderer::RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector2f main_player_position) {
     for (auto const& unit : player_to_render->units) {
-        if (player_to_render->type == PlayerType::RESOURCES and RenderDistanceTo(unit.second->position) > RESOLUTION_X*2)
+        if (player_to_render->type == PlayerType::RESOURCES and RenderDistanceTo(unit.second->position) > ResolutionX*2)
             continue;
 
         RenderUnit(unit.second, player_to_render->type, main_player_position, player_to_render->color);
@@ -367,40 +391,40 @@ void Renderer::RenderDirectionArrows() {
     for (auto const& player_reference : world->players) {
         if (player_reference.second->type == PlayerType::PLAYER and player_reference.second != player) {
             // Determine the distance and angle to the player and scale the distance of the arrow by the distance
-            auto player_screen_position = sf::Vector2f(RESOLUTION_X/2, RESOLUTION_Y);
-            auto target_screen_position = sf::Vector2f((player_reference.second->position.x - player->position.x)*20.0 + RESOLUTION_X/2,
-                                                       (player_reference.second->position.y - player->position.y)*20.0 + RESOLUTION_Y/2);
+            auto player_screen_position = sf::Vector2f(ResolutionX /2, ResolutionY);
+            auto target_screen_position = sf::Vector2f((player_reference.second->position.x - player->position.x)*20.0 + ResolutionX /2,
+                                                       (player_reference.second->position.y - player->position.y)*20.0 + ResolutionY /2);
             double angle = std::atan2(target_screen_position.y - player_screen_position.y,
                                       target_screen_position.x - player_screen_position.x);
 
             auto distance_x = target_screen_position.x - player_screen_position.x;
             auto distance_y = target_screen_position.y - player_screen_position.y;
             auto render_distance = std::sqrt(distance_x*distance_x + distance_y*distance_y);
-            if (render_distance > RESOLUTION_X) {
+            if (render_distance > ResolutionX) {
                 // Only render arrows for players that aren't within fighting distance (since you'll otherwise already
                 // be seeing them on the screen).
                 double magnitude;
                 double abs_cos_angle = std::abs(std::cos(angle));
                 double abs_sin_angle = std::abs(std::sin(angle));
 
-                if (RESOLUTION_X/2.0*abs_sin_angle <= RESOLUTION_Y/2.0*abs_cos_angle) {
-                    magnitude = RESOLUTION_X/2.0/abs_cos_angle;
+                if (ResolutionX /2.0*abs_sin_angle <= ResolutionY /2.0*abs_cos_angle) {
+                    magnitude = ResolutionX /2.0/abs_cos_angle;
                 } else {
-                    magnitude = RESOLUTION_Y/2.0/abs_sin_angle;
+                    magnitude = ResolutionY /2.0/abs_sin_angle;
                 }
 
-                double x_position = magnitude*std::cos(angle) + RESOLUTION_X/2;
-                double y_position = magnitude*std::sin(angle) + RESOLUTION_Y/2;
+                double x_position = magnitude*std::cos(angle) + ResolutionX /2;
+                double y_position = magnitude*std::sin(angle) + ResolutionY /2;
                 auto arrow_position = sf::Vector2f(x_position, y_position);
 
                 double sprite_rotation;
-                if (x_position > static_cast<double>(RESOLUTION_X)-1.0) {
+                if (x_position > static_cast<double>(ResolutionX)-1.0) {
                     // Right wall
                     sprite_rotation = 90.0;
                 } else if (x_position < 1.0) {
                     // Left wall
                     sprite_rotation = -90.0;
-                } else if (y_position > static_cast<double>(RESOLUTION_Y)-1.0) {
+                } else if (y_position > static_cast<double>(ResolutionY)-1.0) {
                     // Bottom wall
                     sprite_rotation = 180.0;
                 } else {
@@ -430,7 +454,7 @@ void Renderer::RenderMenu() {
     sprite.setTexture(textures[ImageId::LOGO]);
     double scale = 0.4;
     sprite.setScale(scale, scale);
-    sprite.setPosition(RESOLUTION_X/2 - sprite.getLocalBounds().width/(2.0/scale), 75.0);
+    sprite.setPosition(ResolutionX /2 - sprite.getLocalBounds().width/(2.0/scale), 75.0);
     window->draw(sprite);
 
     // Render menu options
@@ -493,7 +517,7 @@ void Renderer::RenderMenuText(MenuType selection) {
     }
 
     auto menu_height = menu_entries.size() * text_height;
-    y_offset += RESOLUTION_Y/2 - menu_height/2;
+    y_offset += ResolutionY /2 - menu_height/2;
 
     // Draw each menu entry
     menu_text_entries.clear();
@@ -505,7 +529,7 @@ void Renderer::RenderMenuText(MenuType selection) {
         menu_entry.setColor(sf::Color(0, 0, 50));
         menu_entry.setCharacterSize(text_size);
         menu_entry.setOrigin(menu_entry.getLocalBounds().width/2.0, menu_entry.getLocalBounds().height/2.0);
-        menu_entry.setPosition(sf::Vector2f(RESOLUTION_X/2, y_offset));
+        menu_entry.setPosition(sf::Vector2f(ResolutionX /2, y_offset));
         menu_text_entries.push_back(std::pair<MenuType, sf::Text>(entry, menu_entry));
 
         window->draw(menu_entry);
@@ -543,9 +567,9 @@ MenuType Renderer::MouseOverWhichMenuOption(sf::Vector2f cursor_location) {
  * Returns pixel distance from player position to destination (provided in game world coordinates).
  */
 inline double Renderer::RenderDistanceTo(sf::Vector2f destination) {
-    auto player_screen_position = sf::Vector2f(RESOLUTION_X/2, RESOLUTION_Y);
-    auto target_screen_position = sf::Vector2f((destination.x - player->position.x)*20.0 + RESOLUTION_X/2,
-                                               (destination.y - player->position.y)*20.0 + RESOLUTION_Y/2);
+    auto player_screen_position = sf::Vector2f(ResolutionX /2, ResolutionY);
+    auto target_screen_position = sf::Vector2f((destination.x - player->position.x)*20.0 + ResolutionX /2,
+                                               (destination.y - player->position.y)*20.0 + ResolutionY /2);
     auto distance_x = target_screen_position.x - player_screen_position.x;
     auto distance_y = target_screen_position.y - player_screen_position.y;
     return std::sqrt(distance_x*distance_x + distance_y*distance_y);

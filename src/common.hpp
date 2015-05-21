@@ -189,8 +189,8 @@ enum class PlayerType {
 double const kPlayerWalkSpeed = 20.0;
 
 double const PI = 3.141592653589793238463;
-unsigned int const RESOLUTION_X = 1280;
-unsigned int const RESOLUTION_Y = 1024;
+extern unsigned int ResolutionX;
+extern unsigned int ResolutionY;
 unsigned int const VERSION = 0;
 unsigned int const SUB_VERSION = 1;
 
