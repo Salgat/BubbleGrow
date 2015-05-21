@@ -26,7 +26,7 @@ BatchDrawer::BatchDrawer(std::string sprite_sheet, unsigned int width, unsigned 
  * Prepares BatchDrawer with information regarding which sprites from the sprite sheet to display and their locations
  * on the screen.
  */
-void BatchDrawer::UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned int, double, sf::Color>> const& sprites) {
+void BatchDrawer::UpdateEntries(std::vector<BatchEntry> const& sprites) {
     // Vertices will need to hold a Quad (4 points) for every image to display
     vertices.resize(sprites.size() * 4);
 
@@ -34,8 +34,8 @@ void BatchDrawer::UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned i
     std::size_t index = 0;
     for (auto& sprite : sprites) {
         // Set pixel position on screen
-        auto location = std::get<0>(sprite);
-        auto scale = std::get<2>(sprite);
+        auto location = sprite.location;
+        auto scale = sprite.scale;
         sf::Vertex* quad = &vertices[index*4];
 
         if (center) {
@@ -52,8 +52,8 @@ void BatchDrawer::UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned i
         }
 
         // Set texture coordinates (which image in sprite sheet to display)
-        unsigned int row = std::get<1>(sprite) / spritesheet_width;
-        unsigned int column = std::get<1>(sprite) % spritesheet_width;
+        unsigned int row = sprite.index / spritesheet_width;
+        unsigned int column = sprite.index % spritesheet_width;
 
         quad[0].texCoords = sf::Vector2f(row * sprite_pixel_width, column * sprite_pixel_height);
         quad[1].texCoords = sf::Vector2f((row+1) * sprite_pixel_width, column * sprite_pixel_height);
@@ -61,7 +61,7 @@ void BatchDrawer::UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned i
         quad[3].texCoords = sf::Vector2f((row) * sprite_pixel_width, (column+1) * sprite_pixel_height);
 
         // Set texture color
-        auto color = std::get<3>(sprite);
+        auto color = sprite.color;
         quad[0].color = color;
         quad[1].color = color;
         quad[2].color = color;

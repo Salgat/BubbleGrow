@@ -269,7 +269,8 @@ void Renderer::RenderBackground() {
                                                 background_batch.sprite_pixel_height * scale * start_y -
                                                 player->position.y * parallax_strength);
             unsigned int sprite_index = entry;
-            sprites.push_back(std::make_tuple(screen_location, sprite_index, scale, sf::Color::White));
+            BatchEntry background_sprite(screen_location, sprite_index, scale);
+            sprites.push_back(background_sprite);
 
             ++start_y;
         }
@@ -277,7 +278,7 @@ void Renderer::RenderBackground() {
         start_y = -1 * static_cast<int>(tilemap_dimensions)/2;
     }
 
-    background_batch.UpdateTextures(sprites);
+    background_batch.UpdateEntries(sprites);
     window->draw(background_batch);
 }
 
@@ -306,7 +307,7 @@ void Renderer::RenderUnits() {
         RenderPlayer(non_resource_player, player_position);
     }
 
-    bubbles_batch.UpdateTextures(sprites);
+    bubbles_batch.UpdateEntries(sprites);
     window->draw(bubbles_batch);
 }
 
@@ -323,7 +324,8 @@ void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vecto
                                         (unit->position.y - player_position.y)*20.0 + RESOLUTION_Y/2);
     double scale = unit->size/20.0;
 
-    sprites.push_back(std::make_tuple(screen_location, sprite_index, scale, color));
+    BatchEntry unit_sprite(screen_location, sprite_index, scale, color, true);
+    sprites.push_back(unit_sprite);
 }
 
 /**

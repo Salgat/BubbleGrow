@@ -33,7 +33,8 @@ private:
     BatchDrawer background_batch;
     std::array<std::array<std::size_t, tilemap_dimensions>, tilemap_dimensions> bubble_sprites;
     BatchDrawer bubbles_batch;
-    std::vector<std::tuple<sf::Vector2f, unsigned int, double, sf::Color>> sprites;
+    std::vector<BatchEntry> sprites;
+    //std::vector<std::tuple<sf::Vector2f, unsigned int, double, sf::Color>> sprites;
 
     sf::Sprite sprite;
     std::map<ImageId, sf::Texture> textures;
