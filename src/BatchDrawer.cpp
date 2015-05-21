@@ -55,10 +55,10 @@ void BatchDrawer::UpdateEntries(std::vector<BatchEntry> const& sprites) {
         unsigned int row = sprite.index / spritesheet_width;
         unsigned int column = sprite.index % spritesheet_width;
 
-        quad[0].texCoords = sf::Vector2f(row * sprite_pixel_width, column * sprite_pixel_height);
-        quad[1].texCoords = sf::Vector2f((row+1) * sprite_pixel_width, column * sprite_pixel_height);
-        quad[2].texCoords = sf::Vector2f((row+1) * sprite_pixel_width, (column+1) * sprite_pixel_height);
-        quad[3].texCoords = sf::Vector2f((row) * sprite_pixel_width, (column+1) * sprite_pixel_height);
+        quad[0].texCoords = sf::Vector2f(column * sprite_pixel_width, row * sprite_pixel_height);
+        quad[1].texCoords = sf::Vector2f((column+1) * sprite_pixel_width, row * sprite_pixel_height);
+        quad[2].texCoords = sf::Vector2f((column+1) * sprite_pixel_width, (row+1) * sprite_pixel_height);
+        quad[3].texCoords = sf::Vector2f((column) * sprite_pixel_width, (row+1) * sprite_pixel_height);
 
         // Set texture color
         auto color = sprite.color;

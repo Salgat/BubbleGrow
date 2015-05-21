@@ -70,8 +70,8 @@
       <file leaf-file-name="Renderer.hpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Renderer.hpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-14.103448">
-              <caret line="35" column="36" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
+            <state vertical-scroll-proportion="-11.827586">
+              <caret line="34" column="36" selection-start-line="34" selection-start-column="36" selection-end-line="34" selection-end-column="36" />
               <folding>
                 <element signature="e#106#127#0" expanded="true" />
               </folding>
@@ -82,8 +82,8 @@
       <file leaf-file-name="Renderer.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Renderer.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5766509">
-              <caret line="271" column="77" selection-start-line="271" selection-start-column="77" selection-end-line="271" selection-end-column="77" />
+            <state vertical-scroll-proportion="0.7570755">
+              <caret line="328" column="1" selection-start-line="328" selection-start-column="1" selection-end-line="328" selection-end-column="1" />
               <folding>
                 <element signature="e#41#64#0" expanded="true" />
               </folding>
@@ -128,8 +128,8 @@
       <file leaf-file-name="BatchDrawer.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/BatchDrawer.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-11.24138">
-              <caret line="35" column="39" selection-start-line="35" selection-start-column="39" selection-end-line="35" selection-end-column="39" />
+            <state vertical-scroll-proportion="-18.862068">
+              <caret line="60" column="76" selection-start-line="60" selection-start-column="76" selection-end-line="60" selection-end-column="76" />
               <folding />
             </state>
           </provider>
@@ -194,9 +194,9 @@
         <option value="$PROJECT_DIR$/src/World.cpp" />
         <option value="$PROJECT_DIR$/src/common.hpp" />
         <option value="$PROJECT_DIR$/src/Unit.hpp" />
+        <option value="$PROJECT_DIR$/src/BatchDrawer.hpp" />
         <option value="$PROJECT_DIR$/src/Renderer.hpp" />
         <option value="$PROJECT_DIR$/src/BatchDrawer.cpp" />
-        <option value="$PROJECT_DIR$/src/BatchDrawer.hpp" />
         <option value="$PROJECT_DIR$/src/Renderer.cpp" />
       </list>
     </option>
@@ -387,7 +387,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="2576" height="1416" extended-state="7" />
+    <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -815,24 +815,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Renderer.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-14.103448">
-          <caret line="35" column="36" selection-start-line="35" selection-start-column="36" selection-end-line="35" selection-end-column="36" />
-          <folding>
-            <element signature="e#106#127#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/BatchDrawer.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.24138">
-          <caret line="35" column="39" selection-start-line="35" selection-start-column="39" selection-end-line="35" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/BatchDrawer.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -841,10 +823,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Renderer.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-11.827586">
+          <caret line="34" column="36" selection-start-line="34" selection-start-column="36" selection-end-line="34" selection-end-column="36" />
+          <folding>
+            <element signature="e#106#127#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/BatchDrawer.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-18.862068">
+          <caret line="60" column="76" selection-start-line="60" selection-start-column="76" selection-end-line="60" selection-end-column="76" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Renderer.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5766509">
-          <caret line="271" column="77" selection-start-line="271" selection-start-column="77" selection-end-line="271" selection-end-column="77" />
+        <state vertical-scroll-proportion="0.7570755">
+          <caret line="328" column="1" selection-start-line="328" selection-start-column="1" selection-end-line="328" selection-end-column="1" />
           <folding>
             <element signature="e#41#64#0" expanded="true" />
           </folding>
