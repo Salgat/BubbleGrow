@@ -11,7 +11,8 @@
  */
 BatchDrawer::BatchDrawer(std::string sprite_sheet, unsigned int width, unsigned height)
     : spritesheet_width(width)
-    , spritesheet_height(height) {
+    , spritesheet_height(height)
+    , center(false) {
     // Load the sprite sheet texture into memory and set vertices to handle square textures.
     spritesheet.loadFromFile(sprite_sheet);
     auto texture_size = spritesheet.getSize();
@@ -25,7 +26,7 @@ BatchDrawer::BatchDrawer(std::string sprite_sheet, unsigned int width, unsigned 
  * Prepares BatchDrawer with information regarding which sprites from the sprite sheet to display and their locations
  * on the screen.
  */
-void BatchDrawer::UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned int, double>> const& sprites) {
+void BatchDrawer::UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned int, double, sf::Color>> const& sprites) {
     // Vertices will need to hold a Quad (4 points) for every image to display
     vertices.resize(sprites.size() * 4);
 
@@ -37,10 +38,18 @@ void BatchDrawer::UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned i
         auto scale = std::get<2>(sprite);
         sf::Vertex* quad = &vertices[index*4];
 
-        quad[0].position = sf::Vector2f(location.x, location.y);
-        quad[1].position = sf::Vector2f(location.x + sprite_pixel_width*scale, location.y);
-        quad[2].position = sf::Vector2f(location.x + sprite_pixel_width*scale, location.y + sprite_pixel_height*scale);
-        quad[3].position = sf::Vector2f(location.x, location.y + sprite_pixel_height*scale);
+        if (center) {
+            // Center the position (offset back half the width and height)
+            quad[0].position = sf::Vector2f(location.x - sprite_pixel_width*scale/2.0, location.y - sprite_pixel_height*scale/2.0);
+            quad[1].position = sf::Vector2f(location.x + sprite_pixel_width*scale/2.0, location.y - sprite_pixel_height*scale/2.0);
+            quad[2].position = sf::Vector2f(location.x + sprite_pixel_width*scale/2.0, location.y + sprite_pixel_height*scale/2.0);
+            quad[3].position = sf::Vector2f(location.x - sprite_pixel_width*scale/2.0, location.y + sprite_pixel_height*scale/2.0);
+        } else {
+            quad[0].position = sf::Vector2f(location.x, location.y);
+            quad[1].position = sf::Vector2f(location.x + sprite_pixel_width*scale, location.y);
+            quad[2].position = sf::Vector2f(location.x + sprite_pixel_width*scale, location.y + sprite_pixel_height*scale);
+            quad[3].position = sf::Vector2f(location.x, location.y + sprite_pixel_height*scale);
+        }
 
         // Set texture coordinates (which image in sprite sheet to display)
         unsigned int row = std::get<1>(sprite) / spritesheet_width;
@@ -50,6 +59,13 @@ void BatchDrawer::UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned i
         quad[1].texCoords = sf::Vector2f((row+1) * sprite_pixel_width, column * sprite_pixel_height);
         quad[2].texCoords = sf::Vector2f((row+1) * sprite_pixel_width, (column+1) * sprite_pixel_height);
         quad[3].texCoords = sf::Vector2f((row) * sprite_pixel_width, (column+1) * sprite_pixel_height);
+
+        // Set texture color
+        auto color = std::get<3>(sprite);
+        quad[0].color = color;
+        quad[1].color = color;
+        quad[2].color = color;
+        quad[3].color = color;
 
         ++index;
     }

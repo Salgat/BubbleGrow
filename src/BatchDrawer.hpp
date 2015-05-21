@@ -20,13 +20,14 @@ private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 public:
+    bool center;
     unsigned int sprite_pixel_width; // Pixel width of a single sprite entry in the spritesheet
     unsigned int sprite_pixel_height; // Pixel height
 
     BatchDrawer() {}
     BatchDrawer(std::string sprite_sheet, unsigned int width, unsigned height);
 
-    void UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned int, double>> const& sprites);
+    void UpdateTextures(std::vector<std::tuple<sf::Vector2f, unsigned int, double, sf::Color>> const& sprites);
 };
 
 #endif //BUBBLEGROW_BATCHDRAWER_HPP

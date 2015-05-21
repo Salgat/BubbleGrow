@@ -61,8 +61,10 @@ Renderer::Renderer()
         }
     }
 
-    // Initialize background batch drawer
+    // Initialize background and bubble batch drawer
     background_batch = BatchDrawer("../../data/artwork/BG_Tile1.png", 1, 1);
+    bubbles_batch = BatchDrawer("../../data/artwork/Bubble_Types.png", 3, 3);
+    bubbles_batch.center = true;
 }
 
 /**
@@ -259,7 +261,7 @@ void Renderer::RenderBackground() {
     int start_y = -1 * static_cast<int>(tilemap_dimensions)/2;
 
     // Go through and draw each tile, which is offset by its position in background_map
-    std::vector<std::tuple<sf::Vector2f, unsigned int, double>> sprites;
+    sprites.clear();
     for (auto const& column : background_map) {
         for (auto const entry : column) {
             auto screen_location = sf::Vector2f(background_batch.sprite_pixel_width * scale * start_x -
@@ -267,7 +269,7 @@ void Renderer::RenderBackground() {
                                                 background_batch.sprite_pixel_height * scale * start_y -
                                                 player->position.y * parallax_strength);
             unsigned int sprite_index = entry;
-            sprites.push_back(std::make_tuple(screen_location, sprite_index, scale));
+            sprites.push_back(std::make_tuple(screen_location, sprite_index, scale, sf::Color::White));
 
             ++start_y;
         }
@@ -286,6 +288,7 @@ void Renderer::RenderUnits() {
     if (!player or !world)
         return;
 
+    sprites.clear();
     auto player_position = player->position;
     double scale = 0.1;
     std::vector<std::shared_ptr<Player>> non_resource_players;
@@ -302,30 +305,29 @@ void Renderer::RenderUnits() {
     for (auto const& non_resource_player : non_resource_players) {
         RenderPlayer(non_resource_player, player_position);
     }
+
+    bubbles_batch.UpdateTextures(sprites);
+    window->draw(bubbles_batch);
 }
 
 /**
- * Draws a unit for the given Player type.
+ * Adds a unit for the given Player type to be drawn to the batch drawer.
  */
 void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vector2f player_position, sf::Color color) {
-    if (unit->type == UnitType::BASE_LV1) {
-        //unit->sprite.setTexture(textures[ImageId::BASE_LV1]);
-        unit->sprite.setTexture(textures[ImageId::BUBBLE]);
-    } else if (unit->type == UnitType::RESOURCE or true) {
-        unit->sprite.setTexture(textures[ImageId::BUBBLE]);
+    unsigned int sprite_index = 0;
+    if (unit->type != UnitType::RESOURCE) {
+        sprite_index = static_cast<unsigned int>(unit->type);
     }
 
-    unit->sprite.setOrigin(unit->sprite.getLocalBounds().width/2.0, unit->sprite.getLocalBounds().height/2.0);
-    unit->sprite.setPosition((unit->position.x - player_position.x)*20.0 + RESOLUTION_X/2,
-                             (unit->position.y - player_position.y)*20.0 + RESOLUTION_Y/2);
-    unit->sprite.setColor(color);
-    unit->sprite.setScale(unit->size/20.0, unit->size/20.0);
+    auto screen_location = sf::Vector2f((unit->position.x - player_position.x)*20.0 + RESOLUTION_X/2,
+                                        (unit->position.y - player_position.y)*20.0 + RESOLUTION_Y/2);
+    double scale = unit->size/20.0;
 
-    window->draw(unit->sprite);
+    sprites.push_back(std::make_tuple(screen_location, sprite_index, scale, color));
 }
 
 /**
- * Draws all units for given Player type.
+ * Adds all units for given Player type to be drawn to the batch drawer.
  */
 void Renderer::RenderPlayer(std::shared_ptr<Player> player_to_render, sf::Vector2f main_player_position) {
     for (auto const& unit : player_to_render->units) {
