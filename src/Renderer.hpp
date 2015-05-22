@@ -39,6 +39,7 @@ private:
     std::map<ImageId, sf::Texture> textures;
 
     // Helper functions
+    inline void UpdateView(sf::Vector2u new_window_size);
     inline bool IsMouseOverText(sf::Text& text_object, sf::Vector2f cursor_location);
     inline MenuType MouseOverWhichMenuOption(sf::Vector2f cursor_location);
     inline double RenderDistanceTo(sf::Vector2f destination);

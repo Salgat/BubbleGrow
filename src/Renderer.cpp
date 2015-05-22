@@ -25,19 +25,7 @@ Renderer::Renderer()
 
     // Scale view based on current resolution
     auto window_size = window->getSize();
-    ResolutionX = window_size.x;
-    ResolutionY = window_size.y;
-    double scale_x = 1280.0 / window_size.x;
-    double scale_y = 1024.0 / window_size.y;
-    auto scale = scale_x > scale_y ? scale_x : scale_y;
-
-    auto view = window->getDefaultView();
-    view.zoom(scale);
-    ResolutionX *= scale;
-    ResolutionY *= scale;
-    view.setSize(window_size.x*scale, window_size.y*scale);
-    view.setCenter(window_size.x*scale/2.0, window_size.y*scale/2.0);
-    window->setView(view);
+    UpdateView(window_size);
 
     // Fonts
     if (!font.loadFromFile("../../data/fonts/Sile.ttf")) {
@@ -87,6 +75,23 @@ Renderer::Renderer()
     symbols_batch = BatchDrawer("../../data/artwork/Player_Symbols.png", 3, 3);
 }
 
+void Renderer::UpdateView(sf::Vector2u new_window_size) {
+    // Scale view based on current resolution
+    ResolutionX = new_window_size.x;
+    ResolutionY = new_window_size.y;
+    double scale_x = 1280.0 / new_window_size.x;
+    double scale_y = 1024.0 / new_window_size.y;
+    auto scale = scale_x > scale_y ? scale_x : scale_y;
+
+    auto view = window->getDefaultView();
+    view.zoom(scale);
+    ResolutionX *= scale;
+    ResolutionY *= scale;
+    view.setSize(new_window_size.x*scale, new_window_size.y*scale);
+    view.setCenter(new_window_size.x*scale/2.0, new_window_size.y*scale/2.0);
+    window->setView(view);
+}
+
 /**
  * Handles pending events created by the input. Returns false to end game loop.
  */
@@ -102,17 +107,7 @@ bool Renderer::PollEvents() {
             ResolutionY = event.size.height;
 
             // Scale by whichever dimension is changed the most
-            double scale_x = 1280.0 / event.size.width;
-            double scale_y = 1024.0 / event.size.height;
-            auto scale = scale_x > scale_y ? scale_x : scale_y;
-
-            auto view = window->getDefaultView();
-            view.zoom(scale);
-            ResolutionX *= scale;
-            ResolutionY *= scale;
-            view.setSize(event.size.width*scale, event.size.height*scale);
-            view.setCenter(event.size.width*scale/2.0, event.size.height*scale/2.0);
-            window->setView(view);
+            UpdateView(sf::Vector2u(event.size.width, event.size.height));
         } else if (mode == GameMode::IN_GAME) {
             if(!GamePollEvents(event))
                 return false;
