@@ -24,8 +24,7 @@ Renderer::Renderer()
     //window->setFramerateLimit(60);
 
     // Scale view based on current resolution
-    auto window_size = window->getSize();
-    UpdateView(window_size);
+    UpdateView(window->getSize());
 
     // Fonts
     if (!font.loadFromFile("../../data/fonts/Sile.ttf")) {
@@ -50,6 +49,8 @@ Renderer::Renderer()
     // Load textures to be used by the game
     textures[ImageId::LOGO] = sf::Texture();
     textures[ImageId::LOGO].loadFromFile("../../data/artwork/logo.png");
+    textures[ImageId::HOTKEY_BAR] = sf::Texture();
+    textures[ImageId::HOTKEY_BAR].loadFromFile("../../data/artwork/Bubble_Toolbar.png");
     textures[ImageId::BUBBLE] = sf::Texture();
     textures[ImageId::BUBBLE].loadFromFile("../../data/artwork/bubble.png");
     textures[ImageId::BUBBLE_TYPES] = sf::Texture();
@@ -397,6 +398,17 @@ void Renderer::RenderInterface(double duration) {
     // Display resource count
     RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
     RenderText("FPS: " + std::to_string(1.0/duration), sf::Vector2f(10.0, 30.0), TextSize::RESOURCE_COUNTER);
+
+    // Render Bottom Hotkey Bar
+    sf::Sprite hotkey_bar;
+    hotkey_bar.setOrigin(0.0,0.0);
+    hotkey_bar.setRotation(0.0);
+    hotkey_bar.setColor(sf::Color::White);
+    hotkey_bar.setTexture(textures[ImageId::HOTKEY_BAR]);
+    double scale = 1.0;
+    //hotkey_bar.setScale(scale, scale);
+    hotkey_bar.setPosition(ResolutionX/2 - hotkey_bar.getLocalBounds().width/(2.0/scale), ResolutionY - 100.0);
+    window->draw(hotkey_bar);
 
     if (show_ingame_menu) {
         current_menu = MenuType::GAME_MENU;

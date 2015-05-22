@@ -108,6 +108,7 @@ enum ImageId {
 
 
     LOGO,
+    HOTKEY_BAR,
     BUBBLE,
     BUBBLE_TYPES, // Sprite sheet for Bubble Units
     PLAYER_SYMBOLS, // Sprite sheet for Player Symbols
