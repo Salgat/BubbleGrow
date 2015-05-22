@@ -50,7 +50,6 @@ private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 public:
-    bool center;
     unsigned int sprite_pixel_width; // Pixel width of a single sprite entry in the spritesheet
     unsigned int sprite_pixel_height; // Pixel height
 

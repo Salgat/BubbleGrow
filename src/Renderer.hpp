@@ -19,7 +19,6 @@ class Unit;
 class Renderer {
 private:
     bool mouse_movement;
-    double view_scale; // Determines how much the resolution has changed from the default 1280px width
     MenuType current_menu;
     MenuType last_menu; // This is only updated when a main menu selection includes a back button on the next menu
 
@@ -35,7 +34,6 @@ private:
     BatchDrawer bubbles_batch;
     std::vector<BatchEntry> sprites;
 
-    sf::Sprite sprite;
     std::map<ImageId, sf::Texture> textures;
 
     // Helper functions

@@ -8,22 +8,38 @@
 #include "Unit.hpp"
 #include "Resources.hpp"
 
-unsigned int ResolutionX = 1280;
-unsigned int ResolutionY = 1024;
+unsigned int ResolutionX = 1024;
+unsigned int ResolutionY = 720;
 
 Renderer::Renderer()
     : mouse_movement(true)
-    , view_scale(1.0)
     , current_menu(MenuType::MAIN)
     , last_menu(MenuType::NONE)
     , mode(GameMode::MENU)
     , show_ingame_menu(false) {
     std::string title = "BubbleGrow V" + std::to_string(VERSION) + "." + std::to_string(SUB_VERSION);
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+    //settings.antialiasingLevel = 8;
     window = std::make_shared<sf::RenderWindow>(sf::VideoMode(ResolutionX, ResolutionY), title, sf::Style::Default, settings);
     //window->setFramerateLimit(60);
 
+    // Scale view based on current resolution
+    auto window_size = window->getSize();
+    ResolutionX = window_size.x;
+    ResolutionY = window_size.y;
+    double scale_x = 1280.0 / window_size.x;
+    double scale_y = 1024.0 / window_size.y;
+    auto scale = scale_x > scale_y ? scale_x : scale_y;
+
+    auto view = window->getDefaultView();
+    view.zoom(scale);
+    ResolutionX *= scale;
+    ResolutionY *= scale;
+    view.setSize(window_size.x*scale, window_size.y*scale);
+    view.setCenter(window_size.x*scale/2.0, window_size.y*scale/2.0);
+    window->setView(view);
+
+    // Fonts
     if (!font.loadFromFile("../../data/fonts/Sile.ttf")) {
     } else {
         text.setFont(font);
@@ -68,7 +84,6 @@ Renderer::Renderer()
     // Initialize background and bubble batch drawer
     background_batch = BatchDrawer("../../data/artwork/BG_Tile1.png", 1, 1);
     bubbles_batch = BatchDrawer("../../data/artwork/Bubble_Types.png", 3, 3);
-    bubbles_batch.center = true;
 }
 
 /**
@@ -85,21 +100,18 @@ bool Renderer::PollEvents() {
             ResolutionX = event.size.width;
             ResolutionY = event.size.height;
 
-            /*
-            if (ResolutionX < 1280) {
-                view_scale = 1280.0 / ResolutionX;
-            } else {
-                view_scale = 1.0;
-            }*/
+            // Scale by whichever dimension is changed the most
+            double scale_x = 1280.0 / event.size.width;
+            double scale_y = 1024.0 / event.size.height;
+            auto scale = scale_x > scale_y ? scale_x : scale_y;
 
             auto view = window->getDefaultView();
-            view.setSize(event.size.width, event.size.height);
-            view.setCenter(event.size.width/2.0, event.size.height/2.0);
-            //view.zoom(view_scale);
+            view.zoom(scale);
+            ResolutionX *= scale;
+            ResolutionY *= scale;
+            view.setSize(event.size.width*scale, event.size.height*scale);
+            view.setCenter(event.size.width*scale/2.0, event.size.height*scale/2.0);
             window->setView(view);
-
-            //sf::FloatRect visible_area(0, 0, event.size.width, event.size.height);
-            //window->setView(sf::View(visible_area));
         } else if (mode == GameMode::IN_GAME) {
             if(!GamePollEvents(event))
                 return false;
@@ -139,11 +151,13 @@ bool Renderer::GamePollEvents(sf::Event& event) {
     } else if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {
             // Check if mouse is clicking on any menu selection
-            last_menu_item_clicked = MouseOverWhichMenuOption(sf::Vector2f(event.mouseButton.x, event.mouseButton.y));
+            auto mouse_position = window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+            last_menu_item_clicked = MouseOverWhichMenuOption(mouse_position);
         }
     } else if (event.type == sf::Event::MouseButtonReleased) {
         if (event.mouseButton.button == sf::Mouse::Left) {
-            auto menu_item_released_at = MouseOverWhichMenuOption(sf::Vector2f(event.mouseButton.x, event.mouseButton.y));
+            auto mouse_position = window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+            auto menu_item_released_at = MouseOverWhichMenuOption(mouse_position);
             if (menu_item_released_at == last_menu_item_clicked and last_menu_item_clicked != MenuType::NONE) {
                 // Menu item has been pressed (we checked if the mouse click and release is on the same menu item)
                 if (menu_item_released_at == MenuType::LEAVE_GAME) {
@@ -177,11 +191,13 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
     if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {
             // Check if mouse is clicking on any menu selection
-            last_menu_item_clicked = MouseOverWhichMenuOption(sf::Vector2f(event.mouseButton.x, event.mouseButton.y));
+            auto mouse_position = window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+            last_menu_item_clicked = MouseOverWhichMenuOption(mouse_position);
         }
     } else if (event.type == sf::Event::MouseButtonReleased) {
         if (event.mouseButton.button == sf::Mouse::Left) {
-            auto menu_item_released_at = MouseOverWhichMenuOption(sf::Vector2f(event.mouseButton.x, event.mouseButton.y));
+            auto mouse_position = window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+            auto menu_item_released_at = MouseOverWhichMenuOption(mouse_position);
             if (menu_item_released_at == last_menu_item_clicked and last_menu_item_clicked != MenuType::NONE) {
                 // Menu item has been pressed (we checked if the mouse click and release is on the same menu item)
                 if (menu_item_released_at == MenuType::QUICK_MATCH) {
@@ -236,7 +252,8 @@ void Renderer::ProcessInputs() {
     if (mode == GameMode::IN_GAME) {
         if (mouse_movement) {
             // Movement based on cursor's position from center of screen.
-            auto mouse_position = sf::Mouse::getPosition(*window);
+            auto mouse_position = window->mapPixelToCoords(sf::Mouse::getPosition(*window));
+
             auto distance_x = static_cast<int>(mouse_position.x) - static_cast<int>(ResolutionX /2);
             auto distance_y = static_cast<int>(mouse_position.y) - static_cast<int>(ResolutionY /2);
             float distance_from_center = std::sqrt(distance_x*distance_x + distance_y*distance_y);
@@ -448,14 +465,15 @@ void Renderer::RenderDirectionArrows() {
  */
 void Renderer::RenderMenu() {
     // Render Logo
-    sprite.setOrigin(0.0,0.0);
-    sprite.setRotation(0.0);
-    sprite.setColor(sf::Color::White);
-    sprite.setTexture(textures[ImageId::LOGO]);
+    sf::Sprite logo;
+    logo.setOrigin(0.0,0.0);
+    logo.setRotation(0.0);
+    logo.setColor(sf::Color::White);
+    logo.setTexture(textures[ImageId::LOGO]);
     double scale = 0.4;
-    sprite.setScale(scale, scale);
-    sprite.setPosition(ResolutionX /2 - sprite.getLocalBounds().width/(2.0/scale), 75.0);
-    window->draw(sprite);
+    logo.setScale(scale, scale);
+    logo.setPosition(ResolutionX/2 - logo.getLocalBounds().width/(2.0/scale), 75.0);
+    window->draw(logo);
 
     // Render menu options
     RenderMenuText(current_menu);

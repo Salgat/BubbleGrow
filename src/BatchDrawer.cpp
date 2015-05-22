@@ -11,8 +11,7 @@
  */
 BatchDrawer::BatchDrawer(std::string sprite_sheet, unsigned int width, unsigned height)
     : spritesheet_width(width)
-    , spritesheet_height(height)
-    , center(false) {
+    , spritesheet_height(height) {
     // Load the sprite sheet texture into memory and set vertices to handle square textures.
     spritesheet.loadFromFile(sprite_sheet);
     auto texture_size = spritesheet.getSize();
@@ -38,7 +37,7 @@ void BatchDrawer::UpdateEntries(std::vector<BatchEntry> const& sprites) {
         auto scale = sprite.scale;
         sf::Vertex* quad = &vertices[index*4];
 
-        if (center) {
+        if (sprite.center) {
             // Center the position (offset back half the width and height)
             quad[0].position = sf::Vector2f(location.x - sprite_pixel_width*scale/2.0, location.y - sprite_pixel_height*scale/2.0);
             quad[1].position = sf::Vector2f(location.x + sprite_pixel_width*scale/2.0, location.y - sprite_pixel_height*scale/2.0);
