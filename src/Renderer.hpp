@@ -32,7 +32,9 @@ private:
     std::array<std::array<std::size_t, tilemap_dimensions>, tilemap_dimensions> background_map;
     BatchDrawer background_batch;
     BatchDrawer bubbles_batch;
+    BatchDrawer symbols_batch;
     std::vector<BatchEntry> sprites;
+    std::vector<BatchEntry> sprites_symbols;
 
     std::map<ImageId, sf::Texture> textures;
 

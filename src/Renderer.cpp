@@ -84,6 +84,7 @@ Renderer::Renderer()
     // Initialize background and bubble batch drawer
     background_batch = BatchDrawer("../../data/artwork/BG_Tile1.png", 1, 1);
     bubbles_batch = BatchDrawer("../../data/artwork/Bubble_Types.png", 3, 3);
+    symbols_batch = BatchDrawer("../../data/artwork/Player_Symbols.png", 3, 3);
 }
 
 /**
@@ -331,6 +332,7 @@ void Renderer::RenderUnits() {
         return;
 
     sprites.clear();
+    sprites_symbols.clear();
     auto player_position = player->position;
     double scale = 0.1;
     std::vector<std::shared_ptr<Player>> non_resource_players;
@@ -350,6 +352,9 @@ void Renderer::RenderUnits() {
 
     bubbles_batch.UpdateEntries(sprites);
     window->draw(bubbles_batch);
+
+    symbols_batch.UpdateEntries(sprites_symbols);
+    window->draw(symbols_batch);
 }
 
 /**
@@ -367,6 +372,12 @@ void Renderer::RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vecto
 
     BatchEntry unit_sprite(screen_location, sprite_index, scale, color, true);
     sprites.push_back(unit_sprite);
+
+    if (unit->type != UnitType::RESOURCE) {
+        // Draw player's symbol on each unit (symbol color is a lighter shade of the bubble color)
+        BatchEntry unit_symbol(screen_location, unit->symbol, scale, sf::Color((color.r+255)/2, (color.g+255)/2, (color.b+255)/2), true);
+        sprites_symbols.push_back(unit_symbol);
+    }
 }
 
 /**

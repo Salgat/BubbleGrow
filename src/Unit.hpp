@@ -40,6 +40,7 @@ public:
 
     UnitMainType main_type;
     UnitType type;
+    PlayerSymbol symbol;
     sf::Vector2f position;
     float size; // Radius of unit (meters)
     std::array<std::atomic<int>, 2> health;

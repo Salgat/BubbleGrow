@@ -105,7 +105,18 @@ enum ImageId {
     FIGHTER_LV2 = 7,
     FIGHTER_LV3 = 8,
 
-    // Indexes for each of the Player symbols: Circle = (0, 0), Triangle = (std::floor(7/3), 7%3)
+
+
+    LOGO,
+    BUBBLE,
+    BUBBLE_TYPES, // Sprite sheet for Bubble Units
+    PLAYER_SYMBOLS, // Sprite sheet for Player Symbols
+
+    ARROW
+};
+
+// Indexes for each of the Player symbols (in the spritesheet)
+enum PlayerSymbol {
     CIRCLE = 0,
     CRESCENT = 1,
     DIAMOND = 2,
@@ -114,13 +125,6 @@ enum ImageId {
     SQUARE = 5,
     STAR = 6,
     TRIANGLE = 7,
-
-    LOGO,
-    BUBBLE,
-    BUBBLE_TYPES, // Sprite sheet for Bubble Units
-    PLAYER_SYMBOLS, // Sprite sheet for Player Symbols
-
-    ARROW
 };
 
 enum class ActionType {
