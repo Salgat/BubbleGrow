@@ -1,0 +1,57 @@
+The system is: Windows - 6.2 - AMD64
+Determining if the C compiler works passed with the following output:
+Change Dir: C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/make/make.exe" "cmTryCompileExec2760557458/fast"
+C:/make/make.exe -f CMakeFiles/cmTryCompileExec2760557458.dir/build.make CMakeFiles/cmTryCompileExec2760557458.dir/build
+make.exe[1]: Entering directory 'C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp'
+"C:/Program Files (x86)/CMake/bin/cmake.exe" -E cmake_progress_report C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp/CMakeFiles 1
+"Building C object CMakeFiles/cmTryCompileExec2760557458.dir/testCCompiler.c.obj"
+C:/MinGW/bin/gcc.exe    -o CMakeFiles/cmTryCompileExec2760557458.dir/testCCompiler.c.obj   -c C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp/testCCompiler.c
+"Linking C executable cmTryCompileExec2760557458.exe"
+C:/MinGW/bin/gcc.exe       "CMakeFiles/cmTryCompileExec2760557458.dir/testCCompiler.c.obj"   -o cmTryCompileExec2760557458.exe  
+make.exe[1]: Leaving directory 'C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/make/make.exe" "cmTryCompileExec596384636/fast"
+C:/make/make.exe -f CMakeFiles/cmTryCompileExec596384636.dir/build.make CMakeFiles/cmTryCompileExec596384636.dir/build
+make.exe[1]: Entering directory 'C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp'
+"C:/Program Files (x86)/CMake/bin/cmake.exe" -E cmake_progress_report C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp/CMakeFiles 1
+"Building C object CMakeFiles/cmTryCompileExec596384636.dir/CMakeCCompilerABI.c.obj"
+C:/MinGW/bin/gcc.exe    -o CMakeFiles/cmTryCompileExec596384636.dir/CMakeCCompilerABI.c.obj   -c "C:/Program Files (x86)/CMake/share/cmake-3.2/Modules/CMakeCCompilerABI.c"
+"Linking C executable cmTryCompileExec596384636.exe"
+C:/MinGW/bin/gcc.exe       "CMakeFiles/cmTryCompileExec596384636.dir/CMakeCCompilerABI.c.obj"   -o cmTryCompileExec596384636.exe   
+make.exe[1]: Leaving directory 'C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp'
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/make/make.exe" "cmTryCompileExec2764910734/fast"
+C:/make/make.exe -f CMakeFiles/cmTryCompileExec2764910734.dir/build.make CMakeFiles/cmTryCompileExec2764910734.dir/build
+make.exe[1]: Entering directory 'C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp'
+"C:/Program Files (x86)/CMake/bin/cmake.exe" -E cmake_progress_report C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp/CMakeFiles 1
+"Building CXX object CMakeFiles/cmTryCompileExec2764910734.dir/testCXXCompiler.cxx.obj"
+C:/MinGW/bin/g++.exe     -o CMakeFiles/cmTryCompileExec2764910734.dir/testCXXCompiler.cxx.obj -c C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+"Linking CXX executable cmTryCompileExec2764910734.exe"
+C:/MinGW/bin/g++.exe        "CMakeFiles/cmTryCompileExec2764910734.dir/testCXXCompiler.cxx.obj"   -o cmTryCompileExec2764910734.exe  
+make.exe[1]: Leaving directory 'C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/make/make.exe" "cmTryCompileExec2684458331/fast"
+C:/make/make.exe -f CMakeFiles/cmTryCompileExec2684458331.dir/build.make CMakeFiles/cmTryCompileExec2684458331.dir/build
+make.exe[1]: Entering directory 'C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp'
+"C:/Program Files (x86)/CMake/bin/cmake.exe" -E cmake_progress_report C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp/CMakeFiles 1
+"Building CXX object CMakeFiles/cmTryCompileExec2684458331.dir/CMakeCXXCompilerABI.cpp.obj"
+C:/MinGW/bin/g++.exe     -o CMakeFiles/cmTryCompileExec2684458331.dir/CMakeCXXCompilerABI.cpp.obj -c "C:/Program Files (x86)/CMake/share/cmake-3.2/Modules/CMakeCXXCompilerABI.cpp"
+"Linking CXX executable cmTryCompileExec2684458331.exe"
+C:/MinGW/bin/g++.exe        "CMakeFiles/cmTryCompileExec2684458331.dir/CMakeCXXCompilerABI.cpp.obj"   -o cmTryCompileExec2684458331.exe   
+make.exe[1]: Leaving directory 'C:/Users/Austin/Dropbox/Projects/BubbleGrow/bin/Release/CMakeFiles/CMakeTmp'
+
+

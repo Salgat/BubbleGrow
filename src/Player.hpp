@@ -13,17 +13,29 @@ class World;
 
 class Player : public std::enable_shared_from_this<Player> {
 private:
+    inline double CalculateDistanceTo(sf::Vector2f target_position);
+    inline sf::Vector2f MoveTowards(sf::Vector2f destination, double distance);
+
+    // Player AI
+    // Todo: Consider encapsulating the AI state and logic into a separate class
+    double action_duration;
+    sf::Vector2f ai_destination;
+
+    void MakePlayerDecision(double duration);
+    void EasyAiDecision(double duration);
 
 public:
     // Player information
     std::string name; // Visible name to all players
     uint64_t id;
     uint64_t unit_ids; // Increment and assign each time a new unit is created
+    PlayerType type;
     AiType ai_type;
 
     std::shared_ptr<World> world;
 
     std::queue<Request> requests; // Requests for the player class to process (typically based on input from player)
+    std::array<Request, static_cast<std::size_t>(RequestType::PLAYER_END_REQUESTS)> requests_array;
 
     /* These containers are special, since they will be accessed concurrently. The rule is, when a new unit is created,
    a new entry is added for this unit (in a thread safe area). We can concurrently access this map
@@ -40,15 +52,29 @@ public:
     sf::Vector2f position;
     std::array<unsigned int, static_cast<std::size_t>(UnitType::NONE)> number_of_units;
     unsigned int army_value; // The "score" based on number of units and their types
-    unsigned int resources; // Used to create more base units
+    std::atomic<int> resources; // Used to create more base units
     double wander_range; // Radius in meters that units will wander
+
+    // Render details
+    sf::Color color;
+    //SymbolType symbol;
 
     Player();
 
-    void Update(double duration);
+    void ProcessPlayerRequests(double duration);
+    void PlayerMoveRequest(sf::Vector2f destination, double speed);
+    void PlayerPurchaseRequest(unsigned int purchase_amount, UnitType purchase_type);
+
+    virtual void Update(double duration);
     void ProcessRequests(double duration); // Duration is in seconds (example: 0.01666 == 60fps)
-    void MakeDecisions();
+    void MakeDecisions(double duration);
+    virtual void RemoveExpiredUnits();
+
     void CreateUnits(int amount, UnitType type);
+
+    sf::Vector2f RandomWanderLocation();
+
+    void PurchaseUnits(unsigned int amount, UnitType purchase_type);
 };
 
 #endif //BUBBLEGROW_PLAYER_HPP

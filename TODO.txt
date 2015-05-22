@@ -1,0 +1,29 @@
+This document holds an informal list of work planned to do.
+	- X Add resource player subclass
+		- Simply holds (and possibly creates?) resources on the map, which are units that can be mined
+	- Implement gathering resources
+		- Having an issue where the unit should be gathering but just sitting still
+	- Correct size to distance, since they aren't proportional.
+	- X Add controls to move
+	- Add basic player AI (for computer opponents)
+		- Easy mode should buy gatherer and fighter units 50/50 whenever it has enough resources
+	- Add arrows pointing to other players
+	- Add ability to purchase other elements
+	- Add "const" where needed, same goes for inline only in the headers
+	- Add an end game screen for if the player dies or if the player wins by being the only one left (goes back to main screen)
+
+Later,
+	- Artwork
+	- Menu
+	- Sounds
+
+Way later...
+	- Networking (servers and clients)
+	
+	
+Notes:
+	- Have mouse movement (distance from center point) toggle-able by pressing space bar (to let players click buttons).
+	- Use http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.9.2/threads-posix/seh/ for MinGW build
+	- For CMAKE to work properly, you need to add to PATH the make.exe and 3 DLLs (winpthread, libc++6, etc). The easiest way to do this is to add 
+	  c:/mingw/bin to PATH and be sure to download and place make.exe in c:/mingw/bin. Perhpas easier to include make.exe and MinGW.7z in the project github for easy download?
+	- Perhaps add a flag for the executable to disable multithreading?

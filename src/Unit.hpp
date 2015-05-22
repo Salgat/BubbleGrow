@@ -17,25 +17,33 @@ private:
     inline double CalculateAttackSpeed();
     inline int CalculateAttackDamage();
     inline double CalculateAttackRange();
-    inline double CalculateDistanceTo(sf::Vector2f target_position);
+    inline double CalculateGatherSpeed();
+    inline int CalculateGatherAmount();
+
+    inline double CalculateDistanceTo(sf::Vector2f target_position, bool use_owner_position = false);
 
     inline sf::Vector2f RandomWanderLocation();
 
     std::shared_ptr<Unit> FindClosestEnemy();
     std::shared_ptr<Unit> FindClosestResource();
+    std::shared_ptr<Unit> FindClosestUnit(PlayerType ignore = PlayerType::NONE);
 
-    void WalkTo(sf::Vector2f destination, double duration);
-    void Attack(uint64_t target, double duration);
+    void WalkTo(sf::Vector2f destination, double duration, bool update_action);
+    void Attack(uint64_t target, uint64_t target_owner, double duration);
+    void Gather(uint64_t target, uint64_t target_owner, double duration);
 
 public:
-    uint64_t id;
+    uint64_t id; // Each id/owner_id pair is assumed to be unique, in that no two units will ever have the same pair
     uint64_t owner_id;
     std::shared_ptr<Player> owner; // Used to gain knowledge like current location of player (owner)
     std::shared_ptr<World> world;
 
+    UnitMainType main_type;
     UnitType type;
+    PlayerSymbol symbol;
     sf::Vector2f position;
-    std::array<int, 2> health;
+    float size; // Radius of unit (meters)
+    std::array<std::atomic<int>, 2> health;
     double walk_speed;
     double attack_speed;
     int attack_damage;
@@ -46,10 +54,11 @@ public:
 
     // Update information
     std::atomic<int> pending_damage; // Damage to apply to unit from other sources
+    std::atomic<int> resource_value; // Value if the unit is a resource
 
     Unit();
     void Update(double duration);
-    Request MakeDecision();
+    void MakeDecision(Request& request);
     void ProcessRequest(Request& request, double duration);
 
 

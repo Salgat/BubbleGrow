@@ -1,33 +1,25 @@
 #include "common.hpp"
 #include "World.hpp"
+#include "Player.hpp"
 #include "Renderer.hpp"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-
-    // Setup game state
-    auto world = std::make_shared<World>();
-    auto player = world->AddPlayer();
-    if (player) {
-
-    } else {
-        //return 1;
-    }
-
-    // Setup SFML renderer
+    // Initialize SFML renderer
     auto renderer = std::make_shared<Renderer>();
-    renderer->world = world;
-    renderer->player = player;
 
     // Start game loop
     bool running = true;
-    while(running) {
+    sf::Clock clock;
+    while(running and renderer->window->isOpen()) {
         running = renderer->PollEvents();
         renderer->ProcessInputs();
 
-        world->UpdateAndProcess(1.0);
+        // Only update the game if one is running (otherwise, the player is at the menu).
+        double duration = clock.restart().asSeconds();
+        if (renderer->mode == GameMode::IN_GAME)
+            renderer->world->UpdateAndProcess(duration);
 
-        renderer->RenderWorld();
+        renderer->RenderGame(duration);
     }
 
     return 0;
