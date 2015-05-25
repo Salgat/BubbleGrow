@@ -116,6 +116,19 @@ enum ImageId {
     ARROW
 };
 
+// Identifiers for every sound in the game
+enum class SoundId {
+    BUBBLE_DIE,
+    BUBBLE_ATTACK,
+    BUBBLE_GATHER,
+    MENU_SELECTION,
+    MENU_SELECTION_CHANGE,
+    MAIN_MENU_MUSIC,
+    IN_GAME_MUSIC,
+    NONE
+};
+//std::array<std::string const, static_cast<std::size_t>(SoundId::NONE)> const kSoundIdFiles = {};
+
 // Indexes for each of the Player symbols (in the spritesheet)
 enum PlayerSymbol {
     CIRCLE = 0,
@@ -213,8 +226,8 @@ double const kFighterWalkSpeed = 1.0;
 double const kBruteWalkSpeed = 0.7;
 double const kScoutWalkSpeed = 1.5;
 
-// Attack speed (attacks/second)
-double const kBaseAttackSpeed = 0.5;
+// Attack speed (seconds/attack)
+double const kBaseAttackSpeed = 1.0;
 double const kGathererAttackSpeed = 0.1;
 double const kFighterAttackSpeed = 1.0;
 double const kBruteAttackSpeed = 0.7;

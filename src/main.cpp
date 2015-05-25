@@ -2,10 +2,14 @@
 #include "World.hpp"
 #include "Player.hpp"
 #include "Renderer.hpp"
+#include "SoundManager.hpp"
+
 
 int main() {
     // Initialize SFML renderer
     auto renderer = std::make_shared<Renderer>();
+    auto sound_manager = std::make_shared<SoundManager>(renderer);
+    renderer->sound_manager = sound_manager;
 
     // Start game loop
     bool running = true;
@@ -20,6 +24,7 @@ int main() {
             renderer->world->UpdateAndProcess(duration);
 
         renderer->RenderGame(duration);
+        sound_manager->ProcessPendingEvents();
     }
 
     return 0;

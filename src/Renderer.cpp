@@ -7,6 +7,7 @@
 #include "Player.hpp"
 #include "Unit.hpp"
 #include "Resources.hpp"
+#include "SoundManager.hpp"
 
 unsigned int ResolutionX = 1024;
 unsigned int ResolutionY = 720;
@@ -24,7 +25,20 @@ Renderer::Renderer()
     //window->setFramerateLimit(60);
 
     // Scale view based on current resolution
-    UpdateView(window->getSize());
+    auto window_size = window->getSize();
+    ResolutionX = window_size.x;
+    ResolutionY = window_size.y;
+    double scale_x = 1280.0 / window_size.x;
+    double scale_y = 1024.0 / window_size.y;
+    auto scale = scale_x > scale_y ? scale_x : scale_y;
+
+    auto view = window->getDefaultView();
+    view.zoom(scale);
+    ResolutionX *= scale;
+    ResolutionY *= scale;
+    view.setSize(window_size.x*scale, window_size.y*scale);
+    view.setCenter(window_size.x*scale/2.0, window_size.y*scale/2.0);
+    window->setView(view);
 
     // Fonts
     if (!font.loadFromFile("../../data/fonts/Sile.ttf")) {
@@ -49,8 +63,6 @@ Renderer::Renderer()
     // Load textures to be used by the game
     textures[ImageId::LOGO] = sf::Texture();
     textures[ImageId::LOGO].loadFromFile("../../data/artwork/logo.png");
-    textures[ImageId::HOTKEY_BAR] = sf::Texture();
-    textures[ImageId::HOTKEY_BAR].loadFromFile("../../data/artwork/Bubble_Toolbar.png");
     textures[ImageId::BUBBLE] = sf::Texture();
     textures[ImageId::BUBBLE].loadFromFile("../../data/artwork/bubble.png");
     textures[ImageId::BUBBLE_TYPES] = sf::Texture();
@@ -74,23 +86,9 @@ Renderer::Renderer()
     background_batch = BatchDrawer("../../data/artwork/BG_Tile1.png", 1, 1);
     bubbles_batch = BatchDrawer("../../data/artwork/Bubble_Types.png", 3, 3);
     symbols_batch = BatchDrawer("../../data/artwork/Player_Symbols.png", 3, 3);
-}
 
-void Renderer::UpdateView(sf::Vector2u new_window_size) {
-    // Scale view based on current resolution
-    ResolutionX = new_window_size.x;
-    ResolutionY = new_window_size.y;
-    double scale_x = 1280.0 / new_window_size.x;
-    double scale_y = 1024.0 / new_window_size.y;
-    auto scale = scale_x > scale_y ? scale_x : scale_y;
-
-    auto view = window->getDefaultView();
-    view.zoom(scale);
-    ResolutionX *= scale;
-    ResolutionY *= scale;
-    view.setSize(new_window_size.x*scale, new_window_size.y*scale);
-    view.setCenter(new_window_size.x*scale/2.0, new_window_size.y*scale/2.0);
-    window->setView(view);
+    // Initiate main menu music
+    events.push(Event(EventType::ENTER_MAIN_MENU, sf::Vector2f(0.0,0.0)));
 }
 
 /**
@@ -108,7 +106,17 @@ bool Renderer::PollEvents() {
             ResolutionY = event.size.height;
 
             // Scale by whichever dimension is changed the most
-            UpdateView(sf::Vector2u(event.size.width, event.size.height));
+            double scale_x = 1280.0 / event.size.width;
+            double scale_y = 1024.0 / event.size.height;
+            auto scale = scale_x > scale_y ? scale_x : scale_y;
+
+            auto view = window->getDefaultView();
+            view.zoom(scale);
+            ResolutionX *= scale;
+            ResolutionY *= scale;
+            view.setSize(event.size.width*scale, event.size.height*scale);
+            view.setCenter(event.size.width*scale/2.0, event.size.height*scale/2.0);
+            window->setView(view);
         } else if (mode == GameMode::IN_GAME) {
             if(!GamePollEvents(event))
                 return false;
@@ -157,10 +165,14 @@ bool Renderer::GamePollEvents(sf::Event& event) {
             auto menu_item_released_at = MouseOverWhichMenuOption(mouse_position);
             if (menu_item_released_at == last_menu_item_clicked and last_menu_item_clicked != MenuType::NONE) {
                 // Menu item has been pressed (we checked if the mouse click and release is on the same menu item)
+                events.push(Event(EventType::MENU_SELECTION, sf::Vector2f(0.0,0.0)));
                 if (menu_item_released_at == MenuType::LEAVE_GAME) {
                     // Leave the game and go back to the main menu (and do any cleanup)
                     world = nullptr;
                     player = nullptr;
+
+                    sound_manager->world = nullptr;
+                    events.push(Event(EventType::ENTER_MAIN_MENU, sf::Vector2f(0.0,0.0)));
 
                     show_ingame_menu = false;
                     mouse_movement = true;
@@ -197,6 +209,7 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
             auto menu_item_released_at = MouseOverWhichMenuOption(mouse_position);
             if (menu_item_released_at == last_menu_item_clicked and last_menu_item_clicked != MenuType::NONE) {
                 // Menu item has been pressed (we checked if the mouse click and release is on the same menu item)
+                events.push(Event(EventType::MENU_SELECTION, sf::Vector2f(0.0,0.0)));
                 if (menu_item_released_at == MenuType::QUICK_MATCH) {
                     // Quick Match clicked, setup a game for the player
                     // Todo: Set this up into a function with customizable parameters
@@ -226,6 +239,9 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
 
                     current_menu = MenuType::GAME_MENU;
                     mode = GameMode::IN_GAME;
+
+                    sound_manager->world = world;
+                    events.push(Event(EventType::ENTER_GAME, sf::Vector2f(0.0,0.0)));
                 } else if (menu_item_released_at == MenuType::EXIT_GAME) {
                     // Exit and close game
                     return false;
@@ -398,17 +414,6 @@ void Renderer::RenderInterface(double duration) {
     // Display resource count
     RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
     RenderText("FPS: " + std::to_string(1.0/duration), sf::Vector2f(10.0, 30.0), TextSize::RESOURCE_COUNTER);
-
-    // Render Bottom Hotkey Bar
-    sf::Sprite hotkey_bar;
-    hotkey_bar.setOrigin(0.0,0.0);
-    hotkey_bar.setRotation(0.0);
-    hotkey_bar.setColor(sf::Color::White);
-    hotkey_bar.setTexture(textures[ImageId::HOTKEY_BAR]);
-    double scale = 1.0;
-    //hotkey_bar.setScale(scale, scale);
-    hotkey_bar.setPosition(ResolutionX/2 - hotkey_bar.getLocalBounds().width/(2.0/scale), ResolutionY - 100.0);
-    window->draw(hotkey_bar);
 
     if (show_ingame_menu) {
         current_menu = MenuType::GAME_MENU;

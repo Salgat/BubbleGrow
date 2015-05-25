@@ -211,6 +211,10 @@ void Unit::WalkTo(sf::Vector2f destination, double duration, bool update_action)
  * Processes an attack (either a new attack, or an ongoing attack).
  */
 void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
+    // Initialize random function
+    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    static std::mt19937 gen(seed);
+
     auto target_unit = world->FindUnit(target_owner, target);
 
     if (action == ActionType::ATTACK) {
@@ -220,8 +224,12 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
             if (target_unit)
                 target_unit->health[0].fetch_add(-1 * CalculateAttackDamage());
             action = ActionType::IDLE;
+            events.push(Event(EventType::BUBBLE_ATTACK, position));
         } else {
-            action_duration += duration;
+            std::uniform_real_distribution<> duration_distribution(duration * 0.6, duration * 1.4);
+            double random_duration = duration_distribution(gen);
+
+            action_duration += random_duration;
         }
     } else if (target_unit and target_unit->health[0] > 0) {
         auto target_position = target_unit->position;
@@ -265,6 +273,7 @@ void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
             }
 
             action = ActionType::IDLE;
+            events.push(Event(EventType::BUBBLE_GATHER, position));
         } else {
             // When adding current duration of gather action, add some random variance to smooth out the size
             // reduction of resource bubbles (otherwise it looks really bad when a bunch of bubbles are gathering
