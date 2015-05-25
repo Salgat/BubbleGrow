@@ -168,6 +168,7 @@ bool Renderer::GamePollEvents(sf::Event& event) {
                 events.push(Event(EventType::MENU_SELECTION, sf::Vector2f(0.0,0.0)));
                 if (menu_item_released_at == MenuType::LEAVE_GAME) {
                     // Leave the game and go back to the main menu (and do any cleanup)
+                    world->EndWorld();
                     world = nullptr;
                     player = nullptr;
 
