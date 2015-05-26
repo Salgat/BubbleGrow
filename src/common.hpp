@@ -234,7 +234,7 @@ double const kBruteAttackSpeed = 0.7;
 double const kScoutAttackSpeed = 1.5;
 
 // Attack damage (health/attack)
-int const kBaseAttackDamage = 20;
+int const kBaseAttackDamage = 25;
 int const kGathererAttackDamage = 1;
 int const kFighterAttackDamage = 15;
 int const kBruteAttackDamage = 35;

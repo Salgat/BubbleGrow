@@ -71,6 +71,8 @@ Renderer::Renderer()
     textures[ImageId::PLAYER_SYMBOLS].loadFromFile("../../data/artwork/Player_Symbols.png");
     textures[ImageId::ARROW] = sf::Texture();
     textures[ImageId::ARROW].loadFromFile("../../data/artwork/arrow.png");
+    textures[ImageId::HOTKEY_BAR] = sf::Texture();
+    textures[ImageId::HOTKEY_BAR].loadFromFile("../../data/artwork/Bubble_Toolbar.png");
 
     // Generate random background map (regardless of map size, background map size is the same for simplicity)
     static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -415,6 +417,17 @@ void Renderer::RenderInterface(double duration) {
     // Display resource count
     RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
     RenderText("FPS: " + std::to_string(1.0/duration), sf::Vector2f(10.0, 30.0), TextSize::RESOURCE_COUNTER);
+
+    // Render Bottom Hotkey Bar
+    sf::Sprite hotkey_bar;
+    double scale = 0.25;
+    hotkey_bar.setScale(scale, scale);
+    hotkey_bar.setOrigin(0.0,0.0);
+    hotkey_bar.setRotation(0.0);
+    hotkey_bar.setColor(sf::Color::White);
+    hotkey_bar.setTexture(textures[ImageId::HOTKEY_BAR]);
+    hotkey_bar.setPosition(ResolutionX/2 - hotkey_bar.getLocalBounds().width/(2.0/scale), ResolutionY - hotkey_bar.getLocalBounds().height*scale);
+    window->draw(hotkey_bar);
 
     if (show_ingame_menu) {
         current_menu = MenuType::GAME_MENU;
