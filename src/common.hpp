@@ -364,7 +364,7 @@ std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kUnitCost 
 // Defines the string representation of the corresponding menu entry
 //std::array<std::string const, 1> const kTileStrings = {"BG_Tile1.png"};
 std::size_t const tilemap_dimensions = 20; // 20x20 background tile map
-double const parallax_strength = 10.0; // Determines how fast the background moves in relation to player position
+double const kParallaxStrength = 4.0; // Determines how fast the background moves in relation to player position
 
 #endif //BUBBLEGROW_COMMON_HPP
 

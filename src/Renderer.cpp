@@ -216,7 +216,6 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                         }
                     }
 
-
                     world = std::make_shared<World>();
                     auto resource_player = world->AddResources(1000*10*10*2, 50*10*2, 500);
                     resource_player->color = sf::Color::Green;
@@ -323,9 +322,9 @@ void Renderer::RenderBackground() {
     for (auto const& column : background_map) {
         for (auto const entry : column) {
             auto screen_location = sf::Vector2f(background_batch.sprite_pixel_width * scale * start_x -
-                                                player->position.x * parallax_strength,
+                                                player->position.x * kParallaxStrength,
                                                 background_batch.sprite_pixel_height * scale * start_y -
-                                                player->position.y * parallax_strength);
+                                                player->position.y * kParallaxStrength);
             unsigned int sprite_index = entry;
             BatchEntry background_sprite(screen_location, sprite_index, scale);
             sprites.push_back(background_sprite);
