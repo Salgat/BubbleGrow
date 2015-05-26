@@ -74,18 +74,8 @@ Renderer::Renderer()
     textures[ImageId::HOTKEY_BAR] = sf::Texture();
     textures[ImageId::HOTKEY_BAR].loadFromFile("../../data/artwork/Bubble_Toolbar.png");
 
-    // Generate random background map (regardless of map size, background map size is the same for simplicity)
-    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    static std::mt19937 random_generator(seed);
-    std::uniform_real_distribution<> distribution_tilemap(0, kTileStrings.size());
-    for (auto& column : background_map) {
-        for (auto& entry : column) {
-            entry = distribution_tilemap(random_generator);
-        }
-    }
-
     // Initialize background and bubble batch drawer
-    background_batch = BatchDrawer("../../data/artwork/BG_Tile1.png", 1, 1);
+    background_batch = BatchDrawer("../../data/artwork/Background_Tiles.png", 3, 3);
     bubbles_batch = BatchDrawer("../../data/artwork/Bubble_Types.png", 3, 3);
     symbols_batch = BatchDrawer("../../data/artwork/Player_Symbols.png", 3, 3);
 
@@ -216,6 +206,17 @@ bool Renderer::MenuPollEvents(sf::Event& event) {
                 if (menu_item_released_at == MenuType::QUICK_MATCH) {
                     // Quick Match clicked, setup a game for the player
                     // Todo: Set this up into a function with customizable parameters
+                    // Generate random background map (regardless of map size, background map size is the same for simplicity)
+                    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+                    static std::mt19937 random_generator(seed);
+                    std::uniform_real_distribution<> distribution_tilemap(0, 8);
+                    for (auto& column : background_map) {
+                        for (auto& entry : column) {
+                            entry = distribution_tilemap(random_generator);
+                        }
+                    }
+
+
                     world = std::make_shared<World>();
                     auto resource_player = world->AddResources(1000*10*10*2, 50*10*2, 500);
                     resource_player->color = sf::Color::Green;
