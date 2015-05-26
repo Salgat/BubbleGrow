@@ -28,6 +28,7 @@ private:
     // Helper functions
     inline bool PlaySound(SoundId id, sf::Vector2f const& screen_position);
     inline bool PlaySound(Event const& event);
+    inline void PlayEventSounds(std::stack<Event>& events);
 
 public:
     double master_volume;

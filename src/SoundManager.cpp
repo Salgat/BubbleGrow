@@ -124,30 +124,31 @@ void SoundManager::ProcessPendingEvents() {
     if (world) {
         for (auto& player : world->players) {
             // Play Player Events
-            while (!player.second->events.empty()) {
-                PlaySound(player.second->events.top());
-                player.second->events.pop();
-            }
+            PlayEventSounds(player.second->events);
 
             // Play Unit Events
             for (auto& unit : player.second->units) {
-                while (!unit.second->events.empty()) {
-                    PlaySound(unit.second->events.top());
-                    unit.second->events.pop();
-                }
+                PlayEventSounds(unit.second->events);
             }
         }
     }
 
-    while (!renderer->events.empty()) {
-        PlaySound(renderer->events.top());
-        renderer->events.pop();
-    }
+    PlayEventSounds(renderer->events);
 
     // Check if any sounds are done, then free up the channel
     for (std::size_t index = 0; index < reserved_sounds; ++index) {
         if (!sound_availability[index] and sounds[index].getStatus() == sf::SoundSource::Status::Stopped) {
             sound_availability[index] = true;
         }
+    }
+}
+
+/**
+ * Plays sounds from a given event stack.
+ */
+void SoundManager::PlayEventSounds(std::stack<Event>& events) {
+    while (!events.empty()) {
+        PlaySound(events.top());
+        events.pop();
     }
 }
