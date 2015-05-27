@@ -14,11 +14,14 @@ class World;
 class Player;
 class Unit;
 class SoundManager;
+class InputHandler;
 
 /**
  * Renders game and handles user input.
  */
 class Renderer {
+    friend class InputHandler;
+
 private:
     bool mouse_movement;
     MenuType current_menu;
@@ -42,7 +45,7 @@ private:
 
     // Helper functions
     inline bool IsMouseOverText(sf::Text& text_object, sf::Vector2f cursor_location);
-    inline MenuType MouseOverWhichMenuOption(sf::Vector2f cursor_location);
+    MenuType MouseOverWhichMenuOption(sf::Vector2f cursor_location);
     inline double RenderDistanceTo(sf::Vector2f destination);
 
 public:
@@ -58,15 +61,8 @@ public:
 
     Renderer();
 
-    bool PollEvents();
-    void ProcessInputs(); // Use player->requests to add input requests
-
-    bool GamePollEvents(sf::Event& event);
-    bool MenuPollEvents(sf::Event& event);
-
-    void RenderGame(double duration);
-
     // Rendering functions for an active game world
+    void RenderGame(double duration);
     void RenderBackground();
     void RenderUnits();
     void RenderUnit(std::shared_ptr<Unit> unit, PlayerType type, sf::Vector2f player_position, sf::Color color);
