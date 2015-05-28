@@ -89,7 +89,6 @@ void Unit::MakeDecision(Request& request) {
         auto closest_resource = FindClosestResource();
         if (closest_resource and (type == UnitType::BASE_LV1 or type == UnitType::GATHERER_LV1) and
                 CalculateDistanceTo(closest_resource->position, true) < owner->wander_range) {
-            //std::cout << "Making a gather request" << std::endl;
             request.type = RequestType::GATHER;
             request.int_data[0] = static_cast<int>(closest_resource->owner_id);
             request.int_data[1] = static_cast<int>(closest_resource->id);

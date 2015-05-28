@@ -31,6 +31,8 @@ private:
 
     sf::Font font;
     sf::Text text;
+    sf::FloatRect music_bounding_box;
+    sf::FloatRect sound_bounding_box;
     std::vector<std::pair<MenuType, sf::Text>> menu_text_entries; // Holds the sf::Text for all current menu options
     std::map<unsigned int, float> text_heights; // text_heights[font_size] = pixel_height
 
@@ -44,9 +46,13 @@ private:
     std::map<ImageId, sf::Texture> textures;
 
     // Helper functions
+    void UpdateView(sf::Vector2u new_window_size);
     inline bool IsMouseOverText(sf::Text& text_object, sf::Vector2f cursor_location);
     MenuType MouseOverWhichMenuOption(sf::Vector2f cursor_location);
     inline double RenderDistanceTo(sf::Vector2f destination);
+    inline void RenderImage(double scale, sf::Vector2f origin, double rotation, sf::Color color, ImageId image_id,
+                            sf::Vector2f position, bool subtract_length = false, bool subtract_height = false,
+                            bool center_x = false, bool center_y = false);
 
 public:
     GameMode mode;
@@ -58,6 +64,8 @@ public:
     std::shared_ptr<SoundManager> sound_manager;
 
     std::stack<Event> events;
+    bool music_on;
+    bool sound_on;
 
     Renderer();
 
@@ -73,7 +81,7 @@ public:
 
     // Rendering functions for the menu
     void RenderMenu();
-    void RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color = sf::Color::Black);
+    sf::FloatRect RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color = sf::Color::Black);
     void RenderMenuText(MenuType selection);
 
 

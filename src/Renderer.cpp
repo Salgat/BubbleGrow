@@ -17,28 +17,16 @@ Renderer::Renderer()
     , current_menu(MenuType::MAIN)
     , last_menu(MenuType::NONE)
     , mode(GameMode::MENU)
-    , show_ingame_menu(false) {
+    , show_ingame_menu(false)
+    , music_on(true)
+    , sound_on(true) {
     std::string title = "BubbleGrow V" + std::to_string(VERSION) + "." + std::to_string(SUB_VERSION);
     sf::ContextSettings settings;
-    //settings.antialiasingLevel = 8;
     window = std::make_shared<sf::RenderWindow>(sf::VideoMode(ResolutionX, ResolutionY), title, sf::Style::Default, settings);
     //window->setFramerateLimit(60);
 
     // Scale view based on current resolution
-    auto window_size = window->getSize();
-    ResolutionX = window_size.x;
-    ResolutionY = window_size.y;
-    double scale_x = 1280.0 / window_size.x;
-    double scale_y = 1024.0 / window_size.y;
-    auto scale = scale_x > scale_y ? scale_x : scale_y;
-
-    auto view = window->getDefaultView();
-    view.zoom(scale);
-    ResolutionX *= scale;
-    ResolutionY *= scale;
-    view.setSize(window_size.x*scale, window_size.y*scale);
-    view.setCenter(window_size.x*scale/2.0, window_size.y*scale/2.0);
-    window->setView(view);
+    UpdateView(window->getSize());
 
     // Fonts
     if (!font.loadFromFile("../../data/fonts/Sile.ttf")) {
@@ -81,6 +69,25 @@ Renderer::Renderer()
 
     // Initiate main menu music
     events.push(Event(EventType::ENTER_MAIN_MENU, sf::Vector2f(0.0,0.0)));
+}
+
+/**
+ * Scales view based on current resolution.
+ */
+void Renderer::UpdateView(sf::Vector2u new_window_size) {
+    ResolutionX = new_window_size.x;
+    ResolutionY = new_window_size.y;
+    double scale_x = 1280.0 / new_window_size.x;
+    double scale_y = 1024.0 / new_window_size.y;
+    auto scale = scale_x > scale_y ? scale_x : scale_y;
+
+    auto view = window->getDefaultView();
+    view.zoom(scale);
+    ResolutionX *= scale;
+    ResolutionY *= scale;
+    view.setSize(new_window_size.x*scale, new_window_size.y*scale);
+    view.setCenter(new_window_size.x*scale/2.0, new_window_size.y*scale/2.0);
+    window->setView(view);
 }
 
 /**
@@ -213,20 +220,48 @@ void Renderer::RenderInterface(double duration) {
     RenderText("FPS: " + std::to_string(1.0/duration), sf::Vector2f(10.0, 30.0), TextSize::RESOURCE_COUNTER);
 
     // Render Bottom Hotkey Bar
-    sf::Sprite hotkey_bar;
-    double scale = 0.25;
-    hotkey_bar.setScale(scale, scale);
-    hotkey_bar.setOrigin(0.0,0.0);
-    hotkey_bar.setRotation(0.0);
-    hotkey_bar.setColor(sf::Color::White);
-    hotkey_bar.setTexture(textures[ImageId::HOTKEY_BAR]);
-    hotkey_bar.setPosition(ResolutionX/2 - hotkey_bar.getLocalBounds().width/(2.0/scale), ResolutionY - hotkey_bar.getLocalBounds().height*scale);
-    window->draw(hotkey_bar);
+    RenderImage(0.25, sf::Vector2f(0.0, 0.0), 0.0, sf::Color::White, ImageId::HOTKEY_BAR,
+                sf::Vector2f(ResolutionX/2, ResolutionY), false, true, true, false);
 
     if (show_ingame_menu) {
         current_menu = MenuType::GAME_MENU;
         RenderMenuText(current_menu);
     }
+}
+
+/**
+ * Renders an image (identified by its ImageId) with the provided arguments.
+ *
+ * Note: The 4 default arguments are due to their necessary and regular use. Below is how to use them,
+ *  - subtract_length: Used when you want to have an image at the right edge of the screen (with a position.x of ResolutionX
+ *  - subtract_height: Same as above, but at the bottom of the screen
+ *  - center_x: Centers the image on the x-axis at the position provided to the center of the image
+ *  - center_y: Centers the image on the y-axis at the position provided to the center of the image
+ */
+void Renderer::RenderImage(double scale, sf::Vector2f origin, double rotation, sf::Color color, ImageId image_id, sf::Vector2f position,
+                           bool subtract_length, bool subtract_height, bool center_x, bool center_y) {
+    sf::Sprite image;
+    image.setScale(scale, scale);
+    image.setOrigin(origin.x,origin.y);
+    image.setRotation(rotation);
+    image.setColor(color);
+    image.setTexture(textures[image_id]);
+
+    if (subtract_length) {
+        position.x -=  image.getLocalBounds().width*scale;
+    }
+    if (subtract_height) {
+        position.y -=  image.getLocalBounds().height*scale;
+    }
+    if (center_x) {
+        position.x -= image.getLocalBounds().width/(2.0/scale);
+    }
+    if (center_y) {
+        position.x -= image.getLocalBounds().height/(2.0/scale);
+    }
+
+    image.setPosition(position.x, position.y);
+    window->draw(image);
 }
 
 /**
@@ -295,25 +330,27 @@ void Renderer::RenderDirectionArrows() {
  * Renders the start menu (not the in-game menu).
  */
 void Renderer::RenderMenu() {
+    window->draw(background_batch);
+
     // Render Logo
-    sf::Sprite logo;
-    logo.setOrigin(0.0,0.0);
-    logo.setRotation(0.0);
-    logo.setColor(sf::Color::White);
-    logo.setTexture(textures[ImageId::LOGO]);
-    double scale = 0.4;
-    logo.setScale(scale, scale);
-    logo.setPosition(ResolutionX/2 - logo.getLocalBounds().width/(2.0/scale), 75.0);
-    window->draw(logo);
+    RenderImage(0.4, sf::Vector2f(0.0, 0.0), 0.0, sf::Color::White, ImageId::LOGO,
+                sf::Vector2f(ResolutionX/2, 75.0), false, false, true, false);
 
     // Render menu options
     RenderMenuText(current_menu);
+
+    // Render toggle switches for sound and music
+    std::string bool_string = "On";
+    if (!sound_on) bool_string = "Off";
+    sound_bounding_box = RenderText("Sound: " + bool_string, sf::Vector2f(10.0, ResolutionY - 50.0), TextSize::RESOURCE_COUNTER);
+    if (!music_on) bool_string = "Off"; else bool_string = "On";
+    music_bounding_box = RenderText("Music: " + bool_string, sf::Vector2f(10.0, ResolutionY - 30.0), TextSize::RESOURCE_COUNTER);
 }
 
 /**
  * Renders text at specified location and attributes.
  */
-void Renderer::RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color) {
+sf::FloatRect Renderer::RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color) {
     text.setString(display_text);
     text.setStyle(sf::Text::Regular);
     text.setColor(color);
@@ -321,6 +358,8 @@ void Renderer::RenderText(std::string display_text, sf::Vector2f location, unsig
     text.setCharacterSize(font_size);
     text.setOrigin(0.0, 0.0);
     window->draw(text);
+
+    return text.getGlobalBounds();
 }
 
 /**

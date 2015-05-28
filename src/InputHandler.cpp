@@ -28,23 +28,22 @@ bool InputHandler::PollEvents() {
             ResolutionY = event.size.height;
 
             // Scale by whichever dimension is changed the most
-            double scale_x = 1280.0 / event.size.width;
-            double scale_y = 1024.0 / event.size.height;
-            auto scale = scale_x > scale_y ? scale_x : scale_y;
-
-            auto view = renderer->window->getDefaultView();
-            view.zoom(scale);
-            ResolutionX *= scale;
-            ResolutionY *= scale;
-            view.setSize(event.size.width*scale, event.size.height*scale);
-            view.setCenter(event.size.width*scale/2.0, event.size.height*scale/2.0);
-            renderer->window->setView(view);
+            renderer->UpdateView(sf::Vector2u(event.size.width, event.size.height));
         } else if (renderer->mode == GameMode::IN_GAME) {
             if(!GamePollEvents(event))
                 return false;
         } else if (renderer->mode == GameMode::MENU) {
             if(!MenuPollEvents(event))
                 return false;
+
+            // Test if music or sound toggle clicked
+            if (event.type == sf::Event::MouseButtonReleased) {
+                auto mouse_position = renderer->window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+                if (renderer->sound_bounding_box.contains(mouse_position))
+                    renderer->sound_on = !renderer->sound_on;
+                if (renderer->music_bounding_box.contains(mouse_position))
+                    renderer->music_on = !renderer->music_on;
+            }
         }
     }
 

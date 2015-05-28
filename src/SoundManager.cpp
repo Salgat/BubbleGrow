@@ -77,6 +77,7 @@ bool SoundManager::PlaySound(SoundId id, sf::Vector2f const& screen_position) {
                 sounds[index].setVolume(15.0*master_volume);
                 sounds[index].play();
                 sound_availability[index] = false;
+
                 return true;
             }
         }
@@ -102,8 +103,10 @@ bool SoundManager::PlaySound(Event const& event) {
         sound_to_play = SoundId::MENU_SELECTION_CHANGE;
     } else if (event.type == EventType::ENTER_GAME) {
         sound_to_play = SoundId::IN_GAME_MUSIC;
+        in_main_menu = false;
     } else if (event.type == EventType::ENTER_MAIN_MENU) {
         sound_to_play = SoundId::MAIN_MENU_MUSIC;
+        in_main_menu = true;
     }
 
     // Convert event position from game to screen coordinates
@@ -140,6 +143,21 @@ void SoundManager::ProcessPendingEvents() {
         if (!sound_availability[index] and sounds[index].getStatus() == sf::SoundSource::Status::Stopped) {
             sound_availability[index] = true;
         }
+    }
+
+    // Update master volume and music
+    if (renderer->sound_on) {
+        master_volume = 1.0;
+        if (main_menu_music.getStatus() == sf::SoundSource::Status::Stopped and renderer->music_on and in_main_menu)
+            main_menu_music.play();
+    } else {
+        master_volume = 0.0;
+        main_menu_music.stop();
+    }
+
+    if (!renderer->music_on) {
+        main_menu_music.stop();
+        in_game_music.stop();
     }
 }
 

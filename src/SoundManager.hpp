@@ -20,6 +20,7 @@ private:
 
     sf::Music main_menu_music;
     sf::Music in_game_music;
+    bool in_main_menu;
     std::vector<sf::Sound> sounds; // Vector of available sounds to use (256 total)
     std::vector<bool> sound_availability; // If true, sound is available for use, other is in use. Loop through
                                           // to find an open sound.
