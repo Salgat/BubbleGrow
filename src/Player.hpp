@@ -60,7 +60,7 @@ public:
 
     // Render details
     sf::Color color;
-    //SymbolType symbol;
+    PlayerSymbol symbol;
 
     Player();
 

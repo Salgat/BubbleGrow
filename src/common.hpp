@@ -58,9 +58,9 @@ enum class MenuType {
 };
 
 // Submenu definitions
-std::array<MenuType const, 4> const kMainSubMenus = {MenuType::QUICK_MATCH,
-                                                     MenuType::VERSUS,
-                                                     MenuType::TUTORIAL,
+std::array<MenuType const, 2> const kMainSubMenus = {MenuType::QUICK_MATCH,
+                                                     //MenuType::VERSUS,
+                                                     //MenuType::TUTORIAL,
                                                      MenuType::EXIT_GAME};
 
 std::array<MenuType const, 3> const kVersusSubMenus = {MenuType::COMPUTER_CHALLENGE,

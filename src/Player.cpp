@@ -27,6 +27,12 @@ Player::Player()
         entry = Request();
         entry.type = RequestType::NONE;
     }
+
+    // Choose a random symbol
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    static std::mt19937 random_generator(seed);
+    static std::uniform_real_distribution<> distribution_symbols(0, static_cast<int>(PlayerSymbol::TRIANGLE));
+    symbol = static_cast<PlayerSymbol>(distribution_symbols(random_generator));
 }
 
 /**
@@ -162,6 +168,7 @@ void Player::CreateUnits(int amount, UnitType type) {
             new_unit->owner_id = id;
             new_unit->owner = shared_from_this();
             new_unit->world = world;
+            new_unit->symbol = symbol;
 
             // Add to player's maps
             units[new_unit->id] = new_unit;

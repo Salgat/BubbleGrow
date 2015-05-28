@@ -23,6 +23,7 @@ Unit::Unit()
     , attack_damage(kBaseAttackDamage)
     , action(ActionType::NONE)
     , pending_damage(0.0) {
+
     health[0] = kBaseMaxHealth;
     health[1] = kBaseMaxHealth;
 }
