@@ -101,6 +101,22 @@ bool InputHandler::GamePollEvents(sf::Event& event) {
             }
         } else if (event.key.code == sf::Keyboard::Num1) {
             renderer->player->PlayerPurchaseRequest(10, UnitType::BASE_LV1);
+        } else if (event.key.code == sf::Keyboard::Num2) {
+            renderer->player->PlayerPurchaseRequest(1, UnitType::BASE_LV2);
+        } else if (event.key.code == sf::Keyboard::Num3) {
+            renderer->player->PlayerPurchaseRequest(1, UnitType::BASE_LV3);
+        } else if (event.key.code == sf::Keyboard::Num4) {
+            renderer->player->PlayerPurchaseRequest(1, UnitType::GATHERER_LV1);
+        } else if (event.key.code == sf::Keyboard::Num5) {
+            renderer->player->PlayerPurchaseRequest(1, UnitType::GATHERER_LV2);
+        } else if (event.key.code == sf::Keyboard::Num6) {
+            renderer->player->PlayerPurchaseRequest(1, UnitType::GATHERER_LV3);
+        } else if (event.key.code == sf::Keyboard::Num7) {
+            renderer->player->PlayerPurchaseRequest(1, UnitType::FIGHTER_LV1);
+        } else if (event.key.code == sf::Keyboard::Num8) {
+            renderer->player->PlayerPurchaseRequest(1, UnitType::FIGHTER_LV2);
+        } else if (event.key.code == sf::Keyboard::Num9) {
+            renderer->player->PlayerPurchaseRequest(1, UnitType::FIGHTER_LV3);
         }
     } else if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {

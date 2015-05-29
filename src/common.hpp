@@ -214,151 +214,239 @@ unsigned int const SUB_VERSION = 1;
 
 // Health
 int const kBaseMaxHealth = 100;
+int const kBase2MaxHealth = 100;
+int const kBase3MaxHealth = 100;
 int const kGathererMaxHealth = 100;
+int const kGatherer2MaxHealth = 100;
+int const kGatherer3MaxHealth = 100;
 int const kFighterMaxHealth = 150;
-int const kBruteMaxHealth = 200;
-int const kScoutMaxHealth = 50;
+int const kFighter2MaxHealth = 200;
+int const kFighter3MaxHealth = 200;
 
 // Walk speed (meters/second)
 double const kBaseWalkSpeed = 20.0;
-double const kGathererWalkSpeed = 1.0;
-double const kFighterWalkSpeed = 1.0;
-double const kBruteWalkSpeed = 0.7;
-double const kScoutWalkSpeed = 1.5;
+double const kBase2WalkSpeed = 20.0;
+double const kBase3WalkSpeed = 20.0;
+double const kGathererWalkSpeed = 20.0;
+double const kGatherer2WalkSpeed = 20.0;
+double const kGatherer3WalkSpeed = 20.0;
+double const kFighterWalkSpeed = 20.0;
+double const kFighter2WalkSpeed = 20.0;
+double const kFighter3WalkSpeed = 20.0;
 
 // Attack speed (seconds/attack)
 double const kBaseAttackSpeed = 1.0;
+double const kBase2AttackSpeed = 1.0;
+double const kBase3AttackSpeed = 1.0;
 double const kGathererAttackSpeed = 0.1;
+double const kGatherer2AttackSpeed = 0.1;
+double const kGatherer3AttackSpeed = 0.1;
 double const kFighterAttackSpeed = 1.0;
-double const kBruteAttackSpeed = 0.7;
-double const kScoutAttackSpeed = 1.5;
+double const kFighter2AttackSpeed = 0.7;
+double const kFighter3AttackSpeed = 0.7;
 
 // Attack damage (health/attack)
 int const kBaseAttackDamage = 25;
+int const kBase2AttackDamage = 25;
+int const kBase3AttackDamage = 25;
 int const kGathererAttackDamage = 1;
+int const kGatherer2AttackDamage = 1;
+int const kGatherer3AttackDamage = 1;
 int const kFighterAttackDamage = 15;
-int const kBruteAttackDamage = 35;
-int const kScoutAttackDamage = 5;
+int const kFighter2AttackDamage = 35;
+int const kFighter3AttackDamage = 35;
 
 // Attack range (meters from unit position)
 double const kBaseAttackRange = 1.0;
+double const kBase2AttackRange = 1.0;
+double const kBase3AttackRange = 1.0;
 double const kGathererAttackRange = 1.0;
+double const kGatherer2AttackRange = 1.0;
+double const kGatherer3AttackRange = 1.0;
 double const kFighterAttackRange = 1.0;
-double const kBruteAttackRange = 2.0;
-double const kScoutAttackRange = 0.5;
+double const kFighter2AttackRange = 2.0;
+double const kFighter3AttackRange = 2.0;
 
 // Unit Size (radius in meters)
 double const kBaseSize = 1.0;
+double const kBase2Size = 1.0;
+double const kBase3Size = 1.0;
 double const kGathererSize = 1.0;
+double const kGatherer2Size = 1.0;
+double const kGatherer3Size = 1.0;
 double const kFighterSize = 1.0;
-double const kBruteSize = 2.0;
-double const kScoutSize = 0.5;
+double const kFighter2Size = 2.0;
+double const kFighter3Size = 8.0;
 
 // Gather speed (gathers/second)
 double const kBaseGatherSpeed = 0.2;
+double const kBase2GatherSpeed = 0.2;
+double const kBase3GatherSpeed = 0.2;
 double const kGathererGatherSpeed = 1.0;
+double const kGatherer2GatherSpeed = 1.0;
+double const kGatherer3GatherSpeed = 1.0;
 double const kFighterGatherSpeed = 0.1;
-double const kBruteGatherSpeed = 0.1;
-double const kScoutGatherSpeed = 0.2;
+double const kFighter2GatherSpeed = 0.1;
+double const kFighter3GatherSpeed = 0.1;
 
 // Gather amount (resources/gather)
 int const kBaseGatherAmount = 1;
+int const kBase2GatherAmount = 1;
+int const kBase3GatherAmount = 1;
 int const kGathererGatherAmount = 1;
+int const kGatherer2GatherAmount = 1;
+int const kGatherer3GatherAmount = 1;
 int const kFighterGatherAmount = 1;
-int const kBruteGatherAmount = 1;
-int const kScoutGatherAmount = 1;
+int const kFighter2GatherAmount = 1;
+int const kFighter3GatherAmount = 1;
 
 // Constant Arrays for values. It's important that the order of the entries match the order of the entries in UnitType.
 std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kMaxHealth = {kBaseMaxHealth,
+                                                                                    kBase2MaxHealth,
+                                                                                    kBase3MaxHealth,
                                                                                     kGathererMaxHealth,
+                                                                                    kGatherer2MaxHealth,
+                                                                                    kGatherer3MaxHealth,
                                                                                     kFighterMaxHealth,
-                                                                                    kBruteMaxHealth,
-                                                                                    kScoutMaxHealth};
+                                                                                    kFighter2MaxHealth,
+                                                                                    kFighter3MaxHealth};
 
 std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kWalkSpeed = {kBaseWalkSpeed,
+                                                                                       kBase2WalkSpeed,
+                                                                                       kBase3WalkSpeed,
                                                                                        kGathererWalkSpeed,
+                                                                                       kGatherer2WalkSpeed,
+                                                                                       kGatherer3WalkSpeed,
                                                                                        kFighterWalkSpeed,
-                                                                                       kBruteWalkSpeed,
-                                                                                       kScoutWalkSpeed};
+                                                                                       kFighter2WalkSpeed,
+                                                                                       kFighter3WalkSpeed};
 
 std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kAttackSpeed = {kBaseAttackSpeed,
+                                                                                         kBase2AttackSpeed,
+                                                                                         kBase3AttackSpeed,
                                                                                          kGathererAttackSpeed,
+                                                                                         kGatherer2AttackSpeed,
+                                                                                         kGatherer3AttackSpeed,
                                                                                          kFighterAttackSpeed,
-                                                                                         kBruteAttackSpeed,
-                                                                                         kScoutAttackSpeed};
+                                                                                         kFighter2AttackSpeed,
+                                                                                         kFighter3AttackSpeed};
 
 std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kAttackDamage = {kBaseAttackDamage,
+                                                                                       kBase2AttackDamage,
+                                                                                       kBase3AttackDamage,
                                                                                        kGathererAttackDamage,
+                                                                                       kGatherer2AttackDamage,
+                                                                                       kGatherer3AttackDamage,
                                                                                        kFighterAttackDamage,
-                                                                                       kBruteAttackDamage,
-                                                                                       kScoutAttackDamage};
+                                                                                       kFighter2AttackDamage,
+                                                                                       kFighter3AttackDamage};
 
 std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kAttackRange = {kBaseAttackRange,
+                                                                                         kBase2AttackRange,
+                                                                                         kBase3AttackRange,
                                                                                          kGathererAttackRange,
+                                                                                         kGatherer2AttackRange,
+                                                                                         kGatherer3AttackRange,
                                                                                          kFighterAttackRange,
-                                                                                         kBruteAttackRange,
-                                                                                         kScoutAttackRange};
+                                                                                         kFighter2AttackRange,
+                                                                                         kFighter3AttackRange};
 
 std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kSize = {kBaseSize,
+                                                                                  kBase2Size,
+                                                                                  kBase3Size,
                                                                                   kGathererSize,
+                                                                                  kGatherer2Size,
+                                                                                  kGatherer3Size,
                                                                                   kFighterSize,
-                                                                                  kBruteSize,
-                                                                                  kScoutSize};
+                                                                                  kFighter2Size,
+                                                                                  kFighter3Size};
 
 std::array<double const, static_cast<std::size_t>(UnitType::NONE)> const kGatherSpeed = {kBaseGatherSpeed,
+                                                                                         kBase2GatherSpeed,
+                                                                                         kBase3GatherSpeed,
                                                                                          kGathererGatherSpeed,
+                                                                                         kGatherer2GatherSpeed,
+                                                                                         kGatherer3GatherSpeed,
                                                                                          kFighterGatherSpeed,
-                                                                                         kBruteGatherSpeed,
-                                                                                         kScoutGatherSpeed};
+                                                                                         kFighter2GatherSpeed,
+                                                                                         kFighter3GatherSpeed};
 
 std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kGatherAmount = {kBaseGatherAmount,
+                                                                                       kBase2GatherAmount,
+                                                                                       kBase3GatherAmount,
                                                                                        kGathererGatherAmount,
+                                                                                       kGatherer2GatherAmount,
+                                                                                       kGatherer3GatherAmount,
                                                                                        kFighterGatherAmount,
-                                                                                       kBruteGatherAmount,
-                                                                                       kScoutGatherAmount};
+                                                                                       kFighter2GatherAmount,
+                                                                                       kFighter3GatherAmount};
 
 // Unit cost requirements
 // Resource requirements (resources/unit)
 int const kBaseResourceCost = 100;
+int const kBase2ResourceCost = 100;
+int const kBase3ResourceCost = 100;
 int const kGathererResourceCost = 0;
+int const kGatherer2ResourceCost = 0;
+int const kGatherer3ResourceCost = 0;
 int const kFighterResourceCost = 0;
-int const kBruteResourceCost = 0;
-int const kScoutResourceCost = 0;
+int const kFighter2ResourceCost = 0;
+int const kFighter3ResourceCost = 0;
 
 // Unit Type cost
 UnitType const kBaseUnitTypeCost = UnitType::NONE;
-UnitType const kGathererUnitTypeCost = UnitType::BASE_LV1;
-UnitType const kFighterUnitTypeCost = UnitType::BASE_LV1;
-UnitType const kBruteUnitTypeCost = UnitType::FIGHTER_LV1;
-UnitType const kScoutUnitTypeCost = UnitType::BASE_LV1;
+UnitType const kBase2UnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
+UnitType const kBase3UnitTypeCost = UnitType::NONE;
+UnitType const kGathererUnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
+UnitType const kGatherer2UnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
+UnitType const kGatherer3UnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
+UnitType const kFighterUnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
+UnitType const kFighter2UnitTypeCost = UnitType::NONE;//UnitType::FIGHTER_LV1;
+UnitType const kFighter3UnitTypeCost = UnitType::NONE;//UnitType::FIGHTER_LV1;
 
 // Unit cost requirements (units/new unit)
 int const kBaseUnitCost = 0;
-int const kGathererUnitCost = 5;
-int const kFighterUnitCost = 5;
-int const kBruteUnitCost = 5;
-int const kScoutUnitCost = 5;
+int const kBase2UnitCost = 0;
+int const kBase3UnitCost = 0;
+int const kGathererUnitCost = 0;
+int const kGatherer2UnitCost = 0;
+int const kGatherer3UnitCost = 0;
+int const kFighterUnitCost = 0;
+int const kFighter2UnitCost = 0;
+int const kFighter3UnitCost = 0;
 
 // Determines cost in resources of the unit type
 std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kResourceCost = {kBaseResourceCost,
+                                                                                       kBase2ResourceCost,
+                                                                                       kBase3ResourceCost,
                                                                                        kGathererResourceCost,
+                                                                                       kGatherer2ResourceCost,
+                                                                                       kGatherer3ResourceCost,
                                                                                        kFighterResourceCost,
-                                                                                       kBruteResourceCost,
-                                                                                       kScoutResourceCost};
+                                                                                       kFighter2ResourceCost,
+                                                                                       kFighter3ResourceCost};
 
 // Determines the type of unit for "unit costs"
 std::array<UnitType const, static_cast<std::size_t>(UnitType::NONE)> const kUnitTypeCost = {kBaseUnitTypeCost,
-                                                                                       kGathererUnitTypeCost,
-                                                                                       kFighterUnitTypeCost,
-                                                                                       kBruteUnitTypeCost,
-                                                                                       kScoutUnitTypeCost};
+                                                                                            kBase2UnitTypeCost,
+                                                                                            kBase3UnitTypeCost,
+                                                                                            kGathererUnitTypeCost,
+                                                                                            kGatherer2UnitTypeCost,
+                                                                                            kGatherer3UnitTypeCost,
+                                                                                            kFighterUnitTypeCost,
+                                                                                            kFighter2UnitTypeCost,
+                                                                                            kFighter3UnitTypeCost};
 
 // Determines the cost in units
 std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kUnitCost = {kBaseUnitCost,
+                                                                                   kBase2UnitCost,
+                                                                                   kBase3UnitCost,
                                                                                    kGathererUnitCost,
+                                                                                   kGatherer2UnitCost,
+                                                                                   kGatherer3UnitCost,
                                                                                    kFighterUnitCost,
-                                                                                   kBruteUnitCost,
-                                                                                   kScoutUnitCost};
+                                                                                   kFighter2UnitCost,
+                                                                                   kFighter3UnitCost};
 
 // Tiles to use
 // Defines the string representation of the corresponding menu entry

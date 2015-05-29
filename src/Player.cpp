@@ -147,34 +147,44 @@ void Player::CreateUnits(int amount, UnitType type) {
     std::uniform_real_distribution<> distribution_radius(0, wander_range);
     std::uniform_real_distribution<> distribution_angle(0, 2*PI);
 
-    if (type == UnitType::BASE_LV1) {
-        auto resource_cost = amount * kBaseResourceCost;
-        if (resource_cost > resources) {
-            // Can't afford to create requested amount, create maximum we can afford
-            amount = resources / kBaseResourceCost;
-        }
+    auto unit_resource_cost = kResourceCost[static_cast<int>(type)];
+    UnitMainType main_type;
+    if (type == UnitType::BASE_LV1 or type == UnitType::BASE_LV2 or type == UnitType::BASE_LV3) {
+        main_type = UnitMainType::BASE;
+    } else if (type == UnitType::GATHERER_LV1 or type == UnitType::GATHERER_LV2 or type == UnitType::GATHERER_LV3) {
+        main_type = UnitMainType::GATHERER;
+    } else if (type == UnitType::FIGHTER_LV1 or type == UnitType::FIGHTER_LV2 or type == UnitType::FIGHTER_LV3) {
+        main_type = UnitMainType::FIGHTER;
+    }
 
-        number_of_units[static_cast<std::size_t>(type)] += amount;
-        while (amount-- > 0) {
-            double random_radius = distribution_radius(gen);
-            double random_angle = distribution_angle(gen);
+    auto resource_cost = amount * unit_resource_cost;
+    if (resource_cost > resources) {
+        // Can't afford to create requested amount, create maximum we can afford
+        amount = resources / unit_resource_cost;
+    }
 
-            // Initialize a new unit
-            resources -= kBaseResourceCost;
-            auto new_unit = std::make_shared<Unit>();
-            new_unit->position = sf::Vector2f(position.x + static_cast<float>(random_radius*std::cos(random_angle)),
-                                              position.y + static_cast<float>(random_radius*std::sin(random_angle)));
-            new_unit->id = ++unit_ids;
-            new_unit->owner_id = id;
-            new_unit->owner = shared_from_this();
-            new_unit->world = world;
-            new_unit->symbol = symbol;
+    number_of_units[static_cast<std::size_t>(type)] += amount;
+    while (amount-- > 0) {
+        double random_radius = distribution_radius(gen);
+        double random_angle = distribution_angle(gen);
 
-            // Add to player's maps
-            units[new_unit->id] = new_unit;
-            unit_requests[new_unit->id] = Request();
-            unit_requests[new_unit->id].type = RequestType::NONE;
-        }
+        // Initialize a new unit
+        resources -= unit_resource_cost;
+        auto new_unit = std::make_shared<Unit>();
+        new_unit->position = sf::Vector2f(position.x + static_cast<float>(random_radius*std::cos(random_angle)),
+                                          position.y + static_cast<float>(random_radius*std::sin(random_angle)));
+        new_unit->id = ++unit_ids;
+        new_unit->owner_id = id;
+        new_unit->owner = shared_from_this();
+        new_unit->world = world;
+        new_unit->symbol = symbol;
+        new_unit->main_type = main_type;
+        new_unit->type = type;
+
+        // Add to player's maps
+        units[new_unit->id] = new_unit;
+        unit_requests[new_unit->id] = Request();
+        unit_requests[new_unit->id].type = RequestType::NONE;
     }
 }
 

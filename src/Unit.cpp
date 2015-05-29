@@ -44,30 +44,21 @@ void Unit::Update(double duration) {
 void Unit::ProcessRequest(Request& request, double duration) {
     if (request.type == RequestType::IDLE) {
         // Stops the unit and has him do nothing
-        if (action == ActionType::WALK or action == ActionType::NONE) {
-            action = ActionType::IDLE;
-            request.type = RequestType::NONE;
-        }
+        action = ActionType::IDLE;
+        request.type = RequestType::NONE;
     } else if (request.type == RequestType::WALK) {
         // Commands a unit to start walking in the direction provided
-        //if (action == ActionType::WALK or action == ActionType::IDLE or action == ActionType::NONE) {
-            WalkTo(sf::Vector2f(request.float_data[0], request.float_data[1]), duration, true);
-        //}
+        WalkTo(sf::Vector2f(request.float_data[0], request.float_data[1]), duration, true);
     } else if (request.type == RequestType::ATTACK) {
         // Commands unit to attack a unit if within attack range, if not within range will instead walk towards unit
-        if (action == ActionType::WALK or action == ActionType::IDLE or action == ActionType::NONE or
-            action == ActionType::ATTACK) {
-            Attack(static_cast<uint64_t>(request.int_data[1]), static_cast<uint64_t>(request.int_data[0]), duration);
-        }
+        Attack(static_cast<uint64_t>(request.int_data[1]), static_cast<uint64_t>(request.int_data[0]), duration);
     } else if (request.type == RequestType::GATHER) {
         // Commands a unit to gather the resources of the specified unit.
-        if (action == ActionType::WALK or action == ActionType::IDLE or action == ActionType::NONE or
-            action == ActionType::GATHER) {
-            Gather(static_cast<uint64_t>(request.int_data[1]), static_cast<uint64_t>(request.int_data[0]), duration);
-        }
+        Gather(static_cast<uint64_t>(request.int_data[1]), static_cast<uint64_t>(request.int_data[0]), duration);
     } else {
         // With no requests, just default to idle
         action = ActionType::IDLE;
+        request.type = RequestType::NONE;
     }
 }
 
@@ -79,8 +70,7 @@ void Unit::ProcessRequest(Request& request, double duration) {
 void Unit::MakeDecision(Request& request) {
     // Attacking is prioritized
     auto closest_enemy = FindClosestEnemy();
-    //auto closest_enemy = FindClosestEnemy();
-    if (closest_enemy and (type == UnitType::BASE_LV1 or type == UnitType::FIGHTER_LV1 or type == UnitType::FIGHTER_LV2) and
+    if (closest_enemy and (main_type == UnitMainType::BASE or main_type == UnitMainType::FIGHTER) and
             CalculateDistanceTo(closest_enemy->position, true) < owner->wander_range) {
         request.type = RequestType::ATTACK;
         request.int_data[0] = static_cast<int>(closest_enemy->owner_id);
@@ -88,7 +78,7 @@ void Unit::MakeDecision(Request& request) {
     } else {
         // No enemies, try to find resource to gather
         auto closest_resource = FindClosestResource();
-        if (closest_resource and (type == UnitType::BASE_LV1 or type == UnitType::GATHERER_LV1) and
+        if (closest_resource and (main_type == UnitMainType::BASE or main_type == UnitMainType::GATHERER) and
                 CalculateDistanceTo(closest_resource->position, true) < owner->wander_range) {
             request.type = RequestType::GATHER;
             request.int_data[0] = static_cast<int>(closest_resource->owner_id);
