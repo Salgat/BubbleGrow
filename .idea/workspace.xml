@@ -30,12 +30,12 @@
       <change type="DELETED" beforePath="C:\Users\Austin\Dropbox\Projects\BubbleGrow\Debug\BubbleGrow.exe" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/art/Thumbs.db" afterPath="$PROJECT_DIR$/art/Thumbs.db" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/artwork/Thumbs.db" afterPath="$PROJECT_DIR$/data/artwork/Thumbs.db" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/Release/CMakeCache.txt" afterPath="$PROJECT_DIR$/bin/Release/CMakeCache.txt" />
+      <change type="MODIFICATION" beforePath="C:\Users\Austin\Dropbox\Projects\BubbleGrow\bin\Release\CMakeCache.txt" afterPath="C:\Users\Austin\Dropbox\Projects\BubbleGrow\bin\Release\CMakeCache.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Renderer.cpp" afterPath="$PROJECT_DIR$/src/Renderer.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Renderer.hpp" afterPath="$PROJECT_DIR$/src/Renderer.hpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/common.hpp" afterPath="$PROJECT_DIR$/src/common.hpp" />
       <change type="MODIFICATION" beforePath="C:\Users\Austin\Dropbox\Projects\BubbleGrow\bin\Release\BubbleGrow.exe" afterPath="C:\Users\Austin\Dropbox\Projects\BubbleGrow\bin\Release\BubbleGrow.exe" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="C:\Users\Austin\Dropbox\Projects\BubbleGrow\.idea\workspace.xml" afterPath="C:\Users\Austin\Dropbox\Projects\BubbleGrow\.idea\workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
     </list>
     <ignored path="BubbleGrow.iws" />
@@ -60,8 +60,8 @@
       <file leaf-file-name="common.hpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/common.hpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.759434">
-              <caret line="366" column="34" selection-start-line="366" selection-start-column="34" selection-end-line="366" selection-end-column="34" />
+            <state vertical-scroll-proportion="0.2783019">
+              <caret line="247" column="32" selection-start-line="247" selection-start-column="32" selection-end-line="247" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -81,31 +81,9 @@
         <entry file="file://$PROJECT_DIR$/src/Renderer.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="23" column="33" selection-start-line="23" selection-start-column="33" selection-end-line="23" selection-end-column="33" />
+              <caret line="25" column="20" selection-start-line="25" selection-start-column="18" selection-end-line="25" selection-end-column="20" />
               <folding>
                 <element signature="e#41#64#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="World.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/World.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="136" column="1" selection-start-line="136" selection-start-column="1" selection-end-line="136" selection-end-column="1" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="InputHandler.hpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/InputHandler.hpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-              <folding>
-                <element signature="e#115#136#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -115,7 +93,7 @@
         <entry file="file://$PROJECT_DIR$/src/InputHandler.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="50" column="1" selection-start-line="50" selection-start-column="1" selection-end-line="50" selection-end-column="1" />
+              <caret line="119" column="9" selection-start-line="119" selection-start-column="9" selection-end-line="119" selection-end-column="9" />
               <folding>
                 <element signature="e#42#69#0" expanded="true" />
               </folding>
@@ -145,11 +123,31 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="Player.hpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Player.hpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="62" column="16" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Player.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Player.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="164" column="0" selection-start-line="164" selection-start-column="0" selection-end-line="164" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="Unit.hpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Unit.hpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-17.103449">
-              <caret line="57" column="69" selection-start-line="57" selection-start-column="69" selection-end-line="57" selection-end-column="69" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="43" column="14" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="14" />
               <folding>
                 <element signature="e#98#119#0" expanded="true" />
               </folding>
@@ -161,7 +159,7 @@
         <entry file="file://$PROJECT_DIR$/src/Unit.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="109" column="79" selection-start-line="109" selection-start-column="79" selection-end-line="109" selection-end-column="79" />
+              <caret line="96" column="44" selection-start-line="96" selection-start-column="43" selection-end-line="96" selection-end-column="44" />
               <folding />
             </state>
           </provider>
@@ -188,21 +186,21 @@
         <option value="$PROJECT_DIR$/src/BatchDrawer.cpp" />
         <option value="$PROJECT_DIR$/src/Event.hpp" />
         <option value="$PROJECT_DIR$/src/Unit.hpp" />
-        <option value="$PROJECT_DIR$/src/Player.cpp" />
-        <option value="$PROJECT_DIR$/src/Player.hpp" />
         <option value="$PROJECT_DIR$/src/Resources.cpp" />
         <option value="$PROJECT_DIR$/src/World.hpp" />
         <option value="$PROJECT_DIR$/src/World.cpp" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/src/common.hpp" />
         <option value="$PROJECT_DIR$/src/main.cpp" />
         <option value="$PROJECT_DIR$/src/InputHandler.hpp" />
         <option value="$PROJECT_DIR$/src/SoundManager.hpp" />
         <option value="$PROJECT_DIR$/src/SoundManager.cpp" />
         <option value="$PROJECT_DIR$/src/Renderer.hpp" />
         <option value="$PROJECT_DIR$/src/Renderer.cpp" />
-        <option value="$PROJECT_DIR$/src/InputHandler.cpp" />
+        <option value="$PROJECT_DIR$/src/Player.hpp" />
         <option value="$PROJECT_DIR$/src/Unit.cpp" />
+        <option value="$PROJECT_DIR$/src/Player.cpp" />
+        <option value="$PROJECT_DIR$/src/InputHandler.cpp" />
+        <option value="$PROJECT_DIR$/src/common.hpp" />
       </list>
     </option>
   </component>
@@ -213,6 +211,7 @@
   <component name="NamedScopeManager">
     <order />
   </component>
+  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
@@ -387,7 +386,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
+    <frame x="-8" y="-8" width="2576" height="1416" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -504,7 +503,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="29" column="30" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="30" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -578,7 +577,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -709,31 +708,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Player.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="127" column="8" selection-start-line="127" selection-start-column="8" selection-end-line="127" selection-end-column="90" />
-          <folding>
-            <element signature="e#41#62#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Resources.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="46" column="90" selection-start-line="46" selection-start-column="90" selection-end-line="46" selection-end-column="90" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Player.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-20.51724">
-          <caret line="35" column="33" selection-start-line="35" selection-start-column="33" selection-end-line="35" selection-end-column="33" />
-          <folding>
-            <element signature="e#102#123#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -766,7 +745,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -775,9 +754,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-          <folding>
-            <element signature="e#115#136#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -815,30 +792,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Player.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="62" column="16" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Renderer.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="23" column="33" selection-start-line="23" selection-start-column="33" selection-end-line="23" selection-end-column="33" />
+          <caret line="25" column="20" selection-start-line="25" selection-start-column="18" selection-end-line="25" selection-end-column="20" />
           <folding>
             <element signature="e#41#64#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/InputHandler.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="50" column="1" selection-start-line="50" selection-start-column="1" selection-end-line="50" selection-end-column="1" />
-          <folding>
-            <element signature="e#42#69#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Unit.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-17.103449">
-          <caret line="57" column="69" selection-start-line="57" selection-start-column="69" selection-end-line="57" selection-end-column="69" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="43" column="14" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="14" />
           <folding>
             <element signature="e#98#119#0" expanded="true" />
           </folding>
@@ -848,15 +823,33 @@
     <entry file="file://$PROJECT_DIR$/src/Unit.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="109" column="79" selection-start-line="109" selection-start-column="79" selection-end-line="109" selection-end-column="79" />
+          <caret line="96" column="44" selection-start-line="96" selection-start-column="43" selection-end-line="96" selection-end-column="44" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Player.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="164" column="0" selection-start-line="164" selection-start-column="0" selection-end-line="164" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/InputHandler.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="119" column="9" selection-start-line="119" selection-start-column="9" selection-end-line="119" selection-end-column="9" />
+          <folding>
+            <element signature="e#42#69#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/common.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.759434">
-          <caret line="366" column="34" selection-start-line="366" selection-start-column="34" selection-end-line="366" selection-end-column="34" />
+        <state vertical-scroll-proportion="0.2783019">
+          <caret line="247" column="32" selection-start-line="247" selection-start-column="32" selection-end-line="247" selection-end-column="32" />
           <folding />
         </state>
       </provider>
