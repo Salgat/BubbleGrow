@@ -215,47 +215,47 @@ unsigned int const SUB_VERSION = 1;
 
 // Health
 int const kBaseMaxHealth = 100;
-int const kBase2MaxHealth = 100;
-int const kBase3MaxHealth = 100;
+int const kBase2MaxHealth = 200;
+int const kBase3MaxHealth = 300;
 int const kGathererMaxHealth = 100;
-int const kGatherer2MaxHealth = 100;
-int const kGatherer3MaxHealth = 100;
-int const kFighterMaxHealth = 150;
-int const kFighter2MaxHealth = 200;
-int const kFighter3MaxHealth = 200;
+int const kGatherer2MaxHealth = 200;
+int const kGatherer3MaxHealth = 300;
+int const kFighterMaxHealth = 200;
+int const kFighter2MaxHealth = 300;
+int const kFighter3MaxHealth = 400;
 
 // Walk speed (meters/second)
 double const kBaseWalkSpeed = 20.0;
-double const kBase2WalkSpeed = 20.0;
-double const kBase3WalkSpeed = 20.0;
+double const kBase2WalkSpeed = 25.0;
+double const kBase3WalkSpeed = 30.0;
 double const kGathererWalkSpeed = 20.0;
-double const kGatherer2WalkSpeed = 20.0;
-double const kGatherer3WalkSpeed = 20.0;
+double const kGatherer2WalkSpeed = 25.0;
+double const kGatherer3WalkSpeed = 30.0;
 double const kFighterWalkSpeed = 20.0;
-double const kFighter2WalkSpeed = 20.0;
-double const kFighter3WalkSpeed = 20.0;
+double const kFighter2WalkSpeed = 25.0;
+double const kFighter3WalkSpeed = 30.0;
 
 // Attack speed (seconds/attack)
 double const kBaseAttackSpeed = 1.0;
-double const kBase2AttackSpeed = 1.0;
-double const kBase3AttackSpeed = 1.0;
-double const kGathererAttackSpeed = 0.1;
-double const kGatherer2AttackSpeed = 0.1;
-double const kGatherer3AttackSpeed = 0.1;
+double const kBase2AttackSpeed = 1.0/1.5;
+double const kBase3AttackSpeed = 1.0/2.0;
+double const kGathererAttackSpeed = 1.0;
+double const kGatherer2AttackSpeed = 1.0/1.5;
+double const kGatherer3AttackSpeed = 1.0/2.0;
 double const kFighterAttackSpeed = 1.0;
-double const kFighter2AttackSpeed = 0.7;
-double const kFighter3AttackSpeed = 0.7;
+double const kFighter2AttackSpeed = 1.0/1.5;
+double const kFighter3AttackSpeed = 1.0/2.0;
 
 // Attack damage (health/attack)
 int const kBaseAttackDamage = 25;
 int const kBase2AttackDamage = 25;
 int const kBase3AttackDamage = 25;
-int const kGathererAttackDamage = 1;
-int const kGatherer2AttackDamage = 1;
-int const kGatherer3AttackDamage = 1;
-int const kFighterAttackDamage = 15;
-int const kFighter2AttackDamage = 35;
-int const kFighter3AttackDamage = 35;
+int const kGathererAttackDamage = 25;
+int const kGatherer2AttackDamage = 25;
+int const kGatherer3AttackDamage = 25;
+int const kFighterAttackDamage = 35;
+int const kFighter2AttackDamage = 45;
+int const kFighter3AttackDamage = 55;
 
 // Attack range (meters from unit position)
 double const kBaseAttackRange = 1.0;
@@ -265,8 +265,8 @@ double const kGathererAttackRange = 1.0;
 double const kGatherer2AttackRange = 1.0;
 double const kGatherer3AttackRange = 1.0;
 double const kFighterAttackRange = 1.0;
-double const kFighter2AttackRange = 2.0;
-double const kFighter3AttackRange = 2.0;
+double const kFighter2AttackRange = 1.0;
+double const kFighter3AttackRange = 1.0;
 
 // Unit Size (radius in meters)
 double const kBaseSize = 1.0;
@@ -276,16 +276,16 @@ double const kGathererSize = 1.0;
 double const kGatherer2Size = 1.0;
 double const kGatherer3Size = 1.0;
 double const kFighterSize = 1.0;
-double const kFighter2Size = 2.0;
-double const kFighter3Size = 8.0;
+double const kFighter2Size = 1.0;
+double const kFighter3Size = 1.0;
 
-// Gather speed (gathers/second)
+// Gather speed (seconds/gather)
 double const kBaseGatherSpeed = 0.2;
 double const kBase2GatherSpeed = 0.2;
 double const kBase3GatherSpeed = 0.2;
-double const kGathererGatherSpeed = 1.0;
-double const kGatherer2GatherSpeed = 1.0;
-double const kGatherer3GatherSpeed = 1.0;
+double const kGathererGatherSpeed = 0.1;
+double const kGatherer2GatherSpeed = 0.05;
+double const kGatherer3GatherSpeed = 0.05;
 double const kFighterGatherSpeed = 0.1;
 double const kFighter2GatherSpeed = 0.1;
 double const kFighter3GatherSpeed = 0.1;
@@ -295,11 +295,11 @@ int const kBaseGatherAmount = 1;
 int const kBase2GatherAmount = 1;
 int const kBase3GatherAmount = 1;
 int const kGathererGatherAmount = 1;
-int const kGatherer2GatherAmount = 1;
-int const kGatherer3GatherAmount = 1;
+int const kGatherer2GatherAmount = 2;
+int const kGatherer3GatherAmount = 3;
 int const kFighterGatherAmount = 1;
-int const kFighter2GatherAmount = 1;
-int const kFighter3GatherAmount = 1;
+int const kFighter2GatherAmount = 2;
+int const kFighter3GatherAmount = 3;
 
 // Constant Arrays for values. It's important that the order of the entries match the order of the entries in UnitType.
 std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kMaxHealth = {kBaseMaxHealth,
@@ -385,36 +385,36 @@ std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kGatherAmo
 // Unit cost requirements
 // Resource requirements (resources/unit)
 int const kBaseResourceCost = 100;
-int const kBase2ResourceCost = 100;
-int const kBase3ResourceCost = 100;
-int const kGathererResourceCost = 0;
-int const kGatherer2ResourceCost = 0;
-int const kGatherer3ResourceCost = 0;
-int const kFighterResourceCost = 0;
-int const kFighter2ResourceCost = 0;
-int const kFighter3ResourceCost = 0;
+int const kBase2ResourceCost = 50;
+int const kBase3ResourceCost = 50;
+int const kGathererResourceCost = 50;
+int const kGatherer2ResourceCost = 50;
+int const kGatherer3ResourceCost = 50;
+int const kFighterResourceCost = 50;
+int const kFighter2ResourceCost = 50;
+int const kFighter3ResourceCost = 50;
 
 // Unit Type cost
 UnitType const kBaseUnitTypeCost = UnitType::NONE;
-UnitType const kBase2UnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
-UnitType const kBase3UnitTypeCost = UnitType::NONE;
-UnitType const kGathererUnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
-UnitType const kGatherer2UnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
-UnitType const kGatherer3UnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
-UnitType const kFighterUnitTypeCost = UnitType::NONE;//UnitType::BASE_LV1;
-UnitType const kFighter2UnitTypeCost = UnitType::NONE;//UnitType::FIGHTER_LV1;
-UnitType const kFighter3UnitTypeCost = UnitType::NONE;//UnitType::FIGHTER_LV1;
+UnitType const kBase2UnitTypeCost = UnitType::BASE_LV1;
+UnitType const kBase3UnitTypeCost = UnitType::BASE_LV2;
+UnitType const kGathererUnitTypeCost = UnitType::BASE_LV1;
+UnitType const kGatherer2UnitTypeCost = UnitType::GATHERER_LV1;
+UnitType const kGatherer3UnitTypeCost = UnitType::GATHERER_LV2;
+UnitType const kFighterUnitTypeCost = UnitType::BASE_LV1;
+UnitType const kFighter2UnitTypeCost = UnitType::FIGHTER_LV1;
+UnitType const kFighter3UnitTypeCost = UnitType::FIGHTER_LV2;
 
 // Unit cost requirements (units/new unit)
 int const kBaseUnitCost = 0;
-int const kBase2UnitCost = 0;
-int const kBase3UnitCost = 0;
-int const kGathererUnitCost = 0;
-int const kGatherer2UnitCost = 0;
-int const kGatherer3UnitCost = 0;
-int const kFighterUnitCost = 0;
-int const kFighter2UnitCost = 0;
-int const kFighter3UnitCost = 0;
+int const kBase2UnitCost = 1;
+int const kBase3UnitCost = 2;
+int const kGathererUnitCost = 1;
+int const kGatherer2UnitCost = 2;
+int const kGatherer3UnitCost = 3;
+int const kFighterUnitCost = 1;
+int const kFighter2UnitCost = 2;
+int const kFighter3UnitCost = 3;
 
 // Determines cost in resources of the unit type
 std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kResourceCost = {kBaseResourceCost,

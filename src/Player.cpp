@@ -181,6 +181,9 @@ void Player::CreateUnits(int amount, UnitType type) {
         new_unit->main_type = main_type;
         new_unit->type = type;
 
+        new_unit->health[0] = kMaxHealth[static_cast<int>(type)];
+        new_unit->health[1] = kMaxHealth[static_cast<int>(type)];
+
         // Add to player's maps
         units[new_unit->id] = new_unit;
         unit_requests[new_unit->id] = Request();
