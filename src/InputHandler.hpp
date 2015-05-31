@@ -20,6 +20,9 @@ class Renderer;
 class InputHandler {
 private:
 
+    // Helper functions
+    void QuickMatchGame(unsigned int const num_players = 16);
+
 public:
     std::shared_ptr<Renderer> renderer;
 

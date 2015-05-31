@@ -100,7 +100,7 @@ bool InputHandler::GamePollEvents(sf::Event& event) {
                 renderer->mouse_movement = true;
             }
         } else if (event.key.code == sf::Keyboard::Num1) {
-            renderer->player->PlayerPurchaseRequest(10, UnitType::BASE_LV1);
+            renderer->player->PlayerPurchaseRequest(1, UnitType::BASE_LV1);
         } else if (event.key.code == sf::Keyboard::Num2) {
             renderer->player->PlayerPurchaseRequest(1, UnitType::BASE_LV2);
         } else if (event.key.code == sf::Keyboard::Num3) {
@@ -177,47 +177,8 @@ bool InputHandler::MenuPollEvents(sf::Event& event) {
                 // Menu item has been pressed (we checked if the mouse click and release is on the same menu item)
                 renderer->events.push(Event(EventType::MENU_SELECTION, sf::Vector2f(0.0,0.0)));
                 if (menu_item_released_at == MenuType::QUICK_MATCH) {
-                    // Quick Match clicked, setup a game for the player
-                    // Todo: Set this up into a function with customizable parameters
-                    // Generate random background map (regardless of map size, background map size is the same for simplicity)
-                    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-                    static std::mt19937 random_generator(seed);
-                    std::uniform_real_distribution<> distribution_tilemap(0, 8);
-                    for (auto& column : renderer->background_map) {
-                        for (auto& entry : column) {
-                            entry = distribution_tilemap(random_generator);
-                        }
-                    }
-
-                    renderer->world = std::make_shared<World>();
-                    auto resource_player = renderer->world->AddResources(1000*10*10*2, 50*10*2, 500);
-                    resource_player->color = sf::Color::Green;
-
-                    sf::Color player_colors[] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow,
-                                                 sf::Color::Cyan, sf::Color::Magenta};
-
-                    renderer->player = renderer->world->AddPlayer();
-                    renderer->player->color = player_colors[0];
-                    renderer->player->position = sf::Vector2f(0.0, 0.0);
-                    renderer->player->name = "Test_Player";
-                    renderer->player->resources = 1000;
-                    renderer->player->CreateUnits(10, UnitType::BASE_LV1);
-
-                    for (unsigned int count = 0; count < 4; ++count) {
-                        auto enemy_player = renderer->world->AddPlayer();
-                        enemy_player->color = player_colors[count+1];
-                        enemy_player->position = enemy_player->RandomWanderLocation();
-                        enemy_player->name = "Test_Computer_Player";
-                        enemy_player->ai_type = AiType::EASY;
-                        enemy_player->resources = 1000;
-                        enemy_player->CreateUnits(10, UnitType::BASE_LV1);
-                    }
-
-                    renderer->current_menu = MenuType::GAME_MENU;
-                    renderer->mode = GameMode::IN_GAME;
-
-                    renderer->sound_manager->world = renderer->world;
-                    renderer->events.push(Event(EventType::ENTER_GAME, sf::Vector2f(0.0,0.0)));
+                    // Setup a quick match with some default settings
+                    QuickMatchGame(16);
                 } else if (menu_item_released_at == MenuType::EXIT_GAME) {
                     // Exit and close game
                     return false;
@@ -232,4 +193,63 @@ bool InputHandler::MenuPollEvents(sf::Event& event) {
     }
 
     return true;
+}
+
+void InputHandler::QuickMatchGame(unsigned int const num_players) {
+    // Quick Match clicked, setup a game for the player
+    // Todo: Set this up into a function with customizable parameters
+    // Generate random background map (regardless of map size, background map size is the same for simplicity)
+    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    static std::mt19937 random_generator(seed);
+    std::uniform_real_distribution<> distribution_tilemap(0, 8);
+    for (auto& column : renderer->background_map) {
+        for (auto& entry : column) {
+            entry = distribution_tilemap(random_generator);
+        }
+    }
+
+    renderer->world = std::make_shared<World>();
+    auto resource_player = renderer->world->AddResources(1000*10*10*2, 50*10*2, 500);
+    resource_player->color = sf::Color::Green;
+
+    // The first few players default to colors that are pleasing to the eye, and then from there random colors are given
+    sf::Color player_colors[] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow,
+                                 sf::Color::Cyan, sf::Color::Magenta};
+    static std::mt19937 gen(seed);
+    std::uniform_real_distribution<> dis(0, 255);
+    unsigned char random_red = dis(gen);
+    unsigned char random_green = dis(gen);
+    unsigned char random_blue = dis(gen);
+
+    renderer->player = renderer->world->AddPlayer();
+    renderer->player->color = player_colors[0];
+    renderer->player->position = sf::Vector2f(0.0, 0.0);
+    renderer->player->name = "Test_Player";
+    renderer->player->resources = 1500;
+    renderer->player->CreateUnits(15, UnitType::BASE_LV1);
+
+    for (unsigned int count = 0; count < num_players; ++count) {
+        random_red = dis(gen);
+        random_green = dis(gen);
+        random_blue = dis(gen);
+
+        auto enemy_player = renderer->world->AddPlayer();
+        if (count < 4) {
+            enemy_player->color = player_colors[count+1];
+        } else {
+            enemy_player->color = sf::Color(random_red, random_green, random_blue);
+        }
+
+        enemy_player->position = enemy_player->RandomWanderLocation();
+        enemy_player->name = "Test_Computer_Player";
+        enemy_player->ai_type = AiType::EASY;
+        enemy_player->resources = 1000;
+        enemy_player->CreateUnits(10, UnitType::BASE_LV1);
+    }
+
+    renderer->current_menu = MenuType::GAME_MENU;
+    renderer->mode = GameMode::IN_GAME;
+
+    renderer->sound_manager->world = renderer->world;
+    renderer->events.push(Event(EventType::ENTER_GAME, sf::Vector2f(0.0,0.0)));
 }

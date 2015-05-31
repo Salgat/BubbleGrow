@@ -9,8 +9,8 @@
 #include "Resources.hpp"
 #include "SoundManager.hpp"
 
-unsigned int ResolutionX = 1024;
-unsigned int ResolutionY = 720;
+unsigned int ResolutionX = 800;
+unsigned int ResolutionY = 600;
 
 Renderer::Renderer()
     : mouse_movement(true)
@@ -94,7 +94,7 @@ void Renderer::UpdateView(sf::Vector2u new_window_size) {
  * Render the game.
  */
 void Renderer::RenderGame(double duration) {
-    window->clear(sf::Color(255, 255, 255));
+    window->clear(sf::Color(243, 253, 243)); // Off-white/light green background
 
     // Render based on if the player is using the menu (no active game) or playing a game
     if (mode == GameMode::IN_GAME) {
@@ -216,16 +216,29 @@ void Renderer::RenderInterface(double duration) {
     RenderDirectionArrows();
 
     // Display resource count
-    RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
-    RenderText("FPS: " + std::to_string(1.0/duration), sf::Vector2f(10.0, 30.0), TextSize::RESOURCE_COUNTER);
+    RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 0.0), TextSize::RESOURCE_COUNTER);
+    RenderText("FPS: " + std::to_string(1.0 / duration), sf::Vector2f(10.0, 20.0), TextSize::RESOURCE_COUNTER);
+    int distance_from_center = std::sqrt(
+            player->position.x * player->position.x + player->position.y * player->position.y);
+    RenderText("Distance from center: " + std::to_string(distance_from_center) + "/" +
+                                                                                 std::to_string(static_cast<int>(world->map_radius)),
+               sf::Vector2f(10.0, 40.0), TextSize::RESOURCE_COUNTER);
 
     // Render Bottom Hotkey Bar
     RenderImage(0.25, sf::Vector2f(0.0, 0.0), 0.0, sf::Color::White, ImageId::HOTKEY_BAR,
-                sf::Vector2f(ResolutionX/2, ResolutionY), false, true, true, false);
+                sf::Vector2f(ResolutionX / 2, ResolutionY), false, true, true, false);
 
     if (show_ingame_menu) {
         current_menu = MenuType::GAME_MENU;
         RenderMenuText(current_menu);
+    }
+
+    if (world->players.size() <= 2 and player->units.size() > 0) {
+        RenderText("WINNER!", sf::Vector2f(ResolutionX/2, ResolutionY/4), TextSize::GAME_MENU, sf::Color(52, 255, 102), true);
+    } else if (player->units.size() == 0) {
+        RenderText("GAME OVER", sf::Vector2f(ResolutionX/2, ResolutionY/4), TextSize::GAME_MENU, sf::Color(255, 52, 52), true);
+    } else if (distance_from_center > world->map_radius) {
+        RenderText("WARNING: Leaving game area!", sf::Vector2f(ResolutionX/2, ResolutionY/4), TextSize::WARNING, sf::Color(255, 70, 20), true);
     }
 }
 
@@ -330,8 +343,6 @@ void Renderer::RenderDirectionArrows() {
  * Renders the start menu (not the in-game menu).
  */
 void Renderer::RenderMenu() {
-    window->draw(background_batch);
-
     // Render Logo
     RenderImage(0.4, sf::Vector2f(0.0, 0.0), 0.0, sf::Color::White, ImageId::LOGO,
                 sf::Vector2f(ResolutionX/2, 75.0), false, false, true, false);
@@ -342,20 +353,26 @@ void Renderer::RenderMenu() {
     // Render toggle switches for sound and music
     std::string bool_string = "On";
     if (!sound_on) bool_string = "Off";
-    sound_bounding_box = RenderText("Sound: " + bool_string, sf::Vector2f(10.0, ResolutionY - 50.0), TextSize::RESOURCE_COUNTER);
+    sound_bounding_box = RenderText("Sound: " + bool_string, sf::Vector2f(10.0, ResolutionY - 60.0), TextSize::RESOURCE_COUNTER);
     if (!music_on) bool_string = "Off"; else bool_string = "On";
-    music_bounding_box = RenderText("Music: " + bool_string, sf::Vector2f(10.0, ResolutionY - 30.0), TextSize::RESOURCE_COUNTER);
+    music_bounding_box = RenderText("Music: " + bool_string, sf::Vector2f(10.0, ResolutionY - 40.0), TextSize::RESOURCE_COUNTER);
 }
 
 /**
  * Renders text at specified location and attributes.
  */
-sf::FloatRect Renderer::RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color) {
+sf::FloatRect Renderer::RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color,
+                                   bool center_text_x) {
     text.setString(display_text);
     text.setStyle(sf::Text::Regular);
     text.setColor(color);
-    text.setPosition(location);
     text.setCharacterSize(font_size);
+    if (center_text_x) {
+        text.setPosition(location.x - text.getLocalBounds().width/2.0, location.y);
+    } else {
+        text.setPosition(location);
+    }
+    //text.setOrigin(text.getLocalBounds().width/2.0, 0.0);
     text.setOrigin(0.0, 0.0);
     window->draw(text);
 

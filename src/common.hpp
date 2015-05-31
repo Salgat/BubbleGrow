@@ -58,9 +58,9 @@ enum class MenuType {
 };
 
 // Submenu definitions
-std::array<MenuType const, 2> const kMainSubMenus = {MenuType::QUICK_MATCH,
-                                                     //MenuType::VERSUS,
-                                                     //MenuType::TUTORIAL,
+std::array<MenuType const, 4> const kMainSubMenus = {MenuType::QUICK_MATCH,
+                                                     MenuType::VERSUS,
+                                                     MenuType::TUTORIAL,
                                                      MenuType::EXIT_GAME};
 
 std::array<MenuType const, 3> const kVersusSubMenus = {MenuType::COMPUTER_CHALLENGE,
@@ -85,7 +85,8 @@ std::array<std::string const, static_cast<std::size_t>(MenuType::NONE)> const kM
 // Standard Font Sizes
 enum TextSize {
     GAME_MENU = 144,
-    RESOURCE_COUNTER = 24,
+    WARNING = 100,
+    RESOURCE_COUNTER = 32,
 
     MAIN = 144,
     VERSUS = 144,

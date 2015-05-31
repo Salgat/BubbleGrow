@@ -81,7 +81,8 @@ public:
 
     // Rendering functions for the menu
     void RenderMenu();
-    sf::FloatRect RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color = sf::Color::Black);
+    sf::FloatRect RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color = sf::Color::Black,
+                             bool center_text_x = false);
     void RenderMenuText(MenuType selection);
 
 

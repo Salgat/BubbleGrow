@@ -61,7 +61,16 @@ void World::UpdateAndProcess(double duration) {
         #pragma omp taskwait
     }
 
-    // Add and remove any new/expired units
+    // Clear units for players beyond the map radius (due to "leaving" the game area)
+    for (auto& player : players) {
+        double distance_from_center = std::sqrt(player.second->position.x*player.second->position.x +
+                                                player.second->position.y*player.second->position.y);
+        if (distance_from_center >= map_radius*1.1) {
+            player.second->units.clear();
+        }
+    }
+
+    // Add and remove any new/expired players and units
     std::vector<uint64_t> players_to_remove;
     for (auto& player : players) {
         player.second->RemoveExpiredUnits();

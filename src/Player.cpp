@@ -223,14 +223,14 @@ void Player::EasyAiDecision(double duration) {
     if (resources > kResourceCost[static_cast<std::size_t>(UnitType::BASE_LV1)]) {
         // Since we just want to spend all the resources, it doesn't matter how many we request (pick an
         // arbitrarily big number)
-        PlayerPurchaseRequest(10, UnitType::BASE_LV1);
+        PlayerPurchaseRequest(1, UnitType::BASE_LV1);
     }
 
     // Determine if there are nearby enemy players
     for (auto& player : world->players) {
         if (player.second->type != PlayerType::RESOURCES and player.first != id) {
-            double player_distance = player_distance = CalculateDistanceTo(player.second->position);
-            if (player_distance < 5.0 * wander_range) {
+            double player_distance = CalculateDistanceTo(player.second->position);
+            if (player_distance < 3.0 * wander_range) {
                 // Nearby player found, head towards him to fight
                 PlayerMoveRequest(player.second->position, 1.0);
                 return;
@@ -239,11 +239,11 @@ void Player::EasyAiDecision(double duration) {
     }
 
     // No nearby players found, so just wander around
-    if (CalculateDistanceTo(ai_destination) < 1.0 and action_duration >= kEasyAiIdleTime) {
+    if (CalculateDistanceTo(ai_destination) < 1.0 or action_duration >= kEasyAiIdleTime) {
         ai_destination = MoveTowards(RandomWanderLocation(), 100.0);
         PlayerMoveRequest(ai_destination, 1.0);
         action_duration = 0.0;
-    } else if (CalculateDistanceTo(ai_destination) < 1.0) {
+    } else {
         action_duration += duration;
     }
 }
