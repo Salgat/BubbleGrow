@@ -7,6 +7,7 @@
 
 #include "common.hpp"
 #include "Request.hpp"
+#include "Event.hpp"
 
 class Unit;
 class World;
@@ -34,6 +35,8 @@ public:
 
     std::shared_ptr<World> world;
 
+    std::stack<Event> events;
+
     std::queue<Request> requests; // Requests for the player class to process (typically based on input from player)
     std::array<Request, static_cast<std::size_t>(RequestType::PLAYER_END_REQUESTS)> requests_array;
 
@@ -57,7 +60,7 @@ public:
 
     // Render details
     sf::Color color;
-    //SymbolType symbol;
+    PlayerSymbol symbol;
 
     Player();
 

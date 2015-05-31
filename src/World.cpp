@@ -5,7 +5,7 @@
 #include "World.hpp"
 #include "Player.hpp"
 #include "Resources.hpp"
-
+#include "Unit.hpp"
 
 World::World()
     : player_id_count(0)
@@ -61,7 +61,16 @@ void World::UpdateAndProcess(double duration) {
         #pragma omp taskwait
     }
 
-    // Add and remove any new/expired units
+    // Clear units for players beyond the map radius (due to "leaving" the game area)
+    for (auto& player : players) {
+        double distance_from_center = std::sqrt(player.second->position.x*player.second->position.x +
+                                                player.second->position.y*player.second->position.y);
+        if (distance_from_center >= map_radius*1.1) {
+            player.second->units.clear();
+        }
+    }
+
+    // Add and remove any new/expired players and units
     std::vector<uint64_t> players_to_remove;
     for (auto& player : players) {
         player.second->RemoveExpiredUnits();
@@ -119,4 +128,19 @@ std::shared_ptr<Unit> World::FindUnit(uint64_t owner_id, uint64_t unit_id) {
     }
 
     return nullptr;
+}
+
+/**
+ * Due to circular references (both Player and Unit hold references to world and Units hold references to Player),
+ * World has to manually remove these for shared_ptr to call the destructor on this (World) class instance.
+ */
+void World::EndWorld() {
+    for (auto& player : players) {
+        player.second->world = nullptr;
+
+        for (auto& unit : player.second->units) {
+            unit.second->world = nullptr;
+            unit.second->owner = nullptr;
+        }
+    }
 }

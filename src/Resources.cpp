@@ -44,6 +44,7 @@ void Resources::RemoveExpiredUnits() {
     }
 
     while(!units_to_remove.empty()) {
+        events.push(Event(EventType::BUBBLE_DIE, units[units_to_remove.top()]->position));
         units.erase(units_to_remove.top());
         unit_requests.erase(units_to_remove.top());
         units_to_remove.pop();

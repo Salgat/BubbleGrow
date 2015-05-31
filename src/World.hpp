@@ -29,6 +29,8 @@ public:
     std::shared_ptr<Resources> AddResources(unsigned int amount, float radius, float density);
     std::shared_ptr<Unit> FindUnit(uint64_t owner_id, uint64_t unit_id);
 
+    void EndWorld();
+
 };
 
 #endif //BUBBLEGROW_WORLD_HPP

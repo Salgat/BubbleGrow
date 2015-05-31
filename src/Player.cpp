@@ -27,6 +27,12 @@ Player::Player()
         entry = Request();
         entry.type = RequestType::NONE;
     }
+
+    // Choose a random symbol
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    static std::mt19937 random_generator(seed);
+    static std::uniform_real_distribution<> distribution_symbols(0, static_cast<int>(PlayerSymbol::TRIANGLE));
+    symbol = static_cast<PlayerSymbol>(distribution_symbols(random_generator));
 }
 
 /**
@@ -125,6 +131,7 @@ void Player::RemoveExpiredUnits() {
     }
 
     while(!units_to_remove.empty()) {
+        events.push(Event(EventType::BUBBLE_DIE, units[units_to_remove.top()]->position));
         units.erase(units_to_remove.top());
         unit_requests.erase(units_to_remove.top());
         units_to_remove.pop();
@@ -140,33 +147,47 @@ void Player::CreateUnits(int amount, UnitType type) {
     std::uniform_real_distribution<> distribution_radius(0, wander_range);
     std::uniform_real_distribution<> distribution_angle(0, 2*PI);
 
-    if (type == UnitType::BASE_LV1) {
-        auto resource_cost = amount * kBaseResourceCost;
-        if (resource_cost > resources) {
-            // Can't afford to create requested amount, create maximum we can afford
-            amount = resources / kBaseResourceCost;
-        }
+    auto unit_resource_cost = kResourceCost[static_cast<int>(type)];
+    UnitMainType main_type;
+    if (type == UnitType::BASE_LV1 or type == UnitType::BASE_LV2 or type == UnitType::BASE_LV3) {
+        main_type = UnitMainType::BASE;
+    } else if (type == UnitType::GATHERER_LV1 or type == UnitType::GATHERER_LV2 or type == UnitType::GATHERER_LV3) {
+        main_type = UnitMainType::GATHERER;
+    } else if (type == UnitType::FIGHTER_LV1 or type == UnitType::FIGHTER_LV2 or type == UnitType::FIGHTER_LV3) {
+        main_type = UnitMainType::FIGHTER;
+    }
 
-        number_of_units[static_cast<std::size_t>(type)] += amount;
-        while (amount-- > 0) {
-            double random_radius = distribution_radius(gen);
-            double random_angle = distribution_angle(gen);
+    auto resource_cost = amount * unit_resource_cost;
+    if (resource_cost > resources) {
+        // Can't afford to create requested amount, create maximum we can afford
+        amount = resources / unit_resource_cost;
+    }
 
-            // Initialize a new unit
-            resources -= kBaseResourceCost;
-            auto new_unit = std::make_shared<Unit>();
-            new_unit->position = sf::Vector2f(position.x + static_cast<float>(random_radius*std::cos(random_angle)),
-                                              position.y + static_cast<float>(random_radius*std::sin(random_angle)));
-            new_unit->id = ++unit_ids;
-            new_unit->owner_id = id;
-            new_unit->owner = shared_from_this();
-            new_unit->world = world;
+    number_of_units[static_cast<std::size_t>(type)] += amount;
+    while (amount-- > 0) {
+        double random_radius = distribution_radius(gen);
+        double random_angle = distribution_angle(gen);
 
-            // Add to player's maps
-            units[new_unit->id] = new_unit;
-            unit_requests[new_unit->id] = Request();
-            unit_requests[new_unit->id].type = RequestType::NONE;
-        }
+        // Initialize a new unit
+        resources -= unit_resource_cost;
+        auto new_unit = std::make_shared<Unit>();
+        new_unit->position = sf::Vector2f(position.x + static_cast<float>(random_radius*std::cos(random_angle)),
+                                          position.y + static_cast<float>(random_radius*std::sin(random_angle)));
+        new_unit->id = ++unit_ids;
+        new_unit->owner_id = id;
+        new_unit->owner = shared_from_this();
+        new_unit->world = world;
+        new_unit->symbol = symbol;
+        new_unit->main_type = main_type;
+        new_unit->type = type;
+
+        new_unit->health[0] = kMaxHealth[static_cast<int>(type)];
+        new_unit->health[1] = kMaxHealth[static_cast<int>(type)];
+
+        // Add to player's maps
+        units[new_unit->id] = new_unit;
+        unit_requests[new_unit->id] = Request();
+        unit_requests[new_unit->id].type = RequestType::NONE;
     }
 }
 
@@ -205,14 +226,14 @@ void Player::EasyAiDecision(double duration) {
     if (resources > kResourceCost[static_cast<std::size_t>(UnitType::BASE_LV1)]) {
         // Since we just want to spend all the resources, it doesn't matter how many we request (pick an
         // arbitrarily big number)
-        PlayerPurchaseRequest(10, UnitType::BASE_LV1);
+        PlayerPurchaseRequest(1, UnitType::BASE_LV1);
     }
 
     // Determine if there are nearby enemy players
     for (auto& player : world->players) {
         if (player.second->type != PlayerType::RESOURCES and player.first != id) {
-            double player_distance = player_distance = CalculateDistanceTo(player.second->position);
-            if (player_distance < 5.0 * wander_range) {
+            double player_distance = CalculateDistanceTo(player.second->position);
+            if (player_distance < 3.0 * wander_range) {
                 // Nearby player found, head towards him to fight
                 PlayerMoveRequest(player.second->position, 1.0);
                 return;
@@ -221,11 +242,11 @@ void Player::EasyAiDecision(double duration) {
     }
 
     // No nearby players found, so just wander around
-    if (CalculateDistanceTo(ai_destination) < 1.0 and action_duration >= kEasyAiIdleTime) {
+    if (CalculateDistanceTo(ai_destination) < 1.0 or action_duration >= kEasyAiIdleTime) {
         ai_destination = MoveTowards(RandomWanderLocation(), 100.0);
         PlayerMoveRequest(ai_destination, 1.0);
         action_duration = 0.0;
-    } else if (CalculateDistanceTo(ai_destination) < 1.0) {
+    } else {
         action_duration += duration;
     }
 }

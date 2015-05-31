@@ -7,37 +7,26 @@
 #include "Player.hpp"
 #include "Unit.hpp"
 #include "Resources.hpp"
+#include "SoundManager.hpp"
 
-unsigned int ResolutionX = 1024;
-unsigned int ResolutionY = 720;
+unsigned int ResolutionX = 800;
+unsigned int ResolutionY = 600;
 
 Renderer::Renderer()
     : mouse_movement(true)
     , current_menu(MenuType::MAIN)
     , last_menu(MenuType::NONE)
     , mode(GameMode::MENU)
-    , show_ingame_menu(false) {
+    , show_ingame_menu(false)
+    , music_on(true)
+    , sound_on(true) {
     std::string title = "BubbleGrow V" + std::to_string(VERSION) + "." + std::to_string(SUB_VERSION);
     sf::ContextSettings settings;
-    //settings.antialiasingLevel = 8;
     window = std::make_shared<sf::RenderWindow>(sf::VideoMode(ResolutionX, ResolutionY), title, sf::Style::Default, settings);
     //window->setFramerateLimit(60);
 
     // Scale view based on current resolution
-    auto window_size = window->getSize();
-    ResolutionX = window_size.x;
-    ResolutionY = window_size.y;
-    double scale_x = 1280.0 / window_size.x;
-    double scale_y = 1024.0 / window_size.y;
-    auto scale = scale_x > scale_y ? scale_x : scale_y;
-
-    auto view = window->getDefaultView();
-    view.zoom(scale);
-    ResolutionX *= scale;
-    ResolutionY *= scale;
-    view.setSize(window_size.x*scale, window_size.y*scale);
-    view.setCenter(window_size.x*scale/2.0, window_size.y*scale/2.0);
-    window->setView(view);
+    UpdateView(window->getSize());
 
     // Fonts
     if (!font.loadFromFile("../../data/fonts/Sile.ttf")) {
@@ -70,215 +59,42 @@ Renderer::Renderer()
     textures[ImageId::PLAYER_SYMBOLS].loadFromFile("../../data/artwork/Player_Symbols.png");
     textures[ImageId::ARROW] = sf::Texture();
     textures[ImageId::ARROW].loadFromFile("../../data/artwork/arrow.png");
-
-    // Generate random background map (regardless of map size, background map size is the same for simplicity)
-    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    static std::mt19937 random_generator(seed);
-    std::uniform_real_distribution<> distribution_tilemap(0, kTileStrings.size());
-    for (auto& column : background_map) {
-        for (auto& entry : column) {
-            entry = distribution_tilemap(random_generator);
-        }
-    }
+    textures[ImageId::HOTKEY_BAR] = sf::Texture();
+    textures[ImageId::HOTKEY_BAR].loadFromFile("../../data/artwork/Bubble_Toolbar.png");
 
     // Initialize background and bubble batch drawer
-    background_batch = BatchDrawer("../../data/artwork/BG_Tile1.png", 1, 1);
+    background_batch = BatchDrawer("../../data/artwork/Background_Tiles.png", 3, 3);
     bubbles_batch = BatchDrawer("../../data/artwork/Bubble_Types.png", 3, 3);
     symbols_batch = BatchDrawer("../../data/artwork/Player_Symbols.png", 3, 3);
+
+    // Initiate main menu music
+    events.push(Event(EventType::ENTER_MAIN_MENU, sf::Vector2f(0.0,0.0)));
 }
 
 /**
- * Handles pending events created by the input. Returns false to end game loop.
+ * Scales view based on current resolution.
  */
-bool Renderer::PollEvents() {
-    sf::Event event;
-    while (window->pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
-            window->close();
-            return false;
-        } else if (event.type == sf::Event::Resized) {
-            // Adjust resolution recognized by the game to the resized window resolution.
-            ResolutionX = event.size.width;
-            ResolutionY = event.size.height;
+void Renderer::UpdateView(sf::Vector2u new_window_size) {
+    ResolutionX = new_window_size.x;
+    ResolutionY = new_window_size.y;
+    double scale_x = 1280.0 / new_window_size.x;
+    double scale_y = 1024.0 / new_window_size.y;
+    auto scale = scale_x > scale_y ? scale_x : scale_y;
 
-            // Scale by whichever dimension is changed the most
-            double scale_x = 1280.0 / event.size.width;
-            double scale_y = 1024.0 / event.size.height;
-            auto scale = scale_x > scale_y ? scale_x : scale_y;
-
-            auto view = window->getDefaultView();
-            view.zoom(scale);
-            ResolutionX *= scale;
-            ResolutionY *= scale;
-            view.setSize(event.size.width*scale, event.size.height*scale);
-            view.setCenter(event.size.width*scale/2.0, event.size.height*scale/2.0);
-            window->setView(view);
-        } else if (mode == GameMode::IN_GAME) {
-            if(!GamePollEvents(event))
-                return false;
-        } else if (mode == GameMode::MENU) {
-            if(!MenuPollEvents(event))
-                return false;
-        }
-    }
-
-    return true;
-}
-
-/**
- * Handles pending events for in-game.
- */
-bool Renderer::GamePollEvents(sf::Event& event) {
-    static MenuType last_menu_item_clicked = MenuType::NONE;
-
-    // Todo: Might want to encapsulate the mouse click check into a function?
-    if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Space) {
-            // Toggle movement based on mouse cursor
-            mouse_movement = !mouse_movement;
-
-            // Reset move request so player stops moving
-            player->PlayerMoveRequest(player->position, 0.0);
-        } else if (event.key.code == sf::Keyboard::Escape) {
-            show_ingame_menu = !show_ingame_menu;
-            if (show_ingame_menu) {
-                mouse_movement = false;
-            } else {
-                mouse_movement = true;
-            }
-        } else if (event.key.code == sf::Keyboard::Num1) {
-            player->PlayerPurchaseRequest(10, UnitType::BASE_LV1);
-        }
-    } else if (event.type == sf::Event::MouseButtonPressed) {
-        if (event.mouseButton.button == sf::Mouse::Left) {
-            // Check if mouse is clicking on any menu selection
-            auto mouse_position = window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
-            last_menu_item_clicked = MouseOverWhichMenuOption(mouse_position);
-        }
-    } else if (event.type == sf::Event::MouseButtonReleased) {
-        if (event.mouseButton.button == sf::Mouse::Left) {
-            auto mouse_position = window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
-            auto menu_item_released_at = MouseOverWhichMenuOption(mouse_position);
-            if (menu_item_released_at == last_menu_item_clicked and last_menu_item_clicked != MenuType::NONE) {
-                // Menu item has been pressed (we checked if the mouse click and release is on the same menu item)
-                if (menu_item_released_at == MenuType::LEAVE_GAME) {
-                    // Leave the game and go back to the main menu (and do any cleanup)
-                    world = nullptr;
-                    player = nullptr;
-
-                    show_ingame_menu = false;
-                    mouse_movement = true;
-
-                    current_menu = MenuType::MAIN;
-                    mode = GameMode::MENU;
-                } else if (menu_item_released_at == MenuType::BACK) {
-                    // Close the menu
-                    show_ingame_menu = false;
-                    mouse_movement = true;
-                }
-            }
-        }
-    }
-
-    return true;
-}
-
-/**
- * Handles pending events for menu.
- */
-bool Renderer::MenuPollEvents(sf::Event& event) {
-    // Check if any menu options are clicked
-    static MenuType last_menu_item_clicked = MenuType::NONE;
-    if (event.type == sf::Event::MouseButtonPressed) {
-        if (event.mouseButton.button == sf::Mouse::Left) {
-            // Check if mouse is clicking on any menu selection
-            auto mouse_position = window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
-            last_menu_item_clicked = MouseOverWhichMenuOption(mouse_position);
-        }
-    } else if (event.type == sf::Event::MouseButtonReleased) {
-        if (event.mouseButton.button == sf::Mouse::Left) {
-            auto mouse_position = window->mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
-            auto menu_item_released_at = MouseOverWhichMenuOption(mouse_position);
-            if (menu_item_released_at == last_menu_item_clicked and last_menu_item_clicked != MenuType::NONE) {
-                // Menu item has been pressed (we checked if the mouse click and release is on the same menu item)
-                if (menu_item_released_at == MenuType::QUICK_MATCH) {
-                    // Quick Match clicked, setup a game for the player
-                    // Todo: Set this up into a function with customizable parameters
-                    world = std::make_shared<World>();
-                    auto resource_player = world->AddResources(1000*10*10*2, 50*10*2, 500);
-                    resource_player->color = sf::Color::Green;
-
-                    sf::Color player_colors[] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow,
-                                                 sf::Color::Cyan, sf::Color::Magenta};
-
-                    player = world->AddPlayer();
-                    player->color = player_colors[0];
-                    player->position = sf::Vector2f(0.0, 0.0);
-                    player->name = "Test_Player";
-                    player->resources = 1000;
-                    player->CreateUnits(10, UnitType::BASE_LV1);
-
-                    for (unsigned int count = 0; count < 4; ++count) {
-                        auto enemy_player = world->AddPlayer();
-                        enemy_player->color = player_colors[count+1];
-                        enemy_player->position = enemy_player->RandomWanderLocation();
-                        enemy_player->name = "Test_Computer_Player";
-                        enemy_player->ai_type = AiType::EASY;
-                        enemy_player->resources = 1000;
-                        enemy_player->CreateUnits(10, UnitType::BASE_LV1);
-                    }
-
-                    current_menu = MenuType::GAME_MENU;
-                    mode = GameMode::IN_GAME;
-                } else if (menu_item_released_at == MenuType::EXIT_GAME) {
-                    // Exit and close game
-                    return false;
-                } else if (menu_item_released_at == MenuType::VERSUS) {
-                    current_menu = MenuType::VERSUS;
-                    last_menu = MenuType::MAIN;
-                } else if (menu_item_released_at == MenuType::BACK) {
-                    current_menu = MenuType::MAIN;
-                }
-            }
-        }
-    }
-
-    return true;
-}
-
-/**
- * Handles non-event input handling.
- */
-void Renderer::ProcessInputs() {
-    if (mode == GameMode::IN_GAME) {
-        if (mouse_movement) {
-            // Movement based on cursor's position from center of screen.
-            auto mouse_position = window->mapPixelToCoords(sf::Mouse::getPosition(*window));
-
-            auto distance_x = static_cast<int>(mouse_position.x) - static_cast<int>(ResolutionX /2);
-            auto distance_y = static_cast<int>(mouse_position.y) - static_cast<int>(ResolutionY /2);
-            float distance_from_center = std::sqrt(distance_x*distance_x + distance_y*distance_y);
-
-            // Speed is based on the cursor's distance from the center (with a small area in the center where there is no
-            // speed).
-            float speed = (distance_from_center-50.0)/200.0;
-            if (speed > 1.0)
-                speed = 1.0;
-            else if (speed < 0.0)
-                speed = 0.0;
-
-            player->PlayerMoveRequest(sf::Vector2f(player->position.x + distance_x, player->position.y + distance_y), speed);
-        } else {
-            player->PlayerMoveRequest(sf::Vector2f(player->position.x, player->position.y), 1.0);
-        }
-    }
+    auto view = window->getDefaultView();
+    view.zoom(scale);
+    ResolutionX *= scale;
+    ResolutionY *= scale;
+    view.setSize(new_window_size.x*scale, new_window_size.y*scale);
+    view.setCenter(new_window_size.x*scale/2.0, new_window_size.y*scale/2.0);
+    window->setView(view);
 }
 
 /**
  * Render the game.
  */
 void Renderer::RenderGame(double duration) {
-    window->clear(sf::Color(255, 255, 255));
+    window->clear(sf::Color(243, 253, 243)); // Off-white/light green background
 
     // Render based on if the player is using the menu (no active game) or playing a game
     if (mode == GameMode::IN_GAME) {
@@ -307,9 +123,9 @@ void Renderer::RenderBackground() {
     for (auto const& column : background_map) {
         for (auto const entry : column) {
             auto screen_location = sf::Vector2f(background_batch.sprite_pixel_width * scale * start_x -
-                                                player->position.x * parallax_strength,
+                                                player->position.x * kParallaxStrength,
                                                 background_batch.sprite_pixel_height * scale * start_y -
-                                                player->position.y * parallax_strength);
+                                                player->position.y * kParallaxStrength);
             unsigned int sprite_index = entry;
             BatchEntry background_sprite(screen_location, sprite_index, scale);
             sprites.push_back(background_sprite);
@@ -400,13 +216,65 @@ void Renderer::RenderInterface(double duration) {
     RenderDirectionArrows();
 
     // Display resource count
-    RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 10.0), TextSize::RESOURCE_COUNTER);
-    RenderText("FPS: " + std::to_string(1.0/duration), sf::Vector2f(10.0, 30.0), TextSize::RESOURCE_COUNTER);
+    RenderText("Resources: " + std::to_string(player->resources), sf::Vector2f(10.0, 0.0), TextSize::RESOURCE_COUNTER);
+    RenderText("FPS: " + std::to_string(1.0 / duration), sf::Vector2f(10.0, 20.0), TextSize::RESOURCE_COUNTER);
+    int distance_from_center = std::sqrt(
+            player->position.x * player->position.x + player->position.y * player->position.y);
+    RenderText("Distance from center: " + std::to_string(distance_from_center) + "/" +
+                                                                                 std::to_string(static_cast<int>(world->map_radius)),
+               sf::Vector2f(10.0, 40.0), TextSize::RESOURCE_COUNTER);
+
+    // Render Bottom Hotkey Bar
+    RenderImage(0.25, sf::Vector2f(0.0, 0.0), 0.0, sf::Color::White, ImageId::HOTKEY_BAR,
+                sf::Vector2f(ResolutionX / 2, ResolutionY), false, true, true, false);
 
     if (show_ingame_menu) {
         current_menu = MenuType::GAME_MENU;
         RenderMenuText(current_menu);
     }
+
+    if (world->players.size() <= 2 and player->units.size() > 0) {
+        RenderText("WINNER!", sf::Vector2f(ResolutionX/2, ResolutionY/4), TextSize::GAME_MENU, sf::Color(52, 255, 102), true);
+    } else if (player->units.size() == 0) {
+        RenderText("GAME OVER", sf::Vector2f(ResolutionX/2, ResolutionY/4), TextSize::GAME_MENU, sf::Color(255, 52, 52), true);
+    } else if (distance_from_center > world->map_radius) {
+        RenderText("WARNING: Leaving game area!", sf::Vector2f(ResolutionX/2, ResolutionY/4), TextSize::WARNING, sf::Color(255, 70, 20), true);
+    }
+}
+
+/**
+ * Renders an image (identified by its ImageId) with the provided arguments.
+ *
+ * Note: The 4 default arguments are due to their necessary and regular use. Below is how to use them,
+ *  - subtract_length: Used when you want to have an image at the right edge of the screen (with a position.x of ResolutionX
+ *  - subtract_height: Same as above, but at the bottom of the screen
+ *  - center_x: Centers the image on the x-axis at the position provided to the center of the image
+ *  - center_y: Centers the image on the y-axis at the position provided to the center of the image
+ */
+void Renderer::RenderImage(double scale, sf::Vector2f origin, double rotation, sf::Color color, ImageId image_id, sf::Vector2f position,
+                           bool subtract_length, bool subtract_height, bool center_x, bool center_y) {
+    sf::Sprite image;
+    image.setScale(scale, scale);
+    image.setOrigin(origin.x,origin.y);
+    image.setRotation(rotation);
+    image.setColor(color);
+    image.setTexture(textures[image_id]);
+
+    if (subtract_length) {
+        position.x -=  image.getLocalBounds().width*scale;
+    }
+    if (subtract_height) {
+        position.y -=  image.getLocalBounds().height*scale;
+    }
+    if (center_x) {
+        position.x -= image.getLocalBounds().width/(2.0/scale);
+    }
+    if (center_y) {
+        position.x -= image.getLocalBounds().height/(2.0/scale);
+    }
+
+    image.setPosition(position.x, position.y);
+    window->draw(image);
 }
 
 /**
@@ -476,31 +344,39 @@ void Renderer::RenderDirectionArrows() {
  */
 void Renderer::RenderMenu() {
     // Render Logo
-    sf::Sprite logo;
-    logo.setOrigin(0.0,0.0);
-    logo.setRotation(0.0);
-    logo.setColor(sf::Color::White);
-    logo.setTexture(textures[ImageId::LOGO]);
-    double scale = 0.4;
-    logo.setScale(scale, scale);
-    logo.setPosition(ResolutionX/2 - logo.getLocalBounds().width/(2.0/scale), 75.0);
-    window->draw(logo);
+    RenderImage(0.4, sf::Vector2f(0.0, 0.0), 0.0, sf::Color::White, ImageId::LOGO,
+                sf::Vector2f(ResolutionX/2, 75.0), false, false, true, false);
 
     // Render menu options
     RenderMenuText(current_menu);
+
+    // Render toggle switches for sound and music
+    std::string bool_string = "On";
+    if (!sound_on) bool_string = "Off";
+    sound_bounding_box = RenderText("Sound: " + bool_string, sf::Vector2f(10.0, ResolutionY - 60.0), TextSize::RESOURCE_COUNTER);
+    if (!music_on) bool_string = "Off"; else bool_string = "On";
+    music_bounding_box = RenderText("Music: " + bool_string, sf::Vector2f(10.0, ResolutionY - 40.0), TextSize::RESOURCE_COUNTER);
 }
 
 /**
  * Renders text at specified location and attributes.
  */
-void Renderer::RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color) {
+sf::FloatRect Renderer::RenderText(std::string display_text, sf::Vector2f location, unsigned int font_size, sf::Color color,
+                                   bool center_text_x) {
     text.setString(display_text);
     text.setStyle(sf::Text::Regular);
     text.setColor(color);
-    text.setPosition(location);
     text.setCharacterSize(font_size);
+    if (center_text_x) {
+        text.setPosition(location.x - text.getLocalBounds().width/2.0, location.y);
+    } else {
+        text.setPosition(location);
+    }
+    //text.setOrigin(text.getLocalBounds().width/2.0, 0.0);
     text.setOrigin(0.0, 0.0);
     window->draw(text);
+
+    return text.getGlobalBounds();
 }
 
 /**
