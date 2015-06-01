@@ -40,3 +40,5 @@ CMakeCache.txt
 # Misc
 *.lnk
 Thumbs.db
+
+# Exclude from ignore
