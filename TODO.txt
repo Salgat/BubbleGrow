@@ -27,3 +27,5 @@ Notes:
 	- For CMAKE to work properly, you need to add to PATH the make.exe and 3 DLLs (winpthread, libc++6, etc). The easiest way to do this is to add 
 	  c:/mingw/bin to PATH and be sure to download and place make.exe in c:/mingw/bin. Perhpas easier to include make.exe and MinGW.7z in the project github for easy download?
 	- Perhaps add a flag for the executable to disable multithreading?
+	- For the walkthrough, remove all types, so "std::shared_ptr<Unit> FindUnit(uint64_t owner_id, uint64_t unit_id)" just becomes
+	  "FindUnit(owner_id, unit_id)", otherwise it looks far too messy to read. They can look at the actual headers to see the details.
