@@ -111,7 +111,7 @@ void Player::ProcessRequests(double duration) {
  */
 void Player::MakeDecisions(double duration) {
     for (auto& unit : units) {
-        if (unit.second->health[0] > 0)
+        if (unit.second->health[0] > 0 and (unit.second->action == ActionType::NONE or unit.second->action == ActionType::IDLE))
             unit.second->MakeDecision(unit_requests.find(unit.first)->second);
     }
 
