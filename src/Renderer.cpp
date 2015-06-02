@@ -51,6 +51,8 @@ Renderer::Renderer()
     // Load textures to be used by the game
     textures[ImageId::LOGO] = sf::Texture();
     textures[ImageId::LOGO].loadFromFile("../../data/artwork/logo.png");
+    textures[ImageId::BACKGROUND_MAIN_MENU] = sf::Texture();
+    textures[ImageId::BACKGROUND_MAIN_MENU].loadFromFile("../../data/artwork/MainMenuBackground.png");
     textures[ImageId::BUBBLE] = sf::Texture();
     textures[ImageId::BUBBLE].loadFromFile("../../data/artwork/bubble.png");
     textures[ImageId::BUBBLE_TYPES] = sf::Texture();
@@ -270,7 +272,7 @@ void Renderer::RenderImage(double scale, sf::Vector2f origin, double rotation, s
         position.x -= image.getLocalBounds().width/(2.0/scale);
     }
     if (center_y) {
-        position.x -= image.getLocalBounds().height/(2.0/scale);
+        position.y -= image.getLocalBounds().height/(2.0/scale);
     }
 
     image.setPosition(position.x, position.y);
@@ -343,7 +345,9 @@ void Renderer::RenderDirectionArrows() {
  * Renders the start menu (not the in-game menu).
  */
 void Renderer::RenderMenu() {
-    // Render Logo
+    // Background and Render Logo
+    RenderImage(0.45, sf::Vector2f(0.0, 0.0), 0.0, sf::Color::White, ImageId::BACKGROUND_MAIN_MENU,
+                sf::Vector2f(ResolutionX/2, ResolutionY/2), false, false, true, true);
     RenderImage(0.4, sf::Vector2f(0.0, 0.0), 0.0, sf::Color::White, ImageId::LOGO,
                 sf::Vector2f(ResolutionX/2, 75.0), false, false, true, false);
 

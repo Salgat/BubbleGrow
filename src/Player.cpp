@@ -28,10 +28,13 @@ Player::Player()
         entry.type = RequestType::NONE;
     }
 
+    // Initialize Random Generator
+    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    ++seed;
+    random_generator = std::mt19937(seed);
+
     // Choose a random symbol
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    static std::mt19937 random_generator(seed);
-    static std::uniform_real_distribution<> distribution_symbols(0, static_cast<int>(PlayerSymbol::TRIANGLE));
+    std::uniform_real_distribution<> distribution_symbols(0, static_cast<int>(PlayerSymbol::TRIANGLE));
     symbol = static_cast<PlayerSymbol>(distribution_symbols(random_generator));
 }
 
@@ -111,7 +114,7 @@ void Player::ProcessRequests(double duration) {
  */
 void Player::MakeDecisions(double duration) {
     for (auto& unit : units) {
-        if (unit.second->health[0] > 0)
+        if (unit.second->health[0] > 0 and (unit.second->action == ActionType::NONE or unit.second->action == ActionType::IDLE))
             unit.second->MakeDecision(unit_requests.find(unit.first)->second);
     }
 
@@ -142,8 +145,6 @@ void Player::RemoveExpiredUnits() {
  * Creates new units based on given parameters. This function is executed in a sequential manner (for thread-safety).
  */
 void Player::CreateUnits(int amount, UnitType type) {
-    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    static std::mt19937 gen(seed);
     std::uniform_real_distribution<> distribution_radius(0, wander_range);
     std::uniform_real_distribution<> distribution_angle(0, 2*PI);
 
@@ -165,8 +166,8 @@ void Player::CreateUnits(int amount, UnitType type) {
 
     number_of_units[static_cast<std::size_t>(type)] += amount;
     while (amount-- > 0) {
-        double random_radius = distribution_radius(gen);
-        double random_angle = distribution_angle(gen);
+        double random_radius = distribution_radius(random_generator);
+        double random_angle = distribution_angle(random_generator);
 
         // Initialize a new unit
         resources -= unit_resource_cost;
@@ -256,12 +257,10 @@ void Player::EasyAiDecision(double duration) {
  */
 sf::Vector2f Player::RandomWanderLocation() {
     // Choose a random angle (0 to 2*PI) and calculate position based off direction * wander_range
-    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    static std::mt19937 gen(seed);
     std::uniform_real_distribution<> dis(0, 2*PI);
-    double random_angle = dis(gen);
+    double random_angle = dis(random_generator);
     std::uniform_real_distribution<> dis2(0, world->map_radius);
-    double wander_range = dis2(gen);
+    double wander_range = dis2(random_generator);
 
     return sf::Vector2f(static_cast<float>(wander_range*std::cos(random_angle)),
                         static_cast<float>(wander_range*std::sin(random_angle)));

@@ -14,8 +14,7 @@ class World;
 
 class Player : public std::enable_shared_from_this<Player> {
 private:
-    inline double CalculateDistanceTo(sf::Vector2f target_position);
-    inline sf::Vector2f MoveTowards(sf::Vector2f destination, double distance);
+    std::mt19937 random_generator;
 
     // Player AI
     // Todo: Consider encapsulating the AI state and logic into a separate class
@@ -24,6 +23,9 @@ private:
 
     void MakePlayerDecision(double duration);
     void EasyAiDecision(double duration);
+
+    inline double CalculateDistanceTo(sf::Vector2f target_position);
+    inline sf::Vector2f MoveTowards(sf::Vector2f destination, double distance);
 
 public:
     // Player information
