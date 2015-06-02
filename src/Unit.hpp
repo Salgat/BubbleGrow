@@ -14,6 +14,8 @@ class World;
 
 class Unit {
 private:
+    std::mt19937 random_generator;
+
     inline double CalculateWalkSpeed();
     inline double CalculateAttackSpeed();
     inline int CalculateAttackDamage();

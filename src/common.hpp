@@ -109,6 +109,7 @@ enum ImageId {
 
 
     LOGO,
+    BACKGROUND_MAIN_MENU,
     HOTKEY_BAR,
     BUBBLE,
     BUBBLE_TYPES, // Sprite sheet for Bubble Units
@@ -408,13 +409,13 @@ UnitType const kFighter3UnitTypeCost = UnitType::FIGHTER_LV2;
 // Unit cost requirements (units/new unit)
 int const kBaseUnitCost = 0;
 int const kBase2UnitCost = 1;
-int const kBase3UnitCost = 2;
+int const kBase3UnitCost = 1;
 int const kGathererUnitCost = 1;
-int const kGatherer2UnitCost = 2;
-int const kGatherer3UnitCost = 3;
+int const kGatherer2UnitCost = 1;
+int const kGatherer3UnitCost = 1;
 int const kFighterUnitCost = 1;
-int const kFighter2UnitCost = 2;
-int const kFighter3UnitCost = 3;
+int const kFighter2UnitCost = 1;
+int const kFighter3UnitCost = 1;
 
 // Determines cost in resources of the unit type
 std::array<int const, static_cast<std::size_t>(UnitType::NONE)> const kResourceCost = {kBaseResourceCost,

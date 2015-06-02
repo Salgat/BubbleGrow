@@ -26,6 +26,11 @@ Unit::Unit()
 
     health[0] = kBaseMaxHealth;
     health[1] = kBaseMaxHealth;
+
+    // Initialize Random Generator
+    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    ++seed;
+    random_generator = std::mt19937(seed);
 }
 
 /**
@@ -168,12 +173,10 @@ inline double Unit::CalculateDistanceTo(sf::Vector2f target_position, bool use_o
  */
 inline sf::Vector2f Unit::RandomWanderLocation() {
     // Choose a random angle (0 to 2*PI) and calculate position based off direction * wander_range
-    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    static std::mt19937 gen(seed);
     std::uniform_real_distribution<> dis(0, 2*PI);
-    double random_angle = dis(gen);
+    double random_angle = dis(random_generator);
     std::uniform_real_distribution<> dis2(0, owner->wander_range);
-    double wander_range = dis2(gen);
+    double wander_range = dis2(random_generator);
 
     return sf::Vector2f(owner->position.x + static_cast<float>(wander_range*std::cos(random_angle)),
                         owner->position.y + static_cast<float>(wander_range*std::sin(random_angle)));
@@ -201,10 +204,6 @@ void Unit::WalkTo(sf::Vector2f destination, double duration, bool update_action)
  * Processes an attack (either a new attack, or an ongoing attack).
  */
 void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
-    // Initialize random function
-    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    static std::mt19937 gen(seed);
-
     auto target_unit = world->FindUnit(target_owner, target);
 
     if (action == ActionType::ATTACK) {
@@ -217,7 +216,7 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
             events.push(Event(EventType::BUBBLE_ATTACK, position));
         } else {
             std::uniform_real_distribution<> duration_distribution(duration * 0.6, duration * 1.4);
-            double random_duration = duration_distribution(gen);
+            double random_duration = duration_distribution(random_generator);
 
             action_duration += random_duration;
         }
@@ -247,10 +246,6 @@ void Unit::Attack(uint64_t target, uint64_t target_owner, double duration) {
  * Todo: This and Attack() are very similar; consider combining into a single function.
  */
 void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
-    // Initialize random function
-    static unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    static std::mt19937 gen(seed);
-
     auto target_unit = world->FindUnit(target_owner, target);
 
     if (action == ActionType::GATHER) {
@@ -269,7 +264,7 @@ void Unit::Gather(uint64_t target, uint64_t target_owner, double duration) {
             // reduction of resource bubbles (otherwise it looks really bad when a bunch of bubbles are gathering
             // the same resource).
             std::uniform_real_distribution<> duration_distribution(duration * 0.8, duration * 1.2);
-            double random_duration = duration_distribution(gen);
+            double random_duration = duration_distribution(random_generator);
 
             action_duration += random_duration;
         }
